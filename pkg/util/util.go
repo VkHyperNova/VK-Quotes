@@ -46,7 +46,7 @@ func CompileQuote(quote string, author string, language string) global.Quotes {
 	return global.Quotes{
 		ID:       FindUniqueID(),
 		QUOTE:    quote,
-		AUHTOR:   author,
+		AUTHOR:   author,
 		LANGUAGE: language,
 		DATE:     GetFormattedDate(),
 	}

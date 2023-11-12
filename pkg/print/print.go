@@ -42,9 +42,7 @@ func ClearScreen() {
 
 func PrintQuote(index int) {
 	PrintYellow(strconv.Itoa(global.DB[index].ID) + ". ")
-	// PrintYellow(global.DB[index].DATE + " ")
 	PrintYellow(global.DB[index].QUOTE + " ")
-	// PrintYellow(strconv.FormatBool(global.DB[index].COMPLETE))
 }
 
 func PrintQuotes() {
@@ -52,8 +50,10 @@ func PrintQuotes() {
 
 	for _, value := range global.DB {
 		PrintGray(strconv.Itoa(value.ID) + ". ")
-		PrintGreen("\"" + value.QUOTE + "\" ")
-		PrintYellow(value.AUHTOR + "\n")
-		// PrintCyan(value.LANGUAGE + "\n")
+		PrintCyan("Quote: \"")
+		PrintGreen(value.QUOTE + "\"")
+		PrintCyan(" By ")
+		PrintCyan(value.AUTHOR + "\n")
 	}
 }
+

@@ -1,17 +1,20 @@
 package database
 
 import (
-	"vk-quotes/pkg/util"
 	"vk-quotes/pkg/global"
 	"vk-quotes/pkg/print"
+	"vk-quotes/pkg/util"
 )
 
 func AddQuote() {
 	Quote := util.GetInput("Quote: ")
-	Auhtor := util.GetInput("Auhtor: ")
+	Author := util.GetInput("Auhtor: ")
+	if Author == "" {
+		Author = "Unknown"
+	}
 	Language := util.GetInput("Language: ")
 
-	NewQuote := util.CompileQuote(Quote, Auhtor, Language)
+	NewQuote := util.CompileQuote(Quote, Author, Language)
 	global.DB = append(global.DB, NewQuote)
 	SaveQuoteDatabase()
 }
@@ -34,14 +37,14 @@ func UpdateQuote(id int) {
 		}
 		UpdatedAuthor := util.GetInput("Update Author: ")
 		if UpdatedAuthor == "" {
-			UpdatedAuthor = global.DB[index].AUHTOR
+			UpdatedAuthor = global.DB[index].AUTHOR
 		}
 		UpdatedLanguage := util.GetInput("Update Language: ")
 		if UpdatedLanguage == "" {
 			UpdatedLanguage = global.DB[index].LANGUAGE
 		}
 		global.DB[index].QUOTE = UpdatedQuote
-		global.DB[index].AUHTOR = UpdatedAuthor
+		global.DB[index].AUTHOR = UpdatedAuthor
 		global.DB[index].LANGUAGE = UpdatedLanguage
 		SaveQuoteDatabase()
 		print.PrintGreen("Quote Updated!\n\n")

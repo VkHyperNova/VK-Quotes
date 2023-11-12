@@ -12,5 +12,26 @@
     "author": "",
     "language": "",
     "date": "12.11.2023"
+  },
+  {
+    "id": 3,
+    "quote": "one big sentences. is kety asd. norma porma lorma.",
+    "author": "Veikko",
+    "language": "english",
+    "date": "12.11.2023"
+  },
+  {
+    "id": 4,
+    "quote": "This is a sample string. It contains multiple sentences. Each will be printed on a separate line.",
+    "author": "asd",
+    "language": "ss",
+    "date": "12.11.2023"
+  },
+  {
+    "id": 5,
+    "quote": "asd asd asd",
+    "author": "Unknown",
+    "language": "udsd",
+    "date": "12.11.2023"
   }
 ]
