@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"vk-quotes/pkg/cmd"
+	"vk-quotes/pkg/print"
+	"vk-quotes/pkg/dir"
+)
 
 func main() {
-	fmt.Println("Hello vk qoutes!")
+	print.ClearScreen()
+	dir.ValidateRequiredFiles()
+	cmd.CMD()
 }
