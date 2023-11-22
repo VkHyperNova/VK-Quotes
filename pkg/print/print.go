@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strconv"
 	"vk-quotes/pkg/global"
+	"github.com/fatih/color" // bold tekst
 )
 
 func PrintCommands() {
@@ -24,7 +25,10 @@ func AddBrackets(name string) {
 }
 
 func PrintProgramStart() {
-	PrintCyan("\n<< VK-QUOTES " + global.Version + " >>\n")
+	green := color.New(color.FgGreen)
+    boldGreen := green.Add(color.Bold)
+    boldGreen.Println("\n<< VK-QUOTES " + global.Version + " >>")
+	// PrintCyan("\n<< VK-QUOTES " + global.Version + " >>\n")
 }
 
 func ClearScreen() {
