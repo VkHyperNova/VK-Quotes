@@ -1,11 +1,14 @@
 package print
 
 import (
+	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
+	"strings"
 	"vk-quotes/pkg/global"
+
 	"github.com/fatih/color" // bold tekst
 )
 
@@ -26,8 +29,8 @@ func AddBrackets(name string) {
 
 func PrintProgramStart() {
 	green := color.New(color.FgGreen)
-    boldGreen := green.Add(color.Bold)
-    boldGreen.Println("\n<< VK-QUOTES " + global.Version + " >>")
+	boldGreen := green.Add(color.Bold)
+	boldGreen.Println("\n<< VK-QUOTES " + global.Version + " >>")
 	// PrintCyan("\n<< VK-QUOTES " + global.Version + " >>\n")
 }
 
@@ -49,7 +52,7 @@ func PrintQuote(index int) {
 	PrintYellow(global.DB[index].QUOTE + " ")
 }
 
-func PrintQuotes() {
+func PrintAllQuotes() {
 	PrintCyan("\n\n<< Quotes >>\n")
 
 	for _, value := range global.DB {
@@ -61,3 +64,15 @@ func PrintQuotes() {
 	}
 }
 
+func PrintRandomQuote() {
+	randIndex := rand.Intn(len(global.DB))
+
+	for key, value := range global.DB {
+		if key == randIndex {
+			spaces := strings.Repeat(" ", len(value.QUOTE) - len(value.AUTHOR))
+			PrintGray("\n\"" + value.QUOTE + "\"")
+			PrintBlue("\n" + spaces + " By " + value.AUTHOR + "\n")
+		}
+
+	}
+}

@@ -13,12 +13,13 @@ func CMD() {
 
 	global.DB = database.LoadQuotesDatabase()
 
-	print.PrintQuotes()
-
 	print.PrintProgramStart()
+	print.PrintCyan("\nQuotes: " + strconv.Itoa(len(global.DB)) + "\n")
+	print.PrintRandomQuote()
 	print.PrintCommands()
 
-	print.AddBrackets(strconv.Itoa(len(global.DB)))
+	
+	
 	print.PrintCyan("=> ")
 
 	var cmd string = ""
