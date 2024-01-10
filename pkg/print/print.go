@@ -70,8 +70,9 @@ func PrintRandomQuote() {
 	for key, value := range global.DB {
 		if key == randIndex {
 			spaces := strings.Repeat(" ", len(value.QUOTE) - len(value.AUTHOR))
-			PrintGray("\n\"" + value.QUOTE + "\"")
-			PrintBlue("\n" + spaces + " By " + value.AUTHOR + "\n")
+			PrintCyan("\n(" + strconv.Itoa(value.ID) + ") ")
+			PrintGray("\"" + value.QUOTE + "\"")
+			PrintBlue("\n" + spaces + " By " + value.AUTHOR + " (" + value.DATE + ")\n")
 		}
 
 	}
