@@ -3,7 +3,6 @@ package util
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -45,12 +44,8 @@ func GetFormattedDate() string {
 	return time.Now().Format("02.01.2006")
 }
 
-func PressAnyKey() string {
-
+func PressAnyKey() {
 	PrintGray("\nPress Any Key To Continue...")
-
-	var user_input_string string
-	fmt.Scanln(&user_input_string)
-
-	return user_input_string
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
 }
