@@ -3,24 +3,17 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strconv"
-	"vk-quotes/pkg/database"
-	"vk-quotes/pkg/global"
-	"vk-quotes/pkg/print"
+	db "vk-quotes/pkg/db"
+	"vk-quotes/pkg/util"
 )
+
+var Version = "1.0"
 
 func CMD() {
 
-	global.DB = database.LoadQuotesDatabase()
+	db.DATABASE = db.LoadDB()
 
-	print.PrintProgramStart()
-	print.PrintCyan("\nQuotes: " + strconv.Itoa(len(global.DB)) + "\n")
-	print.PrintRandomQuote()
-	print.PrintCommands()
-
-	
-	
-	print.PrintCyan("=> ")
+	PrintVKQUOTES(Version)
 
 	var cmd string = ""
 	var id int = 0
@@ -30,19 +23,22 @@ func CMD() {
 	for {
 		switch cmd {
 		case "add":
-			database.AddQuote()
+			AddQuote()
 			CMD()
 		case "update":
-			database.UpdateQuote(id)
+			UpdateQuote(id)
 			CMD()
 		case "delete":
-			database.DeleteQuote(id)
+			DeleteQuote(id)
+			CMD()
+		case "showall":
+			PrintAllQuotes()
 			CMD()
 		case "q":
-			print.ClearScreen()
+			util.ClearScreen()
 			os.Exit(0)
 		default:
-			print.ClearScreen()
+			util.ClearScreen()
 			CMD()
 		}
 	}

@@ -2,13 +2,12 @@ package main
 
 import (
 	"vk-quotes/pkg/cmd"
-	"vk-quotes/pkg/print"
-	"vk-quotes/pkg/dir"
-	
+	"vk-quotes/pkg/util"	
+	db "vk-quotes/pkg/db"	
 )
 
 func main() {
-	print.ClearScreen()
-	dir.ValidateRequiredFiles()
+	util.ClearScreen()
+	db.ValidateRequiredFiles()
 	cmd.CMD()
 }
