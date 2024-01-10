@@ -25,7 +25,7 @@ func ClearScreen() {
 }
 
 func GetInput(inputName string) string {
-	PrintCyan(inputName)
+	PrintPurple(inputName)
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	NewTaskString := scanner.Text()
@@ -45,19 +45,9 @@ func GetFormattedDate() string {
 	return time.Now().Format("02.01.2006")
 }
 
-func Confirm() bool {
+func PressAnyKey() string {
 
-	user_input := Prompt("\n\nThis One?: ")
-
-	if user_input == "n" || user_input == "no" {
-		return false
-	}
-	return true
-}
-
-func Prompt(Question string) string {
-
-	PrintCyan(Question)
+	PrintGray("\nPress Any Key To Continue...")
 
 	var user_input_string string
 	fmt.Scanln(&user_input_string)

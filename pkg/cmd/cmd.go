@@ -22,16 +22,16 @@ func CMD() {
 
 	for {
 		switch cmd {
-		case "add":
-			AddQuote()
+		case "add", "a":
+			Add()
 			CMD()
-		case "update":
-			UpdateQuote(id)
+		case "update", "u":
+			Update(id)
 			CMD()
-		case "delete":
-			DeleteQuote(id)
+		case "delete", "d":
+			Delete(id)
 			CMD()
-		case "showall":
+		case "showall", "s":
 			PrintAllQuotes()
 			CMD()
 		case "q":

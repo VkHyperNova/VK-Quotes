@@ -6,6 +6,7 @@ import (
 	"strings"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
+
 	"github.com/fatih/color"
 )
 
@@ -19,7 +20,6 @@ func PrintVKQUOTES(Version string) {
 	if len(db.DATABASE) > 0 {
 		PrintRandomQuote()
 	}
-	
 
 	util.PrintGray("\n")
 	Commands := [5]string{"add", "update", "delete", "showall", "q"}
@@ -36,33 +36,29 @@ func PrintBrackets(name string) {
 }
 
 func PrintQuote(index int) {
-	util.PrintYellow(strconv.Itoa(db.DATABASE[index].ID) + ". ")
-	util.PrintYellow(db.DATABASE[index].QUOTE + " ")
+	spaces := strings.Repeat(" ", len(db.DATABASE[index].QUOTE)-len(db.DATABASE[index].AUTHOR))
+	util.PrintBlue("\n(" + strconv.Itoa(db.DATABASE[index].ID) + ") ")
+	util.PrintGray("\"" + db.DATABASE[index].QUOTE + "\"")
+	util.PrintCyan("\n" + spaces + " By " + db.DATABASE[index].AUTHOR + " (" + db.DATABASE[index].DATE + ")\n")
 }
 
 func PrintAllQuotes() {
-	util.PrintCyan("\n\n<< Quotes >>\n")
+	util.PrintCyan("\n\n<< All Quotes >>\n")
 
-	for _, value := range db.DATABASE {
-		util.PrintGray(strconv.Itoa(value.ID) + ". ")
-		util.PrintCyan("Quote: \"")
-		util.PrintGreen(value.QUOTE + "\"")
-		util.PrintCyan(" By ")
-		util.PrintCyan(value.AUTHOR + "\n")
+	for key := range db.DATABASE {
+		PrintQuote(key)
 	}
-	util.Prompt("\nPress any key to return to CMD\n")
+	util.PressAnyKey()
+	util.ClearScreen()
 }
 
 func PrintRandomQuote() {
 
 	randIndex := rand.Intn(len(db.DATABASE))
 
-	for key, value := range db.DATABASE {
+	for key := range db.DATABASE {
 		if key == randIndex {
-			spaces := strings.Repeat(" ", len(value.QUOTE)-len(value.AUTHOR))
-			util.PrintBlue("\n(" + strconv.Itoa(value.ID) + ") ")
-			util.PrintGray("\"" + value.QUOTE + "\"")
-			util.PrintBlue("\n" + spaces + " By " + value.AUTHOR + " (" + value.DATE + ")\n")
+			PrintQuote(key)
 		}
 
 	}

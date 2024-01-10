@@ -17,9 +17,10 @@ type Quotes struct {
 	DATE     string `json:"date"`
 }
 
-func SaveDB() {
+func SaveDB(action string) {
 	DatabaseAsByte := util.InterfaceToByte(DATABASE)
 	util.WriteDataToFile(DatabasePath, DatabaseAsByte)
+	util.PrintGreen("\n" + action + "\n")
 }
 
 func LoadDB() []Quotes {
@@ -78,4 +79,13 @@ func SearchIndexByID(id int) int {
 	}
 
 	return index
+}
+
+func CheckDublicates(quote string) int {
+	for _, value := range DATABASE {
+		if value.QUOTE == quote {
+			return SearchIndexByID(value.ID)
+		}
+	}
+	return -1
 }

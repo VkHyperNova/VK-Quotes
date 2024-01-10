@@ -5,8 +5,16 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-func AddQuote() {
+func Add() {
 	Quote := util.GetInput("Quote: ")
+
+	if db.CheckDublicates(Quote) != -1 {
+		util.PrintRed("\n<< This quote is in the database >>\n")
+		PrintQuote(db.CheckDublicates(Quote))
+		util.PressAnyKey()
+		util.ClearScreen()
+		CMD()
+	}
 	Author := util.GetInput("Auhtor: ")
 	if Author == "" {
 		Author = "Unknown"
@@ -15,22 +23,20 @@ func AddQuote() {
 
 	NewQuote := db.CompileQuote(Quote, Author, Language)
 	db.DATABASE = append(db.DATABASE, NewQuote)
-	db.SaveDB()
+	db.SaveDB("Quote added!")
+
+	util.PressAnyKey()
+	util.ClearScreen()
 }
 
-func UpdateQuote(id int) {
+func Update(id int) {
 	index := db.SearchIndexByID(id)
-	confirm := false
 
 	if index == -1 {
 		util.PrintRed("\nIndex out of range!\n")
 	} else {
 		PrintQuote(index)
-		confirm = util.Confirm()
-	}
-
-	if confirm {
-		UpdatedQuote := util.GetInput("Update Quote: ")
+		UpdatedQuote := util.GetInput("\nUpdate Quote: ")
 		if UpdatedQuote == "" {
 			UpdatedQuote = db.DATABASE[index].QUOTE
 		}
@@ -45,17 +51,13 @@ func UpdateQuote(id int) {
 		db.DATABASE[index].QUOTE = UpdatedQuote
 		db.DATABASE[index].AUTHOR = UpdatedAuthor
 		db.DATABASE[index].LANGUAGE = UpdatedLanguage
-		db.SaveDB()
-		util.PrintGreen("Quote Updated!\n\n")
-	} else {
-		util.PrintGreen("Returning../\n\n")
+		db.SaveDB("Quote updated!")
 	}
-
+	util.PressAnyKey()
 	util.ClearScreen()
 }
 
-func DeleteQuote(id int) {
-	confirm := false
+func Delete(id int) {
 
 	index := db.SearchIndexByID(id)
 
@@ -63,16 +65,9 @@ func DeleteQuote(id int) {
 		util.PrintRed("\nIndex out of range!\n")
 	} else {
 		PrintQuote(index)
-		confirm = util.Confirm()
-	}
-
-	if confirm {
 		db.DATABASE = append(db.DATABASE[:index], db.DATABASE[index+1:]...)
-		db.SaveDB()
-		util.PrintGreen("Quote deleted!\n\n")
-	} else {
-		util.PrintGreen("Returning../\n\n")
+		db.SaveDB("Quote deleted!")
 	}
-
+	util.PressAnyKey()
 	util.ClearScreen()
 }
