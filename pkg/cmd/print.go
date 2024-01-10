@@ -15,7 +15,11 @@ func PrintVKQUOTES(Version string) {
 	boldGreen.Println("\n<< VK-QUOTES " + Version + " >>")
 
 	util.PrintCyan("\nQuotes: " + strconv.Itoa(len(db.DATABASE)) + "\n")
-	PrintRandomQuote()
+
+	if len(db.DATABASE) > 0 {
+		PrintRandomQuote()
+	}
+	
 
 	util.PrintGray("\n")
 	Commands := [5]string{"add", "update", "delete", "showall", "q"}
@@ -50,6 +54,7 @@ func PrintAllQuotes() {
 }
 
 func PrintRandomQuote() {
+
 	randIndex := rand.Intn(len(db.DATABASE))
 
 	for key, value := range db.DATABASE {
