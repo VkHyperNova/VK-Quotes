@@ -8,6 +8,7 @@ import (
 var DATABASE []Quotes
 
 var DatabasePath = "./database/quotes.json"
+var LastAdd = -1
 
 type Quotes struct {
 	ID       int    `json:"id"`
@@ -48,9 +49,11 @@ func FindUniqueID() int {
 }
 
 func CompileQuote(quote string, author string, language string) Quotes {
+	uniqueID := FindUniqueID()
+	LastAdd = uniqueID
 
 	return Quotes{
-		ID:       FindUniqueID(),
+		ID:       uniqueID,
 		QUOTE:    quote,
 		AUTHOR:   author,
 		LANGUAGE: language,
