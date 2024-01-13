@@ -24,7 +24,7 @@ func PrintVKQUOTES(Version string) {
 	}
 
 	util.PrintGray("\n")
-	Commands := [5]string{"add", "update", "delete", "showall", "q"}
+	Commands := [6]string{"add", "update", "delete", "showall", "stats", "q"}
 	for _, value := range Commands {
 		PrintBrackets(value)
 	}
@@ -42,7 +42,7 @@ func PrintQuote(index int) {
 	if len(db.DATABASE[index].QUOTE)-len(db.DATABASE[index].AUTHOR) >= 10 {
 		spaces = strings.Repeat(" ", len(db.DATABASE[index].QUOTE)-len(db.DATABASE[index].AUTHOR))
 	}
-	
+
 	util.PrintBlue("\n(" + strconv.Itoa(db.DATABASE[index].ID) + ") ")
 	util.PrintGray("\"" + db.DATABASE[index].QUOTE + "\"")
 	util.PrintCyan("\n" + spaces + " By " + db.DATABASE[index].AUTHOR + " (" + db.DATABASE[index].DATE + ")\n")
@@ -56,6 +56,7 @@ func PrintAllQuotes() {
 	}
 	util.PressAnyKey()
 	util.ClearScreen()
+	CMD()
 }
 
 func PrintRandomQuote() {
@@ -73,16 +74,56 @@ func PrintRandomQuote() {
 func PrintStatistics() {
 	util.PrintCyan("\n\n<< Statistics >>\n")
 
+	// Get all authors
 	var authors []string
-
 	for _, value := range db.DATABASE {
 		if !util.Contains(authors, value.AUTHOR) {
 			authors = append(authors, value.AUTHOR)
 		}
 	}
 
-	for _, value := range authors {
-		util.PrintGray(value)
+	// Count quotes by author
+	myMap := make(map[string]int)
+
+	for _, author := range authors {
+		for _, value := range db.DATABASE {
+			if value.AUTHOR == author {
+				myMap[author] += 1
+			}
+		}
 	}
+
+	// Print stats by author
+	for author, count := range myMap {
+		util.PrintGray(author + ": " + strconv.Itoa(count) + "\n")
+	}
+
+	// Get all languages
+	var languages []string
+	for _, value := range db.DATABASE {
+		if !util.Contains(languages, value.LANGUAGE) {
+			languages = append(languages, value.LANGUAGE)
+		}
+	}
+
+	myMap2 := make(map[string]int)
+
+	for _, language := range languages {
+		for _, value := range db.DATABASE {
+			if value.LANGUAGE == language {
+				myMap2[language] += 1
+			}
+		}
+	}
+
+	// Print stats by language
+	for language, count := range myMap2 {
+		util.PrintGray(language + ": " + strconv.Itoa(count) + "\n")
+	}
+
+
+
 	util.PressAnyKey()
+	util.ClearScreen()
+	CMD()
 }

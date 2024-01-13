@@ -24,19 +24,14 @@ func CMD() {
 		switch cmd {
 		case "add", "a":
 			Add()
-			CMD()
 		case "update", "u":
 			Update(id)
-			CMD()
 		case "delete", "d":
 			Delete(id)
-			CMD()
 		case "showall", "s":
 			PrintAllQuotes()
-			CMD()
 		case "stats":
 			PrintStatistics()
-			CMD()
 		case "q":
 			util.ClearScreen()
 			os.Exit(0)

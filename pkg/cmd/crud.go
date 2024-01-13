@@ -27,6 +27,7 @@ func Add() {
 
 	util.PressAnyKey()
 	util.ClearScreen()
+	CMD()
 }
 
 func Update(id int) {
@@ -55,6 +56,7 @@ func Update(id int) {
 	}
 	util.PressAnyKey()
 	util.ClearScreen()
+	CMD()
 }
 
 func Delete(id int) {
@@ -70,4 +72,5 @@ func Delete(id int) {
 	}
 	util.PressAnyKey()
 	util.ClearScreen()
+	CMD()
 }
