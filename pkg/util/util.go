@@ -49,3 +49,12 @@ func PressAnyKey() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 }
+
+func Contains(arr []string, name string) bool {
+	for _, n := range arr {
+		if n == name {
+			return true
+		}
+	}
+	return false
+}

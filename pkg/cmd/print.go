@@ -38,7 +38,11 @@ func PrintBrackets(name string) {
 }
 
 func PrintQuote(index int) {
-	spaces := strings.Repeat(" ", len(db.DATABASE[index].QUOTE)-len(db.DATABASE[index].AUTHOR))
+	spaces := strings.Repeat(" ", 5)
+	if len(db.DATABASE[index].QUOTE)-len(db.DATABASE[index].AUTHOR) >= 10 {
+		spaces = strings.Repeat(" ", len(db.DATABASE[index].QUOTE)-len(db.DATABASE[index].AUTHOR))
+	}
+	
 	util.PrintBlue("\n(" + strconv.Itoa(db.DATABASE[index].ID) + ") ")
 	util.PrintGray("\"" + db.DATABASE[index].QUOTE + "\"")
 	util.PrintCyan("\n" + spaces + " By " + db.DATABASE[index].AUTHOR + " (" + db.DATABASE[index].DATE + ")\n")
@@ -64,4 +68,21 @@ func PrintRandomQuote() {
 		}
 
 	}
+}
+
+func PrintStatistics() {
+	util.PrintCyan("\n\n<< Statistics >>\n")
+
+	var authors []string
+
+	for _, value := range db.DATABASE {
+		if !util.Contains(authors, value.AUTHOR) {
+			authors = append(authors, value.AUTHOR)
+		}
+	}
+
+	for _, value := range authors {
+		util.PrintGray(value)
+	}
+	util.PressAnyKey()
 }

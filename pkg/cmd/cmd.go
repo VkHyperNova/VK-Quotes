@@ -34,6 +34,9 @@ func CMD() {
 		case "showall", "s":
 			PrintAllQuotes()
 			CMD()
+		case "stats":
+			PrintStatistics()
+			CMD()
 		case "q":
 			util.ClearScreen()
 			os.Exit(0)
