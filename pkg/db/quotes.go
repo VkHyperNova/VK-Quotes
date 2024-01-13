@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"strings"
 	"vk-quotes/pkg/util"
 )
 
@@ -86,7 +87,7 @@ func SearchIndexByID(id int) int {
 
 func CheckDublicates(quote string) int {
 	for _, value := range DATABASE {
-		if value.QUOTE == quote {
+		if strings.EqualFold(value.QUOTE, quote) {
 			return SearchIndexByID(value.ID)
 		}
 	}
