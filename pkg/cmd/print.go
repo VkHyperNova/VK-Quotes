@@ -17,12 +17,8 @@ func PrintVKQUOTES(Version string) {
 
 	util.PrintCyan("\nQuotes: " + strconv.Itoa(len(db.DATABASE)) + "\n")
 
-	// if len(db.DATABASE) > 0 && db.LastAdd == -1 {
-	// 	PrintRandomQuote()
-	// }
-
-	if db.LastAdd != -1 {
-		PrintQuote(db.SearchIndexByID(db.LastAdd))
+	if db.SearchIndexByID(db.LastAddID) != -1 {
+		PrintQuote(db.SearchIndexByID(db.LastAddID))
 	} else if len(db.DATABASE) > 0 {
 		PrintRandomQuote()
 	}
