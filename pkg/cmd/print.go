@@ -8,6 +8,7 @@ import (
 	"vk-quotes/pkg/util"
 
 	"github.com/fatih/color"
+	
 )
 
 func PrintVKQUOTES(Version string) {
@@ -71,57 +72,22 @@ func PrintRandomQuote() {
 	}
 }
 
+func PrintMap(m map[string]int) {
+	for name, count := range m {
+		util.PrintGray(name + ": " + strconv.Itoa(count) + "\n")
+	}
+}
+
 func PrintStatistics() {
 	util.PrintCyan("\n\n<< Statistics >>\n")
 
-	// Get all authors
-	var authors []string
-	for _, value := range db.DATABASE {
-		if !util.Contains(authors, value.AUTHOR) {
-			authors = append(authors, value.AUTHOR)
-		}
-	}
+	authors := db.SortNames("authors")
+	authorsMap := db.CountNames("authors", authors)
+	PrintMap(authorsMap)
 
-	// Count quotes by author
-	myMap := make(map[string]int)
-
-	for _, author := range authors {
-		for _, value := range db.DATABASE {
-			if value.AUTHOR == author {
-				myMap[author] += 1
-			}
-		}
-	}
-
-	// Print stats by author
-	for author, count := range myMap {
-		util.PrintGray(author + ": " + strconv.Itoa(count) + "\n")
-	}
-
-	// Get all languages
-	var languages []string
-	for _, value := range db.DATABASE {
-		if !util.Contains(languages, value.LANGUAGE) {
-			languages = append(languages, value.LANGUAGE)
-		}
-	}
-
-	myMap2 := make(map[string]int)
-
-	for _, language := range languages {
-		for _, value := range db.DATABASE {
-			if value.LANGUAGE == language {
-				myMap2[language] += 1
-			}
-		}
-	}
-
-	// Print stats by language
-	for language, count := range myMap2 {
-		util.PrintGray(language + ": " + strconv.Itoa(count) + "\n")
-	}
-
-
+	languages := db.SortNames("languages")
+	languagesMap := db.CountNames("languages", languages)
+	PrintMap(languagesMap)
 
 	util.PressAnyKey()
 	util.ClearScreen()

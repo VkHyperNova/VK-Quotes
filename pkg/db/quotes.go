@@ -94,4 +94,46 @@ func CheckDublicates(quote string) int {
 	return -1
 }
 
+func SortNames(s string) []string {
 
+	var names []string
+
+	for _, value := range DATABASE {
+
+		field := value.LANGUAGE
+		
+		if s == "authors" {
+			field = value.AUTHOR
+		}
+
+		if !util.Contains(names, field) {
+			names = append(names, field)
+		}
+
+	}
+
+	return names
+}
+
+func CountNames(s string, names []string) map[string]int {
+
+	myMap := make(map[string]int)
+
+	for _, name := range names {
+
+		for _, value := range DATABASE {
+
+			field := value.LANGUAGE
+
+			if s == "authors" {
+				field = value.AUTHOR
+			}
+
+			if field == name {
+				myMap[name] += 1
+			}	
+		}
+	}
+
+	return myMap
+}
