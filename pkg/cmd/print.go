@@ -72,22 +72,26 @@ func PrintRandomQuote() {
 	}
 }
 
-func PrintMap(m map[string]int) {
+func PrintMap(m map[string]int, n string) {
+
+	util.PrintCyan("\n< " + n + " >\n\n")
 	for name, count := range m {
-		util.PrintGray(name + ": " + strconv.Itoa(count) + "\n")
+		util.PrintGray("[" + strconv.Itoa(count) + "] ")
+		util.PrintGreen(name + "\n")
+		
 	}
 }
 
 func PrintStatistics() {
-	util.PrintCyan("\n\n<< Statistics >>\n")
+	util.PrintCyan("\n\n\t<< Statistics >>\n")
 
 	authors := db.SortNames("authors")
 	authorsMap := db.CountNames("authors", authors)
-	PrintMap(authorsMap)
+	PrintMap(authorsMap, "Authors")
 
 	languages := db.SortNames("languages")
 	languagesMap := db.CountNames("languages", languages)
-	PrintMap(languagesMap)
+	PrintMap(languagesMap, "Languages")
 
 	util.PressAnyKey()
 	util.ClearScreen()
