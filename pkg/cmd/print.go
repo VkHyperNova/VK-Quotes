@@ -20,6 +20,7 @@ func PrintVKQUOTES(Version string) {
 
 	if db.SearchIndexByID(db.LastAddID) != -1 {
 		PrintQuote(db.SearchIndexByID(db.LastAddID))
+		db.LastAddID = -1
 	} else if len(db.DATABASE) > 0 {
 		PrintRandomQuote()
 	}

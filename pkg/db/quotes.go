@@ -7,8 +7,6 @@ import (
 )
 
 var DATABASE []Quotes
-
-var DatabasePath = "./database/quotes.json"
 var LastAddID = -1
 
 type Quotes struct {
@@ -19,20 +17,20 @@ type Quotes struct {
 	DATE     string `json:"date"`
 }
 
-func SaveDB(action string) {
+func SaveDB(DatabasePath string) string {
 	DatabaseAsByte := util.InterfaceToByte(DATABASE)
 	util.WriteDataToFile(DatabasePath, DatabaseAsByte)
-	util.PrintGreen("\n" + action + "\n")
+	return "Database Updated!"
 }
 
-func LoadDB() []Quotes {
+func LoadDB(DatabasePath string) []Quotes {
 	file := util.ReadFile(DatabasePath)
 	data := GetQuotesArray(file)
 
 	return data
 }
 
-func ValidateRequiredFiles() {
+func ValidateRequiredFiles(DatabasePath string) {
 	if !util.DoesDirectoryExist(DatabasePath) {
 		util.CreateDirectory("database")
 		util.WriteDataToFile(DatabasePath, []byte("[]"))
@@ -50,6 +48,7 @@ func FindUniqueID() int {
 }
 
 func CompileQuote(quote string, author string, language string) Quotes {
+	
 	uniqueID := FindUniqueID()
 	LastAddID = uniqueID
 

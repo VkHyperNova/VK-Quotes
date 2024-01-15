@@ -14,9 +14,6 @@ func ReadFile(filename string) []byte {
 	HandleError(err)
 	return file
 }
-
-
-
 func CreateDirectory(dir_name string) {
 	_ = os.Mkdir(dir_name, 0700)
 }

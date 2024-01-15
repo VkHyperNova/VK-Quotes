@@ -8,10 +8,12 @@ import (
 )
 
 var Version = "1.0"
+var DatabasePath = "./database/quotes.json"
 
 func CMD() {
 
-	db.DATABASE = db.LoadDB()
+	db.ValidateRequiredFiles(DatabasePath)
+	db.DATABASE = db.LoadDB(DatabasePath)
 
 	PrintVKQUOTES(Version)
 
@@ -23,11 +25,15 @@ func CMD() {
 	for {
 		switch cmd {
 		case "add", "a":
-			Add()
+			Quote, Author, Language := Ask()
+			Add(Quote, Author, Language, DatabasePath)
+			util.PressAnyKey()
+			util.ClearScreen()
+			CMD()
 		case "update", "u":
-			Update(id)
+			Update(id, DatabasePath)
 		case "delete", "d":
-			Delete(id)
+			Delete(id, DatabasePath)
 		case "showall", "s":
 			PrintAllQuotes()
 		case "stats":
