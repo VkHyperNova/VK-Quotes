@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"math/rand"
+	"sort"
 	"strconv"
 	"strings"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 
 	"github.com/fatih/color"
-	
 )
 
 func PrintVKQUOTES(Version string) {
@@ -73,28 +73,46 @@ func PrintRandomQuote() {
 	}
 }
 
-func PrintMap(m map[string]int, n string) {
-
-	util.PrintCyan("\n< " + n + " >\n\n")
-	for name, count := range m {
-		util.PrintGray("[" + strconv.Itoa(count) + "] ")
-		util.PrintGreen(name + "\n")
-		
-	}
-}
-
 func PrintStatistics() {
 	util.PrintCyan("\n\n\t<< Statistics >>\n")
 
 	authors := db.SortNames("authors")
 	authorsMap := db.CountNames("authors", authors)
-	PrintMap(authorsMap, "Authors")
+	PrintSortedMap(authorsMap, "Authors")
+
+	// PrintMap(authorsMap, "Authors")
 
 	languages := db.SortNames("languages")
 	languagesMap := db.CountNames("languages", languages)
-	PrintMap(languagesMap, "Languages")
+	PrintSortedMap(languagesMap, "Languages")
 
 	util.PressAnyKey()
 	util.ClearScreen()
 	CMD()
+}
+
+func PrintSortedMap(myMap map[string]int, name string) {
+
+	// Make Pairs
+	type pair struct {
+		name  string
+		count int
+	}
+
+	var pairs []pair
+	for key, value := range myMap {
+		pairs = append(pairs, pair{key, value})
+	}
+
+	// Sort Pairs
+	sort.Slice(pairs, func(i, j int) bool {
+		return pairs[i].count > pairs[j].count
+	})
+
+	// Print Pairs
+	util.PrintCyan("\n< " + name + " >\n\n")
+	for _, pair := range pairs {
+		util.PrintGray("[" + strconv.Itoa(pair.count) + "] ")
+		util.PrintGreen(pair.name + "\n")
+	}
 }
