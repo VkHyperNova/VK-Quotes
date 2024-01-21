@@ -25,15 +25,16 @@ func CMD() {
 	for {
 		switch cmd {
 		case "add", "a":
-			Quote, Author, Language := Ask()
-			Add(Quote, Author, Language, DatabasePath)
-			util.PressAnyKey()
-			util.ClearScreen()
-			CMD()
+			quote, author, language := Ask()
+			Add(quote, author, language, DatabasePath)
+			ReturnToCMD()
 		case "update", "u":
-			Update(id, DatabasePath)
+			quote, author, language := Ask()
+			Update(id, quote, author, language, DatabasePath)
+			ReturnToCMD()
 		case "delete", "d":
 			Delete(id, DatabasePath)
+			ReturnToCMD()
 		case "showall", "s":
 			PrintAllQuotes()
 		case "stats":
@@ -47,3 +48,4 @@ func CMD() {
 		}
 	}
 }
+

@@ -18,9 +18,9 @@ func PrintVKQUOTES(Version string) {
 
 	util.PrintCyan("\nQuotes: " + strconv.Itoa(len(db.DATABASE)) + "\n")
 
-	if db.SearchIndexByID(db.LastAddID) != -1 {
-		PrintQuote(db.SearchIndexByID(db.LastAddID))
-		db.LastAddID = -1
+	if db.SearchIndexByID(db.LastItemID) != -1 {
+		PrintQuote(db.SearchIndexByID(db.LastItemID))
+		db.LastItemID = -1
 	} else if len(db.DATABASE) > 0 {
 		PrintRandomQuote()
 	}
@@ -76,13 +76,13 @@ func PrintRandomQuote() {
 func PrintStatistics() {
 	util.PrintCyan("\n\n\t<< Statistics >>\n")
 
-	authors := db.SortNames("authors")
+	authors := db.GetAllNames("authors")
 	authorsMap := db.CountNames("authors", authors)
 	PrintSortedMap(authorsMap, "Authors")
 
 	// PrintMap(authorsMap, "Authors")
 
-	languages := db.SortNames("languages")
+	languages := db.GetAllNames("languages")
 	languagesMap := db.CountNames("languages", languages)
 	PrintSortedMap(languagesMap, "Languages")
 
