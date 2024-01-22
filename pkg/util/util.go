@@ -58,3 +58,11 @@ func Contains(arr []string, name string) bool {
 	}
 	return false
 }
+
+func FillEmptyInput(a, b string) string {
+	if a == "" {
+		a = b
+	}
+
+	return a
+}

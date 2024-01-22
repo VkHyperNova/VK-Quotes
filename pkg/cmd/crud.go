@@ -6,27 +6,22 @@ import (
 )
 
 func Ask() (string, string, string) {
-	Quote := util.GetInput("Quote: ")
-	if db.CheckDublicates(Quote) != -1 {
+
+	quote := util.GetInput("Quote: ")
+
+	if db.CheckDublicates(quote) != -1 {
 		util.PrintRed("\n<< This quote is in the database >>\n")
-		PrintQuote(db.CheckDublicates(Quote))
-		util.PressAnyKey()
-		util.ClearScreen()
-		CMD()
+		PrintQuote(db.CheckDublicates(quote))
+		ReturnToCMD()
 	}
 
-	Author := util.GetInput("Auhtor: ")
-	if Author == "" {
-		Author = "Unknown"
-	}
+	author := util.GetInput("Auhtor: ")
+	language := util.GetInput("Language: ")
 
-	Language := util.GetInput("Language: ")
-	if Language == "" {
-		Language = "Unknown"
-	}
-
-	return Quote, Author, Language
+	return quote, author, language
 }
+
+
 
 func Add(quote, author, language, databasePath string) bool {
 
@@ -40,9 +35,9 @@ func Add(quote, author, language, databasePath string) bool {
 
 	NewQuote := db.Quotes{
 		ID:       uniqueID,
-		QUOTE:    quote,
-		AUTHOR:   author,
-		LANGUAGE: language,
+		QUOTE:    util.FillEmptyInput(quote, "Unknown"),
+		AUTHOR:   util.FillEmptyInput(author, "Unknown"),
+		LANGUAGE: util.FillEmptyInput(language, "Unknown"),
 		DATE:     util.GetFormattedDate(),
 	}
 
@@ -52,57 +47,38 @@ func Add(quote, author, language, databasePath string) bool {
 	return true
 }
 
-func Update(updatedID int, updatedQuote, updatedAuthor, updatedLanguage, DatabasePath string) bool {
+func Update(updateID int, updatedQuote, updatedAuthor, updatedLanguage, DatabasePath string) bool {
 
-	index := db.SearchIndexByID(updatedID)
+	db.LastItemID = updateID
+
+	index := db.SearchIndexByID(updateID)
 
 	if index == -1 {
 		util.PrintRed("\nIndex out of range!\n")
-		return false
+		ReturnToCMD()
 	}
 
-	PrintQuote(index)
-	db.LastItemID = updatedID
-
-	if updatedQuote == "" {
-		updatedQuote = db.DATABASE[index].QUOTE
-	}
-
-	if updatedAuthor == "" {
-		updatedAuthor = db.DATABASE[index].AUTHOR
-	}
-
-	if updatedLanguage == "" {
-		updatedLanguage = db.DATABASE[index].LANGUAGE
-	}
-
-	db.DATABASE[index].QUOTE = updatedQuote
-	db.DATABASE[index].AUTHOR = updatedAuthor
-	db.DATABASE[index].LANGUAGE = updatedLanguage
-
+	db.DATABASE[index].QUOTE = util.FillEmptyInput(updatedQuote, db.DATABASE[index].QUOTE)
+	db.DATABASE[index].AUTHOR = util.FillEmptyInput(updatedAuthor, db.DATABASE[index].AUTHOR)
+	db.DATABASE[index].LANGUAGE = util.FillEmptyInput(updatedLanguage, db.DATABASE[index].LANGUAGE)
+	
 	db.SaveDB(DatabasePath)
 
 	return true
 }
 
 func Delete(deleteID int, DatabasePath string) bool {
-
 	index := db.SearchIndexByID(deleteID)
 
 	if index == -1 {
 		util.PrintRed("\nIndex out of range!\n")
-		return false
+		ReturnToCMD()
 	}
 
-	PrintQuote(index)
 	db.DATABASE = append(db.DATABASE[:index], db.DATABASE[index+1:]...)
 	db.SaveDB(DatabasePath)
 
 	return true
 }
 
-func ReturnToCMD() {
-	util.PressAnyKey()
-	util.ClearScreen()
-	CMD()
-}
+

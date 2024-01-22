@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"math/rand"
 	"sort"
 	"strconv"
@@ -15,6 +16,7 @@ func PrintVKQUOTES(Version string) {
 	green := color.New(color.FgGreen)
 	boldGreen := green.Add(color.Bold)
 	boldGreen.Println("\n<< VK-QUOTES " + Version + " >>")
+	fmt.Println("LastID: ", db.LastItemID)
 
 	util.PrintCyan("\nQuotes: " + strconv.Itoa(len(db.DATABASE)) + "\n")
 
@@ -56,9 +58,7 @@ func PrintAllQuotes() {
 	for key := range db.DATABASE {
 		PrintQuote(key)
 	}
-	util.PressAnyKey()
-	util.ClearScreen()
-	CMD()
+	ReturnToCMD()
 }
 
 func PrintRandomQuote() {
@@ -86,9 +86,7 @@ func PrintStatistics() {
 	languagesMap := db.CountNames("languages", languages)
 	PrintSortedMap(languagesMap, "Languages")
 
-	util.PressAnyKey()
-	util.ClearScreen()
-	CMD()
+	ReturnToCMD()
 }
 
 func PrintSortedMap(myMap map[string]int, name string) {
@@ -115,4 +113,10 @@ func PrintSortedMap(myMap map[string]int, name string) {
 		util.PrintGray("[" + strconv.Itoa(pair.count) + "] ")
 		util.PrintGreen(pair.name + "\n")
 	}
+}
+
+func ReturnToCMD() {
+	util.PressAnyKey()
+	util.ClearScreen()
+	CMD()
 }

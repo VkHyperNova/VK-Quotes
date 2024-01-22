@@ -7,7 +7,7 @@ import (
 )
 
 var DATABASE []Quotes
-var LastAddID = -1
+var LastItemID = -1
 
 type Quotes struct {
 	ID       int    `json:"id"`
@@ -47,20 +47,6 @@ func FindUniqueID() int {
 	return DATABASE[len(DATABASE)-1].ID + 1
 }
 
-func CompileQuote(quote string, author string, language string) Quotes {
-	
-	uniqueID := FindUniqueID()
-	LastAddID = uniqueID
-
-	return Quotes{
-		ID:       uniqueID,
-		QUOTE:    quote,
-		AUTHOR:   author,
-		LANGUAGE: language,
-		DATE:     util.GetFormattedDate(),
-	}
-}
-
 func GetQuotesArray(body []byte) []Quotes {
 
 	QuotesStruct := []Quotes{}
@@ -75,8 +61,8 @@ func SearchIndexByID(id int) int {
 
 	index := -1
 
-	for key, website := range DATABASE {
-		if id == website.ID {
+	for key, value := range DATABASE {
+		if id == value.ID {
 			index = key
 		}
 	}
@@ -93,14 +79,14 @@ func CheckDublicates(quote string) int {
 	return -1
 }
 
-func SortNames(s string) []string {
+func GetAllNames(s string) []string {
 
 	var names []string
 
 	for _, value := range DATABASE {
 
 		field := value.LANGUAGE
-		
+
 		if s == "authors" {
 			field = value.AUTHOR
 		}
@@ -130,7 +116,7 @@ func CountNames(s string, names []string) map[string]int {
 
 			if field == name {
 				myMap[name] += 1
-			}	
+			}
 		}
 	}
 
