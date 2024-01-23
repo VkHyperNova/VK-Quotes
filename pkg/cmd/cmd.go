@@ -9,36 +9,48 @@ import (
 
 var Version = "1.0"
 var DatabasePath = "./database/quotes.json"
+var LastItemIndex = -1
 
 func CMD() {
 
 	db.ValidateRequiredFiles(DatabasePath)
-	db.DATABASE = db.LoadDB(DatabasePath)
+	// db.DATABASE = db.LoadDB(DatabasePath)
+	Database := db.LoadDB(DatabasePath)
 
-	PrintVKQUOTES(Version)
+	PrintVKQUOTES(Version, LastItemIndex, &Database)
+
 
 	var cmd string = ""
 	var id int = 0
 
 	fmt.Scanln(&cmd, &id)
 
+	
+
 	for {
 		switch cmd {
 		case "add", "a":
-			quote, author, language := Ask()
-			Add(quote, author, language, DatabasePath)
+			quote, author, language := GetQuoteDetails(&Database)
+			id := db.FindUniqueID(&Database)
+			LastItemIndex = CheckIndex(id, &Database)
+			Add(id, quote, author, language, &Database)
+			db.SaveDB(&Database, DatabasePath)
 			ReturnToCMD()
 		case "update", "u":
-			quote, author, language := Ask()
-			Update(id, quote, author, language, DatabasePath)
+			quote, author, language := GetQuoteDetails(&Database)
+			LastItemIndex = CheckIndex(id, &Database)
+			Update(LastItemIndex, quote, author, language, DatabasePath, &Database)
+			db.SaveDB(&Database, DatabasePath)
 			ReturnToCMD()
 		case "delete", "d":
-			Delete(id, DatabasePath)
+			LastItemIndex = CheckIndex(id, &Database)
+			Delete(LastItemIndex, DatabasePath, &Database)
+			db.SaveDB(&Database, DatabasePath)
 			ReturnToCMD()
 		case "showall", "s":
-			PrintAllQuotes()
+			PrintAllQuotes(&Database)
 		case "stats":
-			PrintStatistics()
+			PrintStatistics(&Database)
 		case "q":
 			util.ClearScreen()
 			os.Exit(0)
@@ -47,4 +59,18 @@ func CMD() {
 			CMD()
 		}
 	}
+}
+
+func CheckIndex(id int, Database *[]db.Quotes) int {
+
+	index := db.GetIndexFromId(id, Database)
+
+	if index == -1 {
+		util.PrintRed("\nIndex out of range!\n")
+		ReturnToCMD()
+	}
+
+	// *LastItemIndex = index
+
+	return index
 }

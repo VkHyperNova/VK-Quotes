@@ -5,13 +5,13 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-func Ask() (string, string, string) {
+func GetQuoteDetails(Database *[]db.Quotes) (string, string, string) {
 
 	quote := util.GetInput("Quote: ")
 
-	if db.CheckDublicates(quote) != -1 {
+	if db.CheckDublicates(quote, Database) != -1 {
 		util.PrintRed("\n<< This quote is in the database >>\n")
-		PrintQuote(db.CheckDublicates(quote))
+		PrintQuote(db.CheckDublicates(quote, Database), Database)
 		ReturnToCMD()
 	}
 
@@ -21,64 +21,35 @@ func Ask() (string, string, string) {
 	return quote, author, language
 }
 
-
-
-func Add(quote, author, language, databasePath string) bool {
-
-	uniqueID := 1
-
-	if len(db.DATABASE) != 0 {
-		uniqueID = db.DATABASE[len(db.DATABASE)-1].ID + 1 // Get Last item + 1
-	}
-
-	db.LastItemID = uniqueID
+func Add(id int, quote, author, language string, Database *[]db.Quotes) bool {
 
 	NewQuote := db.Quotes{
-		ID:       uniqueID,
+		ID:       id,
 		QUOTE:    util.FillEmptyInput(quote, "Unknown"),
 		AUTHOR:   util.FillEmptyInput(author, "Unknown"),
 		LANGUAGE: util.FillEmptyInput(language, "Unknown"),
 		DATE:     util.GetFormattedDate(),
 	}
 
-	db.DATABASE = append(db.DATABASE, NewQuote)
-	db.SaveDB(databasePath)
+	// db.DATABASE = append(db.DATABASE, NewQuote)
+	*Database = append(*Database, NewQuote)
 
 	return true
 }
 
-func Update(updateID int, updatedQuote, updatedAuthor, updatedLanguage, DatabasePath string) bool {
+func Update(index int, updatedQuote, updatedAuthor, updatedLanguage, DatabasePath string, Database *[]db.Quotes) bool {
 
-	db.LastItemID = updateID
-
-	index := db.SearchIndexByID(updateID)
-
-	if index == -1 {
-		util.PrintRed("\nIndex out of range!\n")
-		ReturnToCMD()
-	}
-
-	db.DATABASE[index].QUOTE = util.FillEmptyInput(updatedQuote, db.DATABASE[index].QUOTE)
-	db.DATABASE[index].AUTHOR = util.FillEmptyInput(updatedAuthor, db.DATABASE[index].AUTHOR)
-	db.DATABASE[index].LANGUAGE = util.FillEmptyInput(updatedLanguage, db.DATABASE[index].LANGUAGE)
-	
-	db.SaveDB(DatabasePath)
+	(*Database)[index].QUOTE = util.FillEmptyInput(updatedQuote, (*Database)[index].QUOTE)
+	(*Database)[index].AUTHOR = util.FillEmptyInput(updatedAuthor, (*Database)[index].AUTHOR)
+	(*Database)[index].LANGUAGE = util.FillEmptyInput(updatedLanguage, (*Database)[index].LANGUAGE)
 
 	return true
 }
 
-func Delete(deleteID int, DatabasePath string) bool {
-	index := db.SearchIndexByID(deleteID)
+func Delete(index int, DatabasePath string, Database *[]db.Quotes) bool {
 
-	if index == -1 {
-		util.PrintRed("\nIndex out of range!\n")
-		ReturnToCMD()
-	}
-
-	db.DATABASE = append(db.DATABASE[:index], db.DATABASE[index+1:]...)
-	db.SaveDB(DatabasePath)
+	(*Database) = append((*Database)[:index], (*Database)[index+1:]...)
 
 	return true
 }
-
 
