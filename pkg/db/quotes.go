@@ -6,8 +6,8 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-var DATABASE []Quotes
-var LastItemID = -1
+// var DATABASE []Quotes
+// var LastItemIndex = -1
 
 type Quotes struct {
 	ID       int    `json:"id"`
@@ -17,17 +17,13 @@ type Quotes struct {
 	DATE     string `json:"date"`
 }
 
-func SaveDB(DatabasePath string) string {
-	DatabaseAsByte := util.InterfaceToByte(DATABASE)
-	util.WriteDataToFile(DatabasePath, DatabaseAsByte)
-	return "Database Updated!"
+func SaveDB(DB *[]Quotes, DatabasePath string) bool {
+	util.WriteDataToFile(DatabasePath, util.StructToJson(DB))
+	return true
 }
 
 func LoadDB(DatabasePath string) []Quotes {
-	file := util.ReadFile(DatabasePath)
-	data := GetQuotesArray(file)
-
-	return data
+	return JsonToStruct(util.ReadFile(DatabasePath))
 }
 
 func ValidateRequiredFiles(DatabasePath string) {
@@ -38,16 +34,16 @@ func ValidateRequiredFiles(DatabasePath string) {
 	}
 }
 
-func FindUniqueID() int {
+func FindUniqueID(Database *[]Quotes) int {
 
-	if len(DATABASE) == 0 {
+	if len(*Database) == 0 {
 		return 1
 	}
 
-	return DATABASE[len(DATABASE)-1].ID + 1
+	return (*Database)[len(*Database)-1].ID + 1
 }
 
-func GetQuotesArray(body []byte) []Quotes {
+func JsonToStruct(body []byte) []Quotes {
 
 	QuotesStruct := []Quotes{}
 
@@ -57,11 +53,11 @@ func GetQuotesArray(body []byte) []Quotes {
 	return QuotesStruct
 }
 
-func SearchIndexByID(id int) int {
+func GetIndexFromId(id int, Database *[]Quotes) int {
 
 	index := -1
 
-	for key, value := range DATABASE {
+	for key, value := range *Database {
 		if id == value.ID {
 			index = key
 		}
@@ -70,20 +66,20 @@ func SearchIndexByID(id int) int {
 	return index
 }
 
-func CheckDublicates(quote string) int {
-	for _, value := range DATABASE {
+func CheckDublicates(quote string, Database *[]Quotes) int {
+	for key, value := range *Database {
 		if strings.EqualFold(value.QUOTE, quote) {
-			return SearchIndexByID(value.ID)
+			return key
 		}
 	}
 	return -1
 }
 
-func GetAllNames(s string) []string {
+func GetAllNames(s string, Database *[]Quotes) []string {
 
 	var names []string
 
-	for _, value := range DATABASE {
+	for _, value := range *Database {
 
 		field := value.LANGUAGE
 
@@ -100,14 +96,12 @@ func GetAllNames(s string) []string {
 	return names
 }
 
-func CountNames(s string, names []string) map[string]int {
+func CountNames(s string, names []string, Database *[]Quotes) map[string]int {
 
 	myMap := make(map[string]int)
 
 	for _, name := range names {
-
-		for _, value := range DATABASE {
-
+		for _, value := range *Database {
 			field := value.LANGUAGE
 
 			if s == "authors" {

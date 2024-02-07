@@ -33,7 +33,7 @@ func GetInput(inputName string) string {
 	return NewTaskString
 }
 
-func InterfaceToByte(data interface{}) []byte {
+func StructToJson(data interface{}) []byte {
 	dataBytes, err := json.MarshalIndent(data, "", "  ")
 	HandleError(err)
 
@@ -48,6 +48,7 @@ func PressAnyKey() {
 	PrintGray("\nPress Any Key To Continue...")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
+	ClearScreen()
 }
 
 func Contains(arr []string, name string) bool {
@@ -65,4 +66,10 @@ func FillEmptyInput(a, b string) string {
 	}
 
 	return a
+}
+
+func PrintBrackets(name string) {
+	PrintCyan("[")
+	PrintYellow(name)
+	PrintCyan("] ")
 }

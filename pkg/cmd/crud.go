@@ -9,6 +9,7 @@ func GetQuoteDetails(Database *[]db.Quotes) (string, string, string) {
 
 	quote := util.GetInput("Quote: ")
 	if quote == "q" {
+		util.ClearScreen()
 		CMD()
 	}
 
@@ -21,11 +22,13 @@ func GetQuoteDetails(Database *[]db.Quotes) (string, string, string) {
 
 	author := util.GetInput("Auhtor: ")
 	if author == "q" {
+		util.ClearScreen()
 		CMD()
 	}
 	language := util.GetInput("Language: ")
 
 	if language == "q" {
+		util.ClearScreen()
 		CMD()
 	}
 
