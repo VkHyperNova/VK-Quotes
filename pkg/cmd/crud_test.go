@@ -4,23 +4,15 @@ import (
 	"fmt"
 	"testing"
 	db "vk-quotes/pkg/db"
-	"vk-quotes/pkg/util"
 )
 
 var DatabasePathTest = "/home/veikko/Desktop/VK-Quotes/database/quotes.json"
-
-
-
-func GetQuotesDetails() db.Quotes {
-    return db.Quotes{ID: 1, QUOTE: "Quote", AUTHOR: "Author", LANGUAGE: "English", DATE: util.GetFormattedDate()}
-}
 
 func TestAdd(t *testing.T) {
 
 	t.Log("Testing Adding...")
 
 	DatabaseTest := []db.Quotes{}
-	
 
 	expected := true
 
@@ -32,46 +24,52 @@ func TestAdd(t *testing.T) {
 	result = Add(2, "Multiple Words", "Author Author", "English Russian", &DatabaseTest)
 	CompareBoolean(result, expected, t)
 
-	// For Updating
-	result = Add(3, "This Quote is for updating", "Author Author", "English Russian", &DatabaseTest)
-	CompareBoolean(result, expected, t)
-
-	// For Deleting
-	result = Add(4, "Delete me", "Author", "English", &DatabaseTest)
-	CompareBoolean(result, expected, t)
-
+	db.SaveDB(&DatabaseTest, DatabasePathTest)
 	fmt.Println(DatabaseTest)
+
+}
+func TestUpdate(t *testing.T) {
+
+	t.Log("Testing Updating...")
+	
+	// Load Database
+	DatabaseTest := db.LoadDB(DatabasePathTest)
+
+	expected := true
+
+	// One Word
+	result := Update(0, "Updated", "Updated", "Updated", DatabasePathTest,&DatabaseTest)
+	CompareBoolean(result, expected, t)
+
+	// Multiple Words
+	result = Update(1, "Everything works as expected", "Author", "Language", DatabasePathTest,&DatabaseTest)
+	CompareBoolean(result, expected, t)
+
+	// Save and Print
+	db.SaveDB(&DatabaseTest, DatabasePathTest)
+	fmt.Println(DatabaseTest)
+
 }
 
-// func TestUpdate(t *testing.T) {
+func TestDelete(t *testing.T) {
 
-// 	t.Log("Testing Updating...")
-	
-// 	result := Update(2, "Updated Quote", "UPDATED Author", "UPDATED Language", DatabasePathTest)
-// 	expected := true
-// 	CompareBoolean(result, expected, t)
-	
-// }
+	t.Log("Testing Deleting...")
 
-// func TestDelete(t *testing.T) {
+	// Load Database
+	DatabaseTest := db.LoadDB(DatabasePathTest)
 
-// 	t.Log("Testing Deleting...")
-	
-// 	result := Delete(3, DatabasePathTest)
-// 	expected := true
-// 	CompareBoolean(result, expected, t)
-	
-// }
+	expected := true
 
-// func TestSaveDB(t *testing.T) {
-// 	t.Log("Testing SaveDB...")
+	result := Delete(0, DatabasePathTest, &DatabaseTest)
+	CompareBoolean(result, expected, t)
 
-
-// }
+	// Save Database
+	db.SaveDB(&DatabaseTest, DatabasePathTest)
+	fmt.Println(DatabaseTest)
+}
 
 func CompareBoolean(result, expected bool, t *testing.T) {
 	if result != expected {
 		t.Errorf("Expected %v but got %v", expected, result)
 	}
 }
-

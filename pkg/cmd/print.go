@@ -1,6 +1,7 @@
 package cmd
 
 import (
+
 	"math/rand"
 	"sort"
 	"strconv"
@@ -28,15 +29,9 @@ func PrintVKQUOTES(Version string, LastItemIndex int, Database *[]db.Quotes) {
 	util.PrintGray("\n")
 	Commands := [6]string{"add", "update", "delete", "showall", "stats", "q"}
 	for _, value := range Commands {
-		PrintBrackets(value)
+		util.PrintBrackets(value)
 	}
 	util.PrintCyan("\n=> ")
-}
-
-func PrintBrackets(name string) {
-	util.PrintCyan("[")
-	util.PrintYellow(name)
-	util.PrintCyan("] ")
 }
 
 func PrintQuote(index int, Database *[]db.Quotes) {
@@ -56,7 +51,7 @@ func PrintAllQuotes(Database *[]db.Quotes) {
 	for key, _ := range *Database {
 		PrintQuote(key, Database)
 	}
-	ReturnToCMD()
+	
 }
 
 func PrintRandomQuote(Database *[]db.Quotes) {
@@ -78,13 +73,10 @@ func PrintStatistics(Database *[]db.Quotes) {
 	authorsMap := db.CountNames("authors", authors, Database)
 	PrintSortedMap(authorsMap, "Authors")
 
-	// PrintMap(authorsMap, "Authors")
-
 	languages := db.GetAllNames("languages", Database)
 	languagesMap := db.CountNames("languages", languages, Database)
 	PrintSortedMap(languagesMap, "Languages")
 
-	ReturnToCMD()
 }
 
 func PrintSortedMap(myMap map[string]int, name string) {
@@ -105,16 +97,10 @@ func PrintSortedMap(myMap map[string]int, name string) {
 		return pairs[i].count > pairs[j].count
 	})
 
-	// Print Pairs
+
 	util.PrintCyan("\n< " + name + " >\n\n")
 	for _, pair := range pairs {
 		util.PrintGray("[" + strconv.Itoa(pair.count) + "] ")
 		util.PrintGreen(pair.name + "\n")
 	}
-}
-
-func ReturnToCMD() {
-	util.PressAnyKey()
-	util.ClearScreen()
-	CMD()
 }

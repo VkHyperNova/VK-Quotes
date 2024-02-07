@@ -8,15 +8,26 @@ import (
 func GetQuoteDetails(Database *[]db.Quotes) (string, string, string) {
 
 	quote := util.GetInput("Quote: ")
+	if quote == "q" {
+		CMD()
+	}
 
 	if db.CheckDublicates(quote, Database) != -1 {
 		util.PrintRed("\n<< This quote is in the database >>\n")
 		PrintQuote(db.CheckDublicates(quote, Database), Database)
-		ReturnToCMD()
+		util.PressAnyKey()
+		CMD()
 	}
 
 	author := util.GetInput("Auhtor: ")
+	if author == "q" {
+		CMD()
+	}
 	language := util.GetInput("Language: ")
+
+	if language == "q" {
+		CMD()
+	}
 
 	return quote, author, language
 }
@@ -31,7 +42,6 @@ func Add(id int, quote, author, language string, Database *[]db.Quotes) bool {
 		DATE:     util.GetFormattedDate(),
 	}
 
-	// db.DATABASE = append(db.DATABASE, NewQuote)
 	*Database = append(*Database, NewQuote)
 
 	return true
@@ -52,4 +62,3 @@ func Delete(index int, DatabasePath string, Database *[]db.Quotes) bool {
 
 	return true
 }
-
