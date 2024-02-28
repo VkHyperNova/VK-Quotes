@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strings"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
@@ -64,4 +65,14 @@ func Delete(index int, DatabasePath string, Database *[]db.Quotes) bool {
 	(*Database) = append((*Database)[:index], (*Database)[index+1:]...)
 
 	return true
+}
+
+func Search(Database *[]db.Quotes, searchString string) {
+
+	for key, value := range *Database {
+		if strings.EqualFold(searchString, value.AUTHOR){
+			PrintQuote(key, Database)
+		}
+
+	}
 }

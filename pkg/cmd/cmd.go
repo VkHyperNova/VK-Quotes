@@ -59,6 +59,8 @@ func CMD() {
 			os.Exit(0)
 		default:
 			util.ClearScreen()
+			Search(&Database, cmd)
+			util.PressAnyKey()
 			CMD()
 		}
 	}
