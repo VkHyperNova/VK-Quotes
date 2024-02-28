@@ -22,8 +22,15 @@ func SaveDB(DB *[]Quotes, DatabasePath string) bool {
 	return true
 }
 
-func LoadDB(DatabasePath string) []Quotes {
-	return JsonToStruct(util.ReadFile(DatabasePath))
+func ReadDB(DatabasePath string) []Quotes {
+	file := util.ReadFile(DatabasePath)
+
+	Quotes := []Quotes{}
+
+	err := json.Unmarshal(file, &Quotes)
+	util.HandleError(err)
+
+	return Quotes
 }
 
 func ValidateRequiredFiles(DatabasePath string) {
@@ -34,23 +41,14 @@ func ValidateRequiredFiles(DatabasePath string) {
 	}
 }
 
+// FindUniqueID finds unique id for a Quote in the database
 func FindUniqueID(Database *[]Quotes) int {
-
+	// if database is empty, return 1
 	if len(*Database) == 0 {
 		return 1
 	}
-
+	// return last id + 1
 	return (*Database)[len(*Database)-1].ID + 1
-}
-
-func JsonToStruct(body []byte) []Quotes {
-
-	QuotesStruct := []Quotes{}
-
-	err := json.Unmarshal(body, &QuotesStruct)
-	util.HandleError(err)
-
-	return QuotesStruct
 }
 
 func GetIndexFromId(id int, Database *[]Quotes) int {

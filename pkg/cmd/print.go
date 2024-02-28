@@ -100,7 +100,10 @@ func PrintSortedMap(myMap map[string]int, name string) {
 
 	util.PrintCyan("\n< " + name + " >\n\n")
 	for _, pair := range pairs {
-		util.PrintGray("[" + strconv.Itoa(pair.count) + "] ")
-		util.PrintGreen(pair.name + "\n")
+		if pair.count > 1 {
+			util.PrintGray("[" + strconv.Itoa(pair.count) + "] ")
+			util.PrintGreen(pair.name + "\n")
+		}
+		
 	}
 }

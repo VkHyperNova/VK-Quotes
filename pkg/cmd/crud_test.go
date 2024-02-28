@@ -31,18 +31,18 @@ func TestAdd(t *testing.T) {
 func TestUpdate(t *testing.T) {
 
 	t.Log("Testing Updating...")
-	
+
 	// Load Database
-	DatabaseTest := db.LoadDB(DatabasePathTest)
+	DatabaseTest := db.ReadDB(DatabasePathTest)
 
 	expected := true
 
 	// One Word
-	result := Update(0, "Updated", "Updated", "Updated", DatabasePathTest,&DatabaseTest)
+	result := Update(0, "Updated", "Updated", "Updated", DatabasePathTest, &DatabaseTest)
 	CompareBoolean(result, expected, t)
 
 	// Multiple Words
-	result = Update(1, "Everything works as expected", "Author", "Language", DatabasePathTest,&DatabaseTest)
+	result = Update(1, "Everything works as expected", "Author", "Language", DatabasePathTest, &DatabaseTest)
 	CompareBoolean(result, expected, t)
 
 	// Save and Print
@@ -56,7 +56,7 @@ func TestDelete(t *testing.T) {
 	t.Log("Testing Deleting...")
 
 	// Load Database
-	DatabaseTest := db.LoadDB(DatabasePathTest)
+	DatabaseTest := db.ReadDB(DatabasePathTest)
 
 	expected := true
 

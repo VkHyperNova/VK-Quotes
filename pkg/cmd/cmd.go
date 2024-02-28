@@ -14,7 +14,7 @@ var LastItemIndex = -1
 func CMD() {
 
 	db.ValidateRequiredFiles(DatabasePath)
-	Database := db.LoadDB(DatabasePath)
+	Database := db.ReadDB(DatabasePath)
 
 	PrintVKQUOTES(Version, LastItemIndex, &Database)
 
