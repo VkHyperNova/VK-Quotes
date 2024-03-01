@@ -70,9 +70,8 @@ func Delete(index int, DatabasePath string, Database *[]db.Quotes) bool {
 func Search(Database *[]db.Quotes, searchString string) {
 
 	for key, value := range *Database {
-		if strings.EqualFold(searchString, value.AUTHOR){
+		if strings.Contains(strings.ToUpper(value.AUTHOR), strings.ToUpper(searchString)){
 			PrintQuote(key, Database)
-		}
-
+		} 
 	}
 }
