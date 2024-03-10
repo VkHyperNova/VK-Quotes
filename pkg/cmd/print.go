@@ -51,7 +51,7 @@ func PrintAllQuotes(Database *[]db.Quotes) {
 	for key, _ := range *Database {
 		PrintQuote(key, Database)
 	}
-	
+
 }
 
 func PrintRandomQuote(Database *[]db.Quotes) {
@@ -75,7 +75,10 @@ func PrintStatistics(Database *[]db.Quotes) {
 
 	languages := db.GetAllNames("languages", Database)
 	languagesMap := db.CountNames("languages", languages, Database)
-	PrintSortedMap(languagesMap, "Languages")
+	for name, num := range languagesMap {
+		util.PrintGray("\n\n[" + strconv.Itoa(num) + "] ")
+		util.PrintGreen(name + "\n")
+	}
 
 }
 
@@ -97,13 +100,8 @@ func PrintSortedMap(myMap map[string]int, name string) {
 		return pairs[i].count > pairs[j].count
 	})
 
-
-	util.PrintCyan("\n< " + name + " >\n\n")
-	for _, pair := range pairs {
-		if pair.count > 1 {
-			util.PrintGray("[" + strconv.Itoa(pair.count) + "] ")
-			util.PrintGreen(pair.name + "\n")
-		}
-		
+	for i := 0; i < 10; i++ {
+		util.PrintGray("[" + strconv.Itoa(pairs[i].count) + "] ")
+		util.PrintGreen(pairs[i].name + "\n")
 	}
 }
