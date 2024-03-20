@@ -2,12 +2,10 @@ package db
 
 import (
 	"encoding/json"
+	"errors"
 	"strings"
 	"vk-quotes/pkg/util"
 )
-
-// var DATABASE []Quotes
-// var LastItemIndex = -1
 
 type Quotes struct {
 	ID       int    `json:"id"`
@@ -31,14 +29,6 @@ func ReadDB(DatabasePath string) []Quotes {
 	util.HandleError(err)
 
 	return Quotes
-}
-
-func ValidateRequiredFiles(DatabasePath string) {
-	if !util.DoesDirectoryExist(DatabasePath) {
-		util.CreateDirectory("database")
-		util.WriteDataToFile(DatabasePath, []byte("[]"))
-		util.PrintRed("New Database Created!\n")
-	}
 }
 
 func FindUniqueID(Database *[]Quotes) int {
@@ -114,4 +104,21 @@ func CheckForDublicates(name, quote string, Database *[]Quotes) bool {
 	}
 
 	return false
+}
+
+func GetInput(inputName string, Database *[]Quotes) (string, error) {
+
+	util.PrintPurple(inputName)
+
+	userInput := util.ScanUserInput()
+
+	if util.Abort(userInput) {
+		return "", errors.New("<< previous action aborted by user. >>")
+	}
+
+	if CheckForDublicates(inputName, userInput, Database) {
+		return "", errors.New("<< there are dublicates in database. >>")
+	}
+
+	return userInput, nil
 }

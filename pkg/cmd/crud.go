@@ -8,11 +8,24 @@ import (
 
 func Add(id int, Database *[]db.Quotes) bool {
 
+	quoteDetails := []string{"Quote: ", "Author: ", "Language: "}
+	var inputs []string
+
+    for _, value := range quoteDetails {
+        input, err := db.GetInput(value, Database)
+		if err != nil {
+			LastError = err.Error()
+			util.ClearScreen()
+			CMD()
+		}
+		inputs = append(inputs, input)	
+    }
+
 	NewQuote := db.Quotes{
 		ID:       id,
-		QUOTE:    GetInput("Quote: ", Database),
-		AUTHOR:   GetInput("Author: ", Database),
-		LANGUAGE: GetInput("Language: ", Database),
+		QUOTE:    util.FillEmptyInput(inputs[0], "Unknown"),
+		AUTHOR:   util.FillEmptyInput(inputs[1], "Unknown"),
+		LANGUAGE: util.FillEmptyInput(inputs[2], "Unknown"),
 		DATE:     util.GetFormattedDate(),
 	}
 
@@ -21,11 +34,24 @@ func Add(id int, Database *[]db.Quotes) bool {
 	return true
 }
 
-func Update(index int, updatedQuote, updatedAuthor, updatedLanguage, DatabasePath string, Database *[]db.Quotes) bool {
+func Update(index int, DatabasePath string, Database *[]db.Quotes) bool {
 
-	(*Database)[index].QUOTE = util.FillEmptyInput(updatedQuote, (*Database)[index].QUOTE)
-	(*Database)[index].AUTHOR = util.FillEmptyInput(updatedAuthor, (*Database)[index].AUTHOR)
-	(*Database)[index].LANGUAGE = util.FillEmptyInput(updatedLanguage, (*Database)[index].LANGUAGE)
+	quoteDetails := []string{"Quote: ", "Author: ", "Language: "}
+	var inputs []string
+
+    for _, value := range quoteDetails {
+        input, err := db.GetInput(value, Database)
+		if err != nil {
+			LastError = err.Error()
+			util.ClearScreen()
+			CMD()
+		}
+		inputs = append(inputs, input)	
+    }
+
+	(*Database)[index].QUOTE = util.FillEmptyInput(inputs[0], (*Database)[index].QUOTE)
+	(*Database)[index].AUTHOR = util.FillEmptyInput(inputs[1], (*Database)[index].AUTHOR)
+	(*Database)[index].LANGUAGE = util.FillEmptyInput(inputs[2], (*Database)[index].LANGUAGE)
 
 	return true
 }

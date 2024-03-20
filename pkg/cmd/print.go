@@ -1,7 +1,6 @@
 package cmd
 
 import (
-
 	"math/rand"
 	"sort"
 	"strconv"
@@ -24,6 +23,11 @@ func PrintVKQUOTES(Version string, LastItemIndex int, Database *[]db.Quotes) {
 		LastItemIndex = -1
 	} else if len(*Database) > 0 {
 		PrintRandomQuote(Database)
+	}
+
+	if LastError != "" {
+		util.PrintRed("\n" + LastError + "\n")
+		LastError = ""
 	}
 
 	util.PrintGray("\n")

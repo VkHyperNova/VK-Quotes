@@ -10,10 +10,11 @@ import (
 var Version = "1.0"
 var DatabasePath = "./database/quotes.json"
 var LastItemIndex = -1
+var LastError = ""
 
 func CMD() {
 
-	db.ValidateRequiredFiles(DatabasePath)
+	util.ValidateRequiredFiles(DatabasePath)
 	Database := db.ReadDB(DatabasePath)
 
 	PrintVKQUOTES(Version, LastItemIndex, &Database)
@@ -33,16 +34,16 @@ func CMD() {
 			util.PressAnyKey()
 			CMD()
 		case "update", "u":
-			// quote, author, language := GetQuoteDetails(&Database)
-			// LastItemIndex = CheckIndex(id, &Database)
-			// Update(LastItemIndex, quote, author, language, DatabasePath, &Database)
-			// db.SaveDB(&Database, DatabasePath)
-			// util.PressAnyKey()
-			// CMD()
+			LastItemIndex = CheckIndex(id, &Database)
+			Update(LastItemIndex, DatabasePath, &Database)
+			db.SaveDB(&Database, DatabasePath)
+			util.PressAnyKey()
+			CMD()
 		case "delete", "d":
 			LastItemIndex = CheckIndex(id, &Database)
 			Delete(LastItemIndex, DatabasePath, &Database)
 			db.SaveDB(&Database, DatabasePath)
+			LastItemIndex = -1
 			util.PressAnyKey()
 			CMD()
 		case "showall", "s":
@@ -78,24 +79,4 @@ func CheckIndex(id int, Database *[]db.Quotes) int {
 	}
 
 	return index
-}
-
-func GetInput(inputName string, Database *[]db.Quotes) string {
-
-	util.PrintPurple(inputName)
-
-	userInput := util.ScanUserInput()
-
-	if util.Abort(userInput) {
-		util.ClearScreen()
-		CMD()
-	}
-
-	if db.CheckForDublicates(inputName, userInput, Database) {
-		util.PrintRed("\n<< Dublicates >>\n")
-		util.PressAnyKey()
-		CMD()
-	}
-
-	return util.FillEmptyInput(userInput, "Unknown")
 }

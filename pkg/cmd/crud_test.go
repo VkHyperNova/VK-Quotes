@@ -26,23 +26,23 @@ var DatabasePathTest = "/home/veikko/Desktop/VK-Quotes/database/quotes.json"
 // 	fmt.Println(DatabaseTest)
 
 // }
-func TestUpdate(t *testing.T) {
+// func TestUpdate(t *testing.T) {
 
-	t.Log("Testing Updating...")
+// 	t.Log("Testing Updating...")
 
-	DatabaseTest := db.ReadDB(DatabasePathTest)
+// 	DatabaseTest := db.ReadDB(DatabasePathTest)
 
-	expected := true
+// 	expected := true
 
-	result := Update(0, "Updated", "Updated", "Updated", DatabasePathTest, &DatabaseTest)
-	CompareBoolean(result, expected, t)
+// 	result := Update(0, "Updated", "Updated", "Updated", DatabasePathTest, &DatabaseTest)
+// 	CompareBoolean(result, expected, t)
 
-	result = Update(1, "Everything works as expected", "Author", "Language", DatabasePathTest, &DatabaseTest)
-	CompareBoolean(result, expected, t)
+// 	result = Update(1, "Everything works as expected", "Author", "Language", DatabasePathTest, &DatabaseTest)
+// 	CompareBoolean(result, expected, t)
 
-	db.SaveDB(&DatabaseTest, DatabasePathTest)
-	fmt.Println(DatabaseTest)
-}
+// 	db.SaveDB(&DatabaseTest, DatabasePathTest)
+// 	fmt.Println(DatabaseTest)
+// }
 
 func TestDelete(t *testing.T) {
 

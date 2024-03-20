@@ -24,3 +24,11 @@ func DoesDirectoryExist(dir_name string) bool {
 	}
 	return true
 }
+
+func ValidateRequiredFiles(DatabasePath string) {
+	if !DoesDirectoryExist(DatabasePath) {
+		CreateDirectory("database")
+		WriteDataToFile(DatabasePath, []byte("[]"))
+		PrintRed("New Database Created!\n")
+	}
+}
