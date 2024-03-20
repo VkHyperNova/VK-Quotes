@@ -6,43 +6,13 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-func GetQuoteDetails(Database *[]db.Quotes) (string, string, string) {
-
-	quote := util.GetInput("Quote: ")
-	if quote == "q" {
-		util.ClearScreen()
-		CMD()
-	}
-
-	if db.CheckDublicates(quote, Database) != -1 {
-		util.PrintRed("\n<< This quote is in the database >>\n")
-		PrintQuote(db.CheckDublicates(quote, Database), Database)
-		util.PressAnyKey()
-		CMD()
-	}
-
-	author := util.GetInput("Auhtor: ")
-	if author == "q" {
-		util.ClearScreen()
-		CMD()
-	}
-	language := util.GetInput("Language: ")
-
-	if language == "q" {
-		util.ClearScreen()
-		CMD()
-	}
-
-	return quote, author, language
-}
-
-func Add(id int, quote, author, language string, Database *[]db.Quotes) bool {
+func Add(id int, Database *[]db.Quotes) bool {
 
 	NewQuote := db.Quotes{
 		ID:       id,
-		QUOTE:    util.FillEmptyInput(quote, "Unknown"),
-		AUTHOR:   util.FillEmptyInput(author, "Unknown"),
-		LANGUAGE: util.FillEmptyInput(language, "Unknown"),
+		QUOTE:    GetInput("Quote: ", Database),
+		AUTHOR:   GetInput("Author: ", Database),
+		LANGUAGE: GetInput("Language: ", Database),
 		DATE:     util.GetFormattedDate(),
 	}
 
@@ -70,8 +40,8 @@ func Delete(index int, DatabasePath string, Database *[]db.Quotes) bool {
 func Search(Database *[]db.Quotes, searchString string) {
 
 	for key, value := range *Database {
-		if strings.Contains(strings.ToUpper(value.AUTHOR), strings.ToUpper(searchString)){
+		if strings.Contains(strings.ToUpper(value.AUTHOR), strings.ToUpper(searchString)) {
 			PrintQuote(key, Database)
-		} 
+		}
 	}
 }

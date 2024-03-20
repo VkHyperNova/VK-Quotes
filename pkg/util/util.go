@@ -23,16 +23,6 @@ func ClearScreen() {
 	}
 }
 
-func GetInput(inputName string) string {
-	PrintPurple(inputName)
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	NewTaskString := scanner.Text()
-	NewTaskString = strings.TrimSpace(NewTaskString)
-
-	return NewTaskString
-}
-
 func StructToJson(data interface{}) []byte {
 	dataBytes, err := json.MarshalIndent(data, "", "  ")
 	HandleError(err)
@@ -72,4 +62,18 @@ func PrintBrackets(name string) {
 	PrintCyan("[")
 	PrintYellow(name)
 	PrintCyan("] ")
+}
+
+
+func ScanUserInput() string {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	userInput := scanner.Text()
+	userInput = strings.TrimSpace(userInput)
+
+	return userInput
+}
+
+func Abort(input string) bool {
+	return input == "q"
 }

@@ -26,20 +26,19 @@ func CMD() {
 	for {
 		switch cmd {
 		case "add", "a":
-			quote, author, language := GetQuoteDetails(&Database)
 			newID := db.FindUniqueID(&Database)
-			Add(newID, quote, author, language, &Database)
+			Add(newID, &Database)
 			db.SaveDB(&Database, DatabasePath)
 			LastItemIndex = CheckIndex(newID, &Database)
 			util.PressAnyKey()
 			CMD()
 		case "update", "u":
-			quote, author, language := GetQuoteDetails(&Database)
-			LastItemIndex = CheckIndex(id, &Database)
-			Update(LastItemIndex, quote, author, language, DatabasePath, &Database)
-			db.SaveDB(&Database, DatabasePath)
-			util.PressAnyKey()
-			CMD()
+			// quote, author, language := GetQuoteDetails(&Database)
+			// LastItemIndex = CheckIndex(id, &Database)
+			// Update(LastItemIndex, quote, author, language, DatabasePath, &Database)
+			// db.SaveDB(&Database, DatabasePath)
+			// util.PressAnyKey()
+			// CMD()
 		case "delete", "d":
 			LastItemIndex = CheckIndex(id, &Database)
 			Delete(LastItemIndex, DatabasePath, &Database)
@@ -79,4 +78,24 @@ func CheckIndex(id int, Database *[]db.Quotes) int {
 	}
 
 	return index
+}
+
+func GetInput(inputName string, Database *[]db.Quotes) string {
+
+	util.PrintPurple(inputName)
+
+	userInput := util.ScanUserInput()
+
+	if util.Abort(userInput) {
+		util.ClearScreen()
+		CMD()
+	}
+
+	if db.CheckForDublicates(inputName, userInput, Database) {
+		util.PrintRed("\n<< Dublicates >>\n")
+		util.PressAnyKey()
+		CMD()
+	}
+
+	return util.FillEmptyInput(userInput, "Unknown")
 }

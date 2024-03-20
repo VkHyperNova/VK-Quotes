@@ -51,7 +51,6 @@ func PrintAllQuotes(Database *[]db.Quotes) {
 	for key, _ := range *Database {
 		PrintQuote(key, Database)
 	}
-
 }
 
 func PrintRandomQuote(Database *[]db.Quotes) {
@@ -79,7 +78,6 @@ func PrintStatistics(Database *[]db.Quotes) {
 		util.PrintGray("\n\n[" + strconv.Itoa(num) + "] ")
 		util.PrintGreen(name + "\n")
 	}
-
 }
 
 func PrintSortedMap(myMap map[string]int, name string) {

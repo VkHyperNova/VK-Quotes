@@ -41,13 +41,10 @@ func ValidateRequiredFiles(DatabasePath string) {
 	}
 }
 
-// FindUniqueID finds unique id for a Quote in the database
 func FindUniqueID(Database *[]Quotes) int {
-	// if database is empty, return 1
 	if len(*Database) == 0 {
 		return 1
 	}
-	// return last id + 1
 	return (*Database)[len(*Database)-1].ID + 1
 }
 
@@ -62,15 +59,6 @@ func GetIndexFromId(id int, Database *[]Quotes) int {
 	}
 
 	return index
-}
-
-func CheckDublicates(quote string, Database *[]Quotes) int {
-	for key, value := range *Database {
-		if strings.EqualFold(value.QUOTE, quote) {
-			return key
-		}
-	}
-	return -1
 }
 
 func GetAllNames(s string, Database *[]Quotes) []string {
@@ -113,4 +101,17 @@ func CountNames(s string, names []string, Database *[]Quotes) map[string]int {
 	}
 
 	return myMap
+}
+
+func CheckForDublicates(name, quote string, Database *[]Quotes) bool {
+	if name != "Quote: " {
+		return false
+	}
+	for _, value := range *Database {
+		if strings.EqualFold(value.QUOTE, quote) {
+			return true
+		}
+	}
+
+	return false
 }
