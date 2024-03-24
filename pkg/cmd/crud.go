@@ -1,28 +1,22 @@
 package cmd
 
+/* Create, Read, Update, Delete  */
 import (
+	"fmt"
 	"strings"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
 
-func Add(id int, Database *[]db.Quotes) bool {
+var Version = "1.0"
+var DatabasePath = "./database/quotes.json"
+var CurrentQuoteIndex = -1
+var Msg = ""
 
-	quoteDetails := []string{"Quote: ", "Author: ", "Language: "}
-	var inputs []string
-
-    for _, value := range quoteDetails {
-        input, err := db.GetInput(value, Database)
-		if err != nil {
-			LastError = err.Error()
-			util.ClearScreen()
-			CMD()
-		}
-		inputs = append(inputs, input)	
-    }
+func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
 	NewQuote := db.Quotes{
-		ID:       id,
+		ID:       db.FindID(Database),
 		QUOTE:    util.FillEmptyInput(inputs[0], "Unknown"),
 		AUTHOR:   util.FillEmptyInput(inputs[1], "Unknown"),
 		LANGUAGE: util.FillEmptyInput(inputs[2], "Unknown"),
@@ -31,43 +25,54 @@ func Add(id int, Database *[]db.Quotes) bool {
 
 	*Database = append(*Database, NewQuote)
 
-	return true
-}
+	db.SaveDB(Database, DatabasePath)
 
-func Update(index int, DatabasePath string, Database *[]db.Quotes) bool {
+	index := db.FindIndex(NewQuote.ID, Database)
 
-	quoteDetails := []string{"Quote: ", "Author: ", "Language: "}
-	var inputs []string
+	Msg = fmt.Sprintf("<< %d Quote Added! >>", (*Database)[index].ID)
 
-    for _, value := range quoteDetails {
-        input, err := db.GetInput(value, Database)
-		if err != nil {
-			LastError = err.Error()
-			util.ClearScreen()
-			CMD()
-		}
-		inputs = append(inputs, input)	
-    }
-
-	(*Database)[index].QUOTE = util.FillEmptyInput(inputs[0], (*Database)[index].QUOTE)
-	(*Database)[index].AUTHOR = util.FillEmptyInput(inputs[1], (*Database)[index].AUTHOR)
-	(*Database)[index].LANGUAGE = util.FillEmptyInput(inputs[2], (*Database)[index].LANGUAGE)
+	CurrentQuoteIndex = index
 
 	return true
 }
 
-func Delete(index int, DatabasePath string, Database *[]db.Quotes) bool {
-
-	(*Database) = append((*Database)[:index], (*Database)[index+1:]...)
-
-	return true
-}
-
-func Search(Database *[]db.Quotes, searchString string) {
+func Read(Database *[]db.Quotes, searchString string) {
 
 	for key, value := range *Database {
 		if strings.Contains(strings.ToUpper(value.AUTHOR), strings.ToUpper(searchString)) {
 			PrintQuote(key, Database)
 		}
 	}
+}
+
+func Update(id int, inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
+
+	index := db.FindIndex(id, Database)
+
+	CurrentQuoteIndex = index
+
+	(*Database)[index].QUOTE = util.FillEmptyInput(inputs[0], (*Database)[index].QUOTE)
+	(*Database)[index].AUTHOR = util.FillEmptyInput(inputs[1], (*Database)[index].AUTHOR)
+	(*Database)[index].LANGUAGE = util.FillEmptyInput(inputs[2], (*Database)[index].LANGUAGE)
+
+	db.SaveDB(Database, DatabasePath)
+
+	Msg = fmt.Sprintf("<< %d Quote Updated! >>", (*Database)[index].ID)
+
+	return true
+}
+
+func Delete(id int, Database *[]db.Quotes, DatabasePath string) bool {
+
+	index := db.FindIndex(id, Database)
+
+	Msg = fmt.Sprintf("<< %d Quote Deleted! >>", (*Database)[index].ID)
+
+	(*Database) = append((*Database)[:index], (*Database)[index+1:]...)
+
+	db.SaveDB(Database, DatabasePath)
+
+	CurrentQuoteIndex = -1
+
+	return true
 }

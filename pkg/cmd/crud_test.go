@@ -1,62 +1,75 @@
 package cmd
 
 import (
-	"fmt"
 	"testing"
 	db "vk-quotes/pkg/db"
 )
 
 var DatabasePathTest = "/home/veikko/Desktop/VK-Quotes/database/quotes.json"
 
-// func TestAdd(t *testing.T) {
+func TestAdd(t *testing.T) {
 
-// 	t.Log("Testing Adding...")
+	t.Log("Testing Adding...")
 
-// 	DatabaseTest := []db.Quotes{}
+	DatabaseTest := []db.Quotes{}
 
-// 	expected := true
+	expected := true
 
-// 	result := Add(1, "Quote", "Author", "English", &DatabaseTest)
-// 	CompareBoolean(result, expected, t)
-	
-// 	result = Add(2, "Multiple Words", "Author Author", "English Russian", &DatabaseTest)
-// 	CompareBoolean(result, expected, t)
+	TestQuote1 := []string{"Quote 1", "Top G", "English"}
 
-// 	db.SaveDB(&DatabaseTest, DatabasePathTest)
-// 	fmt.Println(DatabaseTest)
+	result := Create(TestQuote1,&DatabaseTest, DatabasePathTest)
+	CompareBoolean(result, expected, t)
 
-// }
-// func TestUpdate(t *testing.T) {
+	TestQuote2 := []string{"Quote 2", "Top A", "RUSSIAN"}
 
-// 	t.Log("Testing Updating...")
+	result = Create(TestQuote2,&DatabaseTest, DatabasePathTest)
+	CompareBoolean(result, expected, t)
 
-// 	DatabaseTest := db.ReadDB(DatabasePathTest)
+	TestQuote3 := []string{"Quote 3", "Top B", "ESTONIAN"}
 
-// 	expected := true
+	result = Create(TestQuote3,&DatabaseTest, DatabasePathTest)
+	CompareBoolean(result, expected, t)
 
-// 	result := Update(0, "Updated", "Updated", "Updated", DatabasePathTest, &DatabaseTest)
-// 	CompareBoolean(result, expected, t)
+	TestQuote4 := []string{"Quote 4", "Top C", "LATVIAN"}
 
-// 	result = Update(1, "Everything works as expected", "Author", "Language", DatabasePathTest, &DatabaseTest)
-// 	CompareBoolean(result, expected, t)
+	result = Create(TestQuote4,&DatabaseTest, DatabasePathTest)
+	CompareBoolean(result, expected, t)
 
-// 	db.SaveDB(&DatabaseTest, DatabasePathTest)
-// 	fmt.Println(DatabaseTest)
-// }
+	TestQuote5 := []string{"Quote 5", "Top D", "KAUKAAASIAN"}
+
+	result = Create(TestQuote5,&DatabaseTest, DatabasePathTest)
+	CompareBoolean(result, expected, t)
+
+}
+
+func TestUpdate(t *testing.T) {
+
+	t.Log("Testing Updating...")
+
+	DatabaseTest := db.OpenDB(DatabasePathTest)
+
+	expected := true
+
+	TestUpdateQuote := []string{"Quote Updated", "Top GG", "English FTW"}
+
+	result := Update(1, TestUpdateQuote, &DatabaseTest, DatabasePathTest)
+	CompareBoolean(result, expected, t)
+
+	result = Update(5, TestUpdateQuote, &DatabaseTest, DatabasePathTest)
+	CompareBoolean(result, expected, t)
+}
 
 func TestDelete(t *testing.T) {
 
 	t.Log("Testing Deleting...")
 
-	DatabaseTest := db.ReadDB(DatabasePathTest)
+	DatabaseTest := db.OpenDB(DatabasePathTest)
 
 	expected := true
 
-	result := Delete(0, DatabasePathTest, &DatabaseTest)
+	result := Delete(3, &DatabaseTest, DatabasePathTest)
 	CompareBoolean(result, expected, t)
 
-	db.SaveDB(&DatabaseTest, DatabasePathTest)
-	fmt.Println(DatabaseTest)
 }
 
 func CompareBoolean(result, expected bool, t *testing.T) {

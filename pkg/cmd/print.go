@@ -1,5 +1,9 @@
 package cmd
 
+/*
+All Print functions
+*/
+
 import (
 	"math/rand"
 	"sort"
@@ -11,23 +15,23 @@ import (
 	"github.com/fatih/color"
 )
 
-func PrintVKQUOTES(Version string, LastItemIndex int, Database *[]db.Quotes) {
+func PrintCMD(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	green := color.New(color.FgGreen)
 	boldGreen := green.Add(color.Bold)
 	boldGreen.Println("\n<< VK-QUOTES " + Version + " >>")
 
 	util.PrintCyan("\nQuotes: " + strconv.Itoa(len(*Database)) + "\n")
 
-	if LastItemIndex != -1 {
-		PrintQuote(LastItemIndex, Database)
-		LastItemIndex = -1
+	if CurrentQuoteIndex != -1 {
+		PrintQuote(CurrentQuoteIndex, Database)
+		CurrentQuoteIndex = -1
 	} else if len(*Database) > 0 {
 		PrintRandomQuote(Database)
 	}
 
-	if LastError != "" {
-		util.PrintRed("\n" + LastError + "\n")
-		LastError = ""
+	if Msg != "" {
+		util.PrintRed("\n" + Msg + "\n")
+		Msg = ""
 	}
 
 	util.PrintGray("\n")
@@ -40,8 +44,13 @@ func PrintVKQUOTES(Version string, LastItemIndex int, Database *[]db.Quotes) {
 
 func PrintQuote(index int, Database *[]db.Quotes) {
 	spaces := strings.Repeat(" ", 5)
-	if len((*Database)[index].QUOTE)-len((*Database)[index].AUTHOR) >= 10 {
-		spaces = strings.Repeat(" ", len((*Database)[index].QUOTE)-len((*Database)[index].AUTHOR))
+
+	quoteLength := len((*Database)[index].QUOTE)
+	authorLength := len((*Database)[index].AUTHOR)
+	repeatTimes := quoteLength - authorLength
+
+	if repeatTimes >= 10 {
+		spaces = strings.Repeat(" ", repeatTimes)
 	}
 
 	util.PrintBlue("\n(" + strconv.Itoa((*Database)[index].ID) + ") ")
@@ -52,18 +61,18 @@ func PrintQuote(index int, Database *[]db.Quotes) {
 func PrintAllQuotes(Database *[]db.Quotes) {
 	util.PrintCyan("\n\n<< All Quotes >>\n")
 
-	for key, _ := range *Database {
+	for key := range *Database {
 		PrintQuote(key, Database)
 	}
 }
 
 func PrintRandomQuote(Database *[]db.Quotes) {
 
-	randIndex := rand.Intn(len(*Database))
+	randomNumber := rand.Intn(len(*Database))
 
-	for key := range *Database {
-		if key == randIndex {
-			PrintQuote(key, Database)
+	for index := range *Database {
+		if index == randomNumber {
+			PrintQuote(index, Database)
 		}
 
 	}
@@ -72,12 +81,12 @@ func PrintRandomQuote(Database *[]db.Quotes) {
 func PrintStatistics(Database *[]db.Quotes) {
 	util.PrintCyan("\n\n\t<< Statistics >>\n")
 
-	authors := db.GetAllNames("authors", Database)
-	authorsMap := db.CountNames("authors", authors, Database)
+	allAuthors := db.GetAllNamesOf("authors", Database)
+	authorsMap := db.CountByName("authors", allAuthors, Database)
 	PrintSortedMap(authorsMap, "Authors")
 
-	languages := db.GetAllNames("languages", Database)
-	languagesMap := db.CountNames("languages", languages, Database)
+	languages := db.GetAllNamesOf("languages", Database)
+	languagesMap := db.CountByName("languages", languages, Database)
 	for name, num := range languagesMap {
 		util.PrintGray("\n\n[" + strconv.Itoa(num) + "] ")
 		util.PrintGreen(name + "\n")
