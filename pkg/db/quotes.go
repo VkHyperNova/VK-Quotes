@@ -2,7 +2,6 @@ package db
 
 import (
 	"encoding/json"
-	"errors"
 	"strings"
 	"vk-quotes/pkg/util"
 )
@@ -20,7 +19,7 @@ func SaveDB(DB *[]Quotes, DatabasePath string) bool {
 	return true
 }
 
-func ReadDB(DatabasePath string) []Quotes {
+func OpenDB(DatabasePath string) []Quotes {
 	file := util.ReadFile(DatabasePath)
 
 	Quotes := []Quotes{}
@@ -31,27 +30,14 @@ func ReadDB(DatabasePath string) []Quotes {
 	return Quotes
 }
 
-func FindUniqueID(Database *[]Quotes) int {
+func FindID(Database *[]Quotes) int {
 	if len(*Database) == 0 {
 		return 1
 	}
 	return (*Database)[len(*Database)-1].ID + 1
 }
 
-func GetIndexFromId(id int, Database *[]Quotes) int {
-
-	index := -1
-
-	for key, value := range *Database {
-		if id == value.ID {
-			index = key
-		}
-	}
-
-	return index
-}
-
-func GetAllNames(s string, Database *[]Quotes) []string {
+func GetAllNamesOf(s string, Database *[]Quotes) []string {
 
 	var names []string
 
@@ -71,8 +57,46 @@ func GetAllNames(s string, Database *[]Quotes) []string {
 
 	return names
 }
+/* Print all the authors at once */
+func Authors(Database *[]Quotes) {
+	var authors []string
+	var langauges []string
 
-func CountNames(s string, names []string, Database *[]Quotes) map[string]int {
+	for _, quote := range *Database {
+		if !util.Contains(authors, quote.AUTHOR) {
+			authors = append(authors, quote.AUTHOR)
+		}
+
+		if !util.Contains(langauges, quote.LANGUAGE) {
+			langauges = append(langauges, quote.LANGUAGE)
+		}
+	}
+
+	authorsByCount := make(map[string]int)
+	
+	for _, author := range authors {
+		for _, quote := range *Database {
+			if author == quote.AUTHOR {
+				authorsByCount[quote.AUTHOR] += 1
+			}
+		}	
+	}
+
+	languagesByCount := make(map[string]int)
+
+	for _, langauge := range langauges {
+		for _, quote := range *Database {
+			if langauge == quote.LANGUAGE {
+				languagesByCount[quote.LANGUAGE] += 1
+			}
+		}	
+	}
+
+	
+
+}
+
+func CountByName(s string, names []string, Database *[]Quotes) map[string]int {
 
 	myMap := make(map[string]int)
 
@@ -93,10 +117,8 @@ func CountNames(s string, names []string, Database *[]Quotes) map[string]int {
 	return myMap
 }
 
-func CheckForDublicates(name, quote string, Database *[]Quotes) bool {
-	if name != "Quote: " {
-		return false
-	}
+func FindDublicates(quote string, Database *[]Quotes) bool {
+
 	for _, value := range *Database {
 		if strings.EqualFold(value.QUOTE, quote) {
 			return true
@@ -106,19 +128,49 @@ func CheckForDublicates(name, quote string, Database *[]Quotes) bool {
 	return false
 }
 
-func GetInput(inputName string, Database *[]Quotes) (string, error) {
+func GetUserInput() []string {
+	quoteDetails := []string{"Quote: ", "Author: ", "Language: "}
+	var inputs []string
 
-	util.PrintPurple(inputName)
-
-	userInput := util.ScanUserInput()
-
-	if util.Abort(userInput) {
-		return "", errors.New("<< previous action aborted by user. >>")
+	for _, value := range quoteDetails {
+		util.PrintCyan(value)
+		input := util.ScanUserInput()
+		inputs = append(inputs, input)
 	}
 
-	if CheckForDublicates(inputName, userInput, Database) {
-		return "", errors.New("<< there are dublicates in database. >>")
-	}
-
-	return userInput, nil
+	return inputs
 }
+
+func ProcessUserInput(userInput []string, Database *[]Quotes) (string, bool) {
+
+	for _, value := range userInput {
+		if util.Abort(value) {
+			return "<< previous action aborted by user. >>", false
+		}
+	}
+
+	if FindDublicates(userInput[0], Database) {
+		return "<< there are dublicates in database. >>", false
+	}
+
+	return "", true
+}
+
+func FindIndex(id int, Database *[]Quotes) int {
+
+	index := -1
+
+	for key, value := range *Database {
+		if id == value.ID {
+			index = key
+		}
+	}
+
+	if index == -1 {
+		panic("Error: Index not found!")
+	}
+
+	return index
+}
+
+

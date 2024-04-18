@@ -58,13 +58,6 @@ func FillEmptyInput(a, b string) string {
 	return a
 }
 
-func PrintBrackets(name string) {
-	PrintCyan("[")
-	PrintYellow(name)
-	PrintCyan("] ")
-}
-
-
 func ScanUserInput() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()

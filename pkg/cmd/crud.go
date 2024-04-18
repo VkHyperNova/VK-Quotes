@@ -15,11 +15,18 @@ var Msg = ""
 
 func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
+	Message, err := db.ProcessUserInput(inputs, Database)
+	Msg = Message
+	
+	if !err {
+		return false
+	}
+
 	NewQuote := db.Quotes{
 		ID:       db.FindID(Database),
 		QUOTE:    util.FillEmptyInput(inputs[0], "Unknown"),
 		AUTHOR:   util.FillEmptyInput(inputs[1], "Unknown"),
-		LANGUAGE: util.FillEmptyInput(inputs[2], "Unknown"),
+		LANGUAGE: util.FillEmptyInput(inputs[2], "English"),
 		DATE:     util.GetFormattedDate(),
 	}
 

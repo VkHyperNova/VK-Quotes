@@ -15,7 +15,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func PrintCMD(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
+func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	green := color.New(color.FgGreen)
 	boldGreen := green.Add(color.Bold)
 	boldGreen.Println("\n<< VK-QUOTES " + Version + " >>")
@@ -34,12 +34,14 @@ func PrintCMD(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 		Msg = ""
 	}
 
-	util.PrintGray("\n")
 	Commands := [6]string{"add", "update", "delete", "showall", "stats", "q"}
+	util.PrintCyan("\n")
 	for _, value := range Commands {
-		util.PrintBrackets(value)
+		util.PrintYellow("[")
+		util.PrintYellow(value)
+		util.PrintYellow("] ")
 	}
-	util.PrintCyan("\n=> ")
+	util.PrintYellow("\n=> ")
 }
 
 func PrintQuote(index int, Database *[]db.Quotes) {
@@ -81,16 +83,22 @@ func PrintRandomQuote(Database *[]db.Quotes) {
 func PrintStatistics(Database *[]db.Quotes) {
 	util.PrintCyan("\n\n\t<< Statistics >>\n")
 
+	util.PrintCyan("\n--------------------------------------------\n\n")
+
 	allAuthors := db.GetAllNamesOf("authors", Database)
 	authorsMap := db.CountByName("authors", allAuthors, Database)
 	PrintSortedMap(authorsMap, "Authors")
 
+	util.PrintCyan("\n--------------------------------------------\n")
+
 	languages := db.GetAllNamesOf("languages", Database)
 	languagesMap := db.CountByName("languages", languages, Database)
 	for name, num := range languagesMap {
-		util.PrintGray("\n\n[" + strconv.Itoa(num) + "] ")
-		util.PrintGreen(name + "\n")
+		util.PrintGray("\n[" + strconv.Itoa(num) + "] ")
+		util.PrintGray(name)
 	}
+
+	util.PrintCyan("\n\n--------------------------------------------\n")
 }
 
 func PrintSortedMap(myMap map[string]int, name string) {
@@ -111,7 +119,7 @@ func PrintSortedMap(myMap map[string]int, name string) {
 		return pairs[i].count > pairs[j].count
 	})
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < len(pairs) && i < 10; i++ {
 		util.PrintGray("[" + strconv.Itoa(pairs[i].count) + "] ")
 		util.PrintGreen(pairs[i].name + "\n")
 	}
