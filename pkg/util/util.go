@@ -2,12 +2,9 @@ package util
 
 import (
 	"bufio"
-	"encoding/json"
 	"os"
 	"os/exec"
 	"runtime"
-	"strings"
-	"time"
 )
 
 func ClearScreen() {
@@ -23,17 +20,6 @@ func ClearScreen() {
 	}
 }
 
-func StructToJson(data interface{}) []byte {
-	dataBytes, err := json.MarshalIndent(data, "", "  ")
-	HandleError(err)
-
-	return dataBytes
-}
-
-func GetFormattedDate() string {
-	return time.Now().Format("02.01.2006")
-}
-
 func PressAnyKey() {
 	PrintGray("\nPress Any Key To Continue...")
 	scanner := bufio.NewScanner(os.Stdin)
@@ -41,7 +27,7 @@ func PressAnyKey() {
 	ClearScreen()
 }
 
-func Contains(arr []string, name string) bool {
+func ArrayContains(arr []string, name string) bool {
 	for _, n := range arr {
 		if n == name {
 			return true
@@ -58,15 +44,10 @@ func FillEmptyInput(a, b string) string {
 	return a
 }
 
-func ScanUserInput() string {
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	userInput := scanner.Text()
-	userInput = strings.TrimSpace(userInput)
-
-	return userInput
-}
-
-func Abort(input string) bool {
-	return input == "q"
+func ValidateRequiredFiles(DatabasePath string) {
+	if _, err := os.Stat(DatabasePath); os.IsNotExist(err) {
+		_ = os.Mkdir("database", 0700)
+		HandleError(os.WriteFile(DatabasePath, []byte("[]"), 0644))
+		PrintRed("New Database Created!\n")
+	}
 }

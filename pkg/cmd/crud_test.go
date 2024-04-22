@@ -13,10 +13,10 @@ func TestAdd(t *testing.T) {
 
 	DatabaseTest := []db.Quotes{}
 
-	TestQuote1 := []string{"q", "Top G", "English"}
+	TestQuote1 := []string{"Quote 1", "Top G", "English"}
 
 	result := Create(TestQuote1,&DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, false, t)
+	CompareBoolean(result, true, t)
 
 	TestQuote2 := []string{"Quote 2", "Top A", "RUSSIAN"}
 
@@ -26,7 +26,7 @@ func TestAdd(t *testing.T) {
 	TestQuote3 := []string{"Quote 2", "Top B", "ESTONIAN"}
 
 	result = Create(TestQuote3,&DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, false, t)
+	CompareBoolean(result, true, t)
 
 	TestQuote4 := []string{"Quote 4", "Top C", "LATVIAN"}
 
@@ -46,15 +46,13 @@ func TestUpdate(t *testing.T) {
 
 	DatabaseTest := db.OpenDB(DatabasePathTest)
 
-	expected := true
-
 	TestUpdateQuote := []string{"Quote Updated", "Top GG", "English FTW"}
 
 	result := Update(1, TestUpdateQuote, &DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, expected, t)
+	CompareBoolean(result, true, t)
 
 	result = Update(2, TestUpdateQuote, &DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, expected, t)
+	CompareBoolean(result, true, t)
 }
 
 func TestDelete(t *testing.T) {

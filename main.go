@@ -1,12 +1,46 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"vk-quotes/pkg/cmd"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
+
+func userInput(Database *[]db.Quotes) []string {
+	quoteFields := []string{"Quote: ", "Author: ", "Language: "}
+	var inputs []string
+
+	for _, field := range quoteFields {
+
+		util.PrintCyan(field)
+
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		userInput := scanner.Text()
+		userInput = strings.TrimSpace(userInput)
+
+		if userInput == "q" {
+			cmd.Msg = "<< previous action aborted by user. >>"
+			main()
+		}
+
+		if field == "Quote: " {
+			if db.FindDublicates(userInput, Database) != -1 {
+				cmd.Msg = "<< there are dublicates in database. >>"
+				cmd.CurrentQuoteIndex = db.FindDublicates(userInput, Database)
+				main()
+			}
+		}
+
+		inputs = append(inputs, userInput)
+	}
+
+	return inputs
+}
 
 func main() {
 	util.ClearScreen()
@@ -23,12 +57,11 @@ func main() {
 	for {
 		switch command {
 		case "add", "a":
-			quote := db.GetUserInput()
+			quote := userInput(&Database)
 			cmd.Create(quote, &Database, cmd.DatabasePath)
 			main()
 		case "update", "u":
-			quote := db.GetUserInput()
-			db.ProcessUserInput(quote, &Database)
+			quote := userInput(&Database)
 			cmd.Update(id, quote, &Database, cmd.DatabasePath)
 			main()
 		case "delete", "d":
