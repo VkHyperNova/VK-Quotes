@@ -9,62 +9,57 @@ var DatabasePathTest = "/home/veikko/Desktop/VK-Quotes/database/quotes.json"
 
 func TestAdd(t *testing.T) {
 
-	t.Log("Testing Adding...")
-
 	DatabaseTest := []db.Quotes{}
 
 	TestQuote1 := []string{"Quote 1", "Top G", "English"}
-
-	result := Create(TestQuote1,&DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, true, t)
-
 	TestQuote2 := []string{"Quote 2", "Top A", "RUSSIAN"}
-
-	result = Create(TestQuote2,&DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, true, t)
-
-	TestQuote3 := []string{"Quote 2", "Top B", "ESTONIAN"}
-
-	result = Create(TestQuote3,&DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, true, t)
-
+	TestQuote3 := []string{"Quote 3", "Top B", "ESTONIAN"}
 	TestQuote4 := []string{"Quote 4", "Top C", "LATVIAN"}
-
-	result = Create(TestQuote4,&DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, true, t)
-
 	TestQuote5 := []string{"Quote 5", "Top D", "KAUKAAASIAN"}
+	TestQuote6 := []string{"Quote 6", "Top D", "KAUKAAASIAN"}
+	TestQuote7 := []string{"Quote 7", "Top D", "KAUKAAASIAN"}
+	TestQuote8 := []string{"Quote 8", "Top D", "KAUKAAASIAN"}
+	TestQuote9 := []string{"Quote 9", "Top D", "KAUKAAASIAN"}
+	TestQuote10 := []string{"Quote 10", "Top D", "KAUKAAASIAN"}
 
-	result = Create(TestQuote5,&DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, true, t)
+	TestQuoteArray := [][]string{TestQuote1, TestQuote2, TestQuote3, TestQuote4, TestQuote5, TestQuote6, TestQuote7, TestQuote8, TestQuote9, TestQuote10}
 
+	for _, testquote := range TestQuoteArray {
+		result := Create(testquote, &DatabaseTest, DatabasePathTest)
+		CompareBoolean(result, true, t)
+	}
+
+	t.Log("10 Quotes Added!")
 }
 
 func TestUpdate(t *testing.T) {
 
-	t.Log("Testing Updating...")
-
 	DatabaseTest := db.OpenDB(DatabasePathTest)
 
-	TestUpdateQuote := []string{"Quote Updated", "Top GG", "English FTW"}
+	TestUpdateQuote := []string{"Quote Updated Successfully", "Top G Updated", "Language Updated"}
 
-	result := Update(1, TestUpdateQuote, &DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, true, t)
+	for i := 5; i < 11; i++ {
+		result := Update(i, TestUpdateQuote, &DatabaseTest, DatabasePathTest)
+		CompareBoolean(result, true, t)
+	}
 
-	result = Update(2, TestUpdateQuote, &DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, true, t)
+	t.Log("5 Quotes Updated!")
 }
 
 func TestDelete(t *testing.T) {
 
-	t.Log("Testing Deleting...")
-
 	DatabaseTest := db.OpenDB(DatabasePathTest)
 
-	expected := true
+	for i := 1; i < 5; i++ {
+		Create([]string{"Quote For Deleting", "Top G Del", "English Del"}, &DatabaseTest, DatabasePathTest)
+	}
 
-	result := Delete(3, &DatabaseTest, DatabasePathTest)
-	CompareBoolean(result, expected, t)
+	for i := 11; i < 15; i++ {
+		result := Delete(i, &DatabaseTest, DatabasePathTest)
+		CompareBoolean(result, true, t)
+	}
+
+	t.Log("5 Quotes Deleted!")
 }
 
 func CompareBoolean(result, expected bool, t *testing.T) {

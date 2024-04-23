@@ -9,11 +9,6 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-var Version = "1.0"
-var DatabasePath = "./database/quotes.json"
-var CurrentQuoteIndex = -1
-var Msg = ""
-
 func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
 	NewQuote := db.Quotes{

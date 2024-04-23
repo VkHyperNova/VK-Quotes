@@ -27,9 +27,18 @@ func PressAnyKey() {
 	ClearScreen()
 }
 
-func ArrayContains(arr []string, name string) bool {
+func ArrayContainsString(arr []string, name string) bool {
 	for _, n := range arr {
 		if n == name {
+			return true
+		}
+	}
+	return false
+}
+
+func ArrayContainsInt(numbers []int, number int) bool {
+	for _, n := range numbers {
+		if n == number {
 			return true
 		}
 	}

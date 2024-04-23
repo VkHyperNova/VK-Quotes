@@ -84,6 +84,7 @@ func main() {
 				cmd.Read(&Database, command)
 				util.PressAnyKey()
 			}
+			cmd.ReadCount += 1
 			main()
 		}
 	}

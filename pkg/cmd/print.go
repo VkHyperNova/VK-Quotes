@@ -5,6 +5,7 @@ All Print functions
 */
 
 import (
+	"fmt"
 	"math/rand"
 	"sort"
 	"strconv"
@@ -15,13 +16,42 @@ import (
 	"github.com/fatih/color"
 )
 
+var Version = "1.1"
+var DatabasePath = "./database/quotes.json"
+var CurrentQuoteIndex = -1
+var Msg = ""
+var ReadCount = 1
+var UsedIndexes []int
+
 func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
+
+	/* Print Program Name and Version in bold */
 	green := color.New(color.FgGreen)
 	boldGreen := green.Add(color.Bold)
-	boldGreen.Println("\n<< VK-QUOTES " + Version + " >>")
+	util.PrintBlue("\n|| ")
+	boldGreen.Print("VK-QUOTES " + Version)
+	util.PrintBlue(" ||")
 
-	util.PrintCyan("\nQuotes: " + strconv.Itoa(len(*Database)) + "\n")
+	/* Print Read Counter */
+	util.PrintBlue("\n\n <")
+	util.PrintGreen(strconv.Itoa(ReadCount))
+	util.PrintBlue("/")
+	util.PrintGray(strconv.Itoa(len(*Database)-ReadCount))
+	util.PrintBlue("> ")
 
+	/* Print Loading bar */
+	percentage := float64(ReadCount) / float64(len(*Database)) * 100
+	i := 0
+	for i < ReadCount {
+		util.PrintGreen("-")
+		i++
+	}
+	util.PrintGreen("> ")
+	util.PrintGray(fmt.Sprintf("%.2f", percentage)+"%")
+
+	
+
+	/* Print Main Quote */
 	if CurrentQuoteIndex != -1 {
 		PrintQuote(CurrentQuoteIndex, Database)
 		CurrentQuoteIndex = -1
@@ -29,19 +59,23 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 		PrintRandomQuote(Database)
 	}
 
+	/* Print Message */
 	if Msg != "" {
 		util.PrintRed("\n" + Msg + "\n")
 		Msg = ""
 	}
 
+	/* Print CLI */
 	Commands := [6]string{"add", "update", "delete", "showall", "stats", "q"}
 	util.PrintCyan("\n")
 	for _, value := range Commands {
-		util.PrintYellow("[")
+		util.PrintBlue("|")
 		util.PrintYellow(value)
-		util.PrintYellow("] ")
+		util.PrintBlue("| ")
 	}
-	util.PrintYellow("\n=> ")
+	util.PrintBlue("\n|")
+	util.PrintYellow("=> ")
+
 }
 
 func PrintQuote(index int, Database *[]db.Quotes) {
@@ -55,7 +89,7 @@ func PrintQuote(index int, Database *[]db.Quotes) {
 		spaces = strings.Repeat(" ", repeatTimes)
 	}
 
-	util.PrintBlue("\n(" + strconv.Itoa((*Database)[index].ID) + ") ")
+	util.PrintBlue("\n\n|" + strconv.Itoa((*Database)[index].ID) + "| ")
 	util.PrintGray("\"" + (*Database)[index].QUOTE + "\"")
 	util.PrintCyan("\n" + spaces + " By " + (*Database)[index].AUTHOR + " (" + (*Database)[index].DATE + ")\n")
 }
@@ -70,13 +104,30 @@ func PrintAllQuotes(Database *[]db.Quotes) {
 
 func PrintRandomQuote(Database *[]db.Quotes) {
 
-	randomNumber := rand.Intn(len(*Database))
+	var randomIndex int
+	/* Validate Index */
+	isValid := false
+	for !isValid {
+		randomIndex = rand.Intn(len(*Database))
+		if !util.ArrayContainsInt(UsedIndexes, randomIndex) {
+			UsedIndexes = append(UsedIndexes, randomIndex)
+			isValid = true
+		}
+	}
 
+	/* Find and Print Quote */
 	for index := range *Database {
-		if index == randomNumber {
+		if index == randomIndex {
 			PrintQuote(index, Database)
 		}
 
+	}
+
+	/* Empty the Slice if its full */
+	if len(UsedIndexes) == len(*Database) {
+		Msg = "You Have Read Everything!"
+		UsedIndexes = UsedIndexes[:0]
+		ReadCount = 0
 	}
 }
 
@@ -85,7 +136,7 @@ func PrintAuthors(Database *[]db.Quotes) {
 	/* Get All Author Names*/
 	var authors []string
 	for _, value := range *Database {
-		if !util.ArrayContains(authors, value.AUTHOR) {
+		if !util.ArrayContainsString(authors, value.AUTHOR) {
 			authors = append(authors, value.AUTHOR)
 		}
 	}
