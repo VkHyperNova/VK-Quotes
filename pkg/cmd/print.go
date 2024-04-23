@@ -33,21 +33,22 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	util.PrintBlue(" ||")
 
 	/* Print Read Counter */
-	util.PrintBlue("\n\n <")
-	util.PrintGreen(strconv.Itoa(ReadCount))
-	util.PrintBlue("/")
-	util.PrintGray(strconv.Itoa(len(*Database)-ReadCount))
-	util.PrintBlue("> ")
+	
+	util.PrintGreen("\n\n( Read: " + strconv.Itoa(ReadCount) + ") ")
+	
+	
 
 	/* Print Loading bar */
 	percentage := float64(ReadCount) / float64(len(*Database)) * 100
+	util.PrintBlue("\n[" +fmt.Sprintf("%.2f", percentage)+"%] ")
 	i := 0
+	util.PrintBlue("|")
 	for i < ReadCount {
 		util.PrintGreen("-")
 		i++
 	}
-	util.PrintGreen("> ")
-	util.PrintGray(fmt.Sprintf("%.2f", percentage)+"%")
+	util.PrintBlue("|")
+	
 
 	
 
