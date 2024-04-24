@@ -26,31 +26,26 @@ var UsedIndexes []int
 func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 
 	/* Print Program Name and Version in bold */
-	green := color.New(color.FgGreen)
-	boldGreen := green.Add(color.Bold)
-	util.PrintBlue("\n|| ")
+	white := color.New(color.FgCyan)
+	boldGreen := white.Add(color.Bold)
+	util.PrintGreen("\n|| ")
 	boldGreen.Print("VK-QUOTES " + Version)
-	util.PrintBlue(" ||")
+	util.PrintGreen(" ||")
 
 	/* Print Read Counter */
+	util.PrintGreen("\n\n[" + strconv.Itoa(ReadCount) + "] ")
 	
-	util.PrintGreen("\n\n( Read: " + strconv.Itoa(ReadCount) + ") ")
-	
-	
-
 	/* Print Loading bar */
 	percentage := float64(ReadCount) / float64(len(*Database)) * 100
-	util.PrintBlue("\n[" +fmt.Sprintf("%.2f", percentage)+"%] ")
+	util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
+	
 	i := 0
-	util.PrintBlue("|")
+	util.PrintGray("|")
 	for i < ReadCount {
 		util.PrintGreen("-")
 		i++
 	}
-	util.PrintBlue("|")
-	
-
-	
+	util.PrintGray("|")
 
 	/* Print Main Quote */
 	if CurrentQuoteIndex != -1 {
@@ -70,11 +65,11 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	Commands := [6]string{"add", "update", "delete", "showall", "stats", "q"}
 	util.PrintCyan("\n")
 	for _, value := range Commands {
-		util.PrintBlue("|")
+		util.PrintGreen("|")
 		util.PrintYellow(value)
-		util.PrintBlue("| ")
+		util.PrintGreen("| ")
 	}
-	util.PrintBlue("\n|")
+	util.PrintGreen("\n|")
 	util.PrintYellow("=> ")
 
 }
@@ -90,7 +85,7 @@ func PrintQuote(index int, Database *[]db.Quotes) {
 		spaces = strings.Repeat(" ", repeatTimes)
 	}
 
-	util.PrintBlue("\n\n|" + strconv.Itoa((*Database)[index].ID) + "| ")
+	util.PrintCyan("\n\n" + strconv.Itoa((*Database)[index].ID) + " ")
 	util.PrintGray("\"" + (*Database)[index].QUOTE + "\"")
 	util.PrintCyan("\n" + spaces + " By " + (*Database)[index].AUTHOR + " (" + (*Database)[index].DATE + ")\n")
 }
