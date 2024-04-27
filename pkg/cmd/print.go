@@ -65,7 +65,6 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	}
 	util.PrintGreen("\n|")
 	util.PrintYellow("=> ")
-
 }
 
 func PrintQuote(index int, Database *[]db.Quotes) {

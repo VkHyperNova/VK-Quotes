@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 )
 
 func ClearScreen() {
@@ -59,4 +60,11 @@ func ValidateRequiredFiles(DatabasePath string) {
 		HandleError(os.WriteFile(DatabasePath, []byte("[]"), 0644))
 		PrintRed("New Database Created!\n")
 	}
+}
+
+func ScanUserInput() string {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	userInput := scanner.Text()
+	return strings.TrimSpace(userInput)
 }
