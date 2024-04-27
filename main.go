@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"vk-quotes/pkg/cmd"
 	db "vk-quotes/pkg/db"
@@ -47,7 +48,9 @@ func main() {
 	util.ValidateRequiredFiles(cmd.DatabasePath)
 	Database := db.OpenDB(cmd.DatabasePath)
 
+	util.PrintRed(strconv.Itoa(cmd.CurrentQuoteIndex))
 	cmd.PrintCLI(cmd.Version, cmd.CurrentQuoteIndex, &Database)
+	util.PrintRed(strconv.Itoa(cmd.CurrentQuoteIndex))
 
 	var command string = ""
 	var id int = 0
@@ -84,6 +87,7 @@ func main() {
 				cmd.Read(&Database, command)
 				util.PressAnyKey()
 			}
+			cmd.CurrentQuoteIndex = -1
 			cmd.ReadCount += 1
 			main()
 		}

@@ -16,12 +16,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var Version = "1.1"
-var DatabasePath = "./database/quotes.json"
-var CurrentQuoteIndex = -1
-var Msg = ""
-var ReadCount = 1
-var UsedIndexes []int
+
 
 func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 
@@ -50,7 +45,6 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	/* Print Main Quote */
 	if CurrentQuoteIndex != -1 {
 		PrintQuote(CurrentQuoteIndex, Database)
-		CurrentQuoteIndex = -1
 	} else if len(*Database) > 0 {
 		PrintRandomQuote(Database)
 	}
