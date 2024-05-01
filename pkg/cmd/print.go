@@ -55,7 +55,7 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 
 	if ErrorMsg != "" {
 		util.PrintRed("\n" + ErrorMsg + "\n")
-		SuccessMsg = ""
+		ErrorMsg = ""
 	}
 
 	/* Print CLI */
