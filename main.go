@@ -10,7 +10,7 @@ import (
 
 func Abort(input string) {
 	if input == "q" {
-		cmd.Msg = "<< previous action aborted by user. >>"
+		cmd.ErrorMsg = "<< previous action aborted by user. >>"
 		main()
 	}
 }
@@ -30,7 +30,7 @@ func GetQuote(Database *[]db.Quotes, id int) string {
 	Abort(input)
 
 	if db.FindDublicates(input, Database) != -1 {
-		cmd.Msg = "<< there are dublicates in database. >>"
+		cmd.ErrorMsg = "<< there are dublicates in database. >>"
 		cmd.CurrentQuoteIndex = db.FindDublicates(input, Database)
 		main()
 	}

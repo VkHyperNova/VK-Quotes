@@ -25,7 +25,7 @@ func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
 	index := db.FindIndex(NewQuote.ID, Database)
 
-	Msg = fmt.Sprintf("<< %d Quote Added! >>", (*Database)[index].ID)
+	SuccessMsg = fmt.Sprintf("<< %d Quote Added! >>", (*Database)[index].ID)
 
 	CurrentQuoteIndex = index
 
@@ -53,7 +53,7 @@ func Update(id int, inputs []string, Database *[]db.Quotes, DatabasePath string)
 
 	db.SaveDB(Database, DatabasePath)
 
-	Msg = fmt.Sprintf("<< %d Quote Updated! >>", (*Database)[index].ID)
+	SuccessMsg = fmt.Sprintf("<< %d Quote Updated! >>", (*Database)[index].ID)
 
 	return true
 }
@@ -62,7 +62,7 @@ func Delete(id int, Database *[]db.Quotes, DatabasePath string) bool {
 
 	index := db.FindIndex(id, Database)
 
-	Msg = fmt.Sprintf("<< %d Quote Deleted! >>", (*Database)[index].ID)
+	SuccessMsg = fmt.Sprintf("<< %d Quote Deleted! >>", (*Database)[index].ID)
 
 	(*Database) = append((*Database)[:index], (*Database)[index+1:]...)
 

@@ -16,8 +16,6 @@ import (
 	"github.com/fatih/color"
 )
 
-
-
 func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 
 	/* Print Program Name and Version in bold */
@@ -29,11 +27,11 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 
 	/* Print Read Counter */
 	util.PrintGreen("\n\n[" + strconv.Itoa(ReadCount) + "] ")
-	
+
 	/* Print Loading bar */
 	percentage := float64(ReadCount) / float64(len(*Database)) * 100
 	util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
-	
+
 	i := 0
 	util.PrintGray("|")
 	for i < ReadCount {
@@ -50,9 +48,14 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	}
 
 	/* Print Message */
-	if Msg != "" {
-		util.PrintRed("\n" + Msg + "\n")
-		Msg = ""
+	if SuccessMsg != "" {
+		util.PrintGreen("\n" + SuccessMsg + "\n")
+		SuccessMsg = ""
+	}
+
+	if ErrorMsg != "" {
+		util.PrintRed("\n" + ErrorMsg + "\n")
+		SuccessMsg = ""
 	}
 
 	/* Print CLI */
@@ -114,7 +117,7 @@ func PrintRandomQuote(Database *[]db.Quotes) {
 
 	/* Empty the Slice if its full */
 	if len(UsedIndexes) == len(*Database) {
-		Msg = "You Have Read Everything!"
+		SuccessMsg = "You Have Read Everything!"
 		UsedIndexes = UsedIndexes[:0]
 		ReadCount = 0
 	}
