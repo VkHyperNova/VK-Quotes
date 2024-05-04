@@ -94,20 +94,25 @@ func main() {
 		case "add", "a":
 			input := userInput(&Database, 0)
 			cmd.Create(input, &Database, cmd.DatabasePath)
+			cmd.ReadCount = 1
 			main()
 		case "update", "u":
 			input := userInput(&Database, id)
 			cmd.Update(id, input, &Database, cmd.DatabasePath)
+			cmd.ReadCount = 1
 			main()
 		case "delete", "d":
 			cmd.Delete(id, &Database, cmd.DatabasePath)
+			cmd.ReadCount = 1
 			main()
 		case "showall", "s":
 			cmd.PrintAllQuotes(&Database)
+			cmd.ReadCount = 1
 			util.PressAnyKey()
 			main()
 		case "stats":
 			cmd.PrintStatistics(&Database)
+			cmd.ReadCount = 1
 			util.PressAnyKey()
 			main()
 		case "q":
