@@ -16,28 +16,43 @@ import (
 	"github.com/fatih/color"
 )
 
-func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
+func PrintCLI(Database *[]db.Quotes) {
+	PrintProgramNameAndVersion()
+	PrintReadCounter(Database)
+	PrintMainQuote(Database)
+	PrintMessage()
+	PrintCommands()
+	PrintAddCounter()
+	util.PrintYellow("=> ")
+}
 
-	/* Print Program Name and Version in bold */
+func PrintProgramNameAndVersion(){
 	white := color.New(color.FgCyan)
 	boldGreen := white.Add(color.Bold)
 	util.PrintGreen("\n|| ")
 	boldGreen.Print("VK-QUOTES " + Version)
 	util.PrintGreen(" ||")
+}
 
-	if ReadCount > 1 {
-		ReadCounter(Database)
+func PrintCommands() {
+	Commands := [6]string{"add", "update", "delete", "showall", "stats", "q"}
+	util.PrintCyan("\n")
+	for _, value := range Commands {
+		util.PrintGreen("|")
+		util.PrintYellow(value)
+		util.PrintGreen("| ")
 	}
-	
+}
 
-	/* Print Main Quote */
+func PrintMainQuote(Database *[]db.Quotes) {
 	if CurrentQuoteIndex != -1 {
 		PrintQuote(CurrentQuoteIndex, Database)
 	} else if len(*Database) > 0 {
 		PrintRandomQuote(Database)
 	}
+}
 
-	/* Print Message */
+func PrintMessage() {
 	if SuccessMsg != "" {
 		util.PrintGreen("\n" + SuccessMsg + "\n")
 		SuccessMsg = ""
@@ -47,39 +62,28 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 		util.PrintRed("\n" + ErrorMsg + "\n")
 		ErrorMsg = ""
 	}
-
-	/* Print CLI */
-	Commands := [6]string{"add", "update", "delete", "showall", "stats", "q"}
-	util.PrintCyan("\n")
-	for _, value := range Commands {
-		util.PrintGreen("|")
-		util.PrintYellow(value)
-		util.PrintGreen("| ")
-	}
-
-	AddCounter()
-	
-	util.PrintYellow("=> ")
 }
 
-func ReadCounter(Database *[]db.Quotes) {
-	/* Print Read Counter */
-	util.PrintGreen("\n\n[" + strconv.Itoa(ReadCount) + "] ")
+func PrintReadCounter(Database *[]db.Quotes) {
 
-	/* Print Loading bar */
-	percentage := float64(ReadCount) / float64(len(*Database)) * 100
-	util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
+	if ReadCount > 1 {
 
-	i := 0
-	util.PrintGray("|")
-	for i < ReadCount {
-		util.PrintGreen("-")
-		i++
+		util.PrintGreen("\n\n[" + strconv.Itoa(ReadCount) + "] ")
+
+		percentage := float64(ReadCount) / float64(len(*Database)) * 100
+		util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
+
+		i := 0
+		util.PrintGray("|")
+		for i < ReadCount {
+			util.PrintGreen("-")
+			i++
+		}
+		util.PrintGray("|")
 	}
-	util.PrintGray("|")
 }
 
-func AddCounter() {
+func PrintAddCounter() {
 	if AddCount > 0 {
 		util.PrintGreen("\n|")
 		util.PrintRed(strconv.Itoa(AddCount))
@@ -90,8 +94,8 @@ func AddCounter() {
 }
 
 func PrintQuote(index int, Database *[]db.Quotes) {
-	spaces := strings.Repeat(" ", 5)
 
+	spaces := strings.Repeat(" ", 5)
 	quoteLength := len((*Database)[index].QUOTE)
 	authorLength := len((*Database)[index].AUTHOR)
 	repeatTimes := quoteLength - authorLength
@@ -100,8 +104,11 @@ func PrintQuote(index int, Database *[]db.Quotes) {
 		spaces = strings.Repeat(" ", repeatTimes)
 	}
 
-	util.PrintCyan("\n\n" + strconv.Itoa((*Database)[index].ID) + " ")
-	util.PrintGray("\"" + (*Database)[index].QUOTE + "\"")
+	util.PrintPurple("\n\n< " + strconv.Itoa((*Database)[index].ID) + " >")
+
+	util.PrintCyan("\n\"")
+	util.PrintGray((*Database)[index].QUOTE)
+	util.PrintCyan("\"")
 	util.PrintCyan("\n" + spaces + " By " + (*Database)[index].AUTHOR + " (" + (*Database)[index].DATE + ")\n")
 }
 

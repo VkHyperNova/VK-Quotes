@@ -32,7 +32,7 @@ func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 	return true
 }
 
-func Read(Database *[]db.Quotes, searchString string) {
+func FindByAuthor(Database *[]db.Quotes, searchString string) {
 
 	for key, value := range *Database {
 		if strings.Contains(strings.ToUpper(value.AUTHOR), strings.ToUpper(searchString)) {
