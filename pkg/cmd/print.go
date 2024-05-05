@@ -25,20 +25,10 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 	boldGreen.Print("VK-QUOTES " + Version)
 	util.PrintGreen(" ||")
 
-	/* Print Read Counter */
-	util.PrintGreen("\n\n[" + strconv.Itoa(ReadCount) + "] ")
-
-	/* Print Loading bar */
-	percentage := float64(ReadCount) / float64(len(*Database)) * 100
-	util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
-
-	i := 0
-	util.PrintGray("|")
-	for i < ReadCount {
-		util.PrintGreen("-")
-		i++
+	if ReadCount > 1 {
+		ReadCounter(Database)
 	}
-	util.PrintGray("|")
+	
 
 	/* Print Main Quote */
 	if CurrentQuoteIndex != -1 {
@@ -66,8 +56,34 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 		util.PrintYellow(value)
 		util.PrintGreen("| ")
 	}
-	util.PrintGreen("\n|")
+	if AddCount > 0 {
+		util.PrintGreen("\n|" + strconv.Itoa(AddCount) + "|")
+	} else {
+		util.PrintGreen("\n|")
+	}
+	
 	util.PrintYellow("=> ")
+}
+
+func ReadCounter(Database *[]db.Quotes) {
+	/* Print Read Counter */
+	util.PrintGreen("\n\n[" + strconv.Itoa(ReadCount) + "] ")
+
+	/* Print Loading bar */
+	percentage := float64(ReadCount) / float64(len(*Database)) * 100
+	util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
+
+	i := 0
+	util.PrintGray("|")
+	for i < ReadCount {
+		util.PrintGreen("-")
+		i++
+	}
+	util.PrintGray("|")
+}
+
+func AddCounter() {
+	
 }
 
 func PrintQuote(index int, Database *[]db.Quotes) {

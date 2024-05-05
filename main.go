@@ -94,6 +94,7 @@ func main() {
 		case "add", "a":
 			input := userInput(&Database, 0)
 			cmd.Create(input, &Database, cmd.DatabasePath)
+			cmd.AddCount += 1
 			cmd.ReadCount = 1
 			main()
 		case "update", "u":
