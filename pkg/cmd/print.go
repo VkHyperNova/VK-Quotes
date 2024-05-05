@@ -56,11 +56,8 @@ func PrintCLI(Version string, CurrentQuoteIndex int, Database *[]db.Quotes) {
 		util.PrintYellow(value)
 		util.PrintGreen("| ")
 	}
-	if AddCount > 0 {
-		util.PrintGreen("\n|" + strconv.Itoa(AddCount) + "|")
-	} else {
-		util.PrintGreen("\n|")
-	}
+
+	AddCounter()
 	
 	util.PrintYellow("=> ")
 }
@@ -83,7 +80,13 @@ func ReadCounter(Database *[]db.Quotes) {
 }
 
 func AddCounter() {
-	
+	if AddCount > 0 {
+		util.PrintGreen("\n|")
+		util.PrintRed(strconv.Itoa(AddCount))
+		util.PrintGreen("|")
+	} else {
+		util.PrintGreen("\n|")
+	}
 }
 
 func PrintQuote(index int, Database *[]db.Quotes) {
