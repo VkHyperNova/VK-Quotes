@@ -86,7 +86,7 @@ func PrintReadCounter(Database *[]db.Quotes) {
 func PrintAddCounter() {
 	if AddCount > 0 {
 		util.PrintGreen("\n|")
-		util.PrintRed(strconv.Itoa(AddCount))
+		util.PrintPurple(strconv.Itoa(AddCount))
 		util.PrintGreen("|")
 	} else {
 		util.PrintGreen("\n|")
