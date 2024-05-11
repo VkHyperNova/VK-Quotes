@@ -104,7 +104,7 @@ func PrintQuote(index int, Database *[]db.Quotes) {
 		spaces = strings.Repeat(" ", repeatTimes)
 	}
 
-	util.PrintCyan("\n\n(" + strconv.Itoa((*Database)[index].ID) + ") ")
+	util.PrintGray("\n\n" + strconv.Itoa((*Database)[index].ID) + ". ")
 
 	util.PrintCyan("\"")
 	util.PrintGray((*Database)[index].QUOTE)
