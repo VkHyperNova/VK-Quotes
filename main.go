@@ -22,32 +22,45 @@ func main() {
 	for {
 		switch command {
 		case "add", "a":
+			cmd.SuccessMsg = ""
+			cmd.ErrorMsg = ""
 			input, validation := cmd.UserInput(&Database, 0)
 			if validation {
 				cmd.Create(input, &Database, cmd.DatabasePath)
 				cmd.AddCount += 1
 			}
-			cmd.ReadCount = 1
+			cmd.ReadCount = 0
 			main()
 		case "update", "u":
+			cmd.SuccessMsg = ""
+			cmd.ErrorMsg = ""
 			input, validation := cmd.UserInput(&Database, id)
 			if validation {
 				cmd.Update(id, input, &Database, cmd.DatabasePath)
 			}
-			cmd.ReadCount = 1
+			cmd.ReadCount = 0
 			main()
 		case "delete", "d":
+			cmd.SuccessMsg = ""
+			cmd.ErrorMsg = ""
 			cmd.Delete(id, &Database, cmd.DatabasePath)
-			cmd.ReadCount = 1
+			cmd.CurrentQuoteIndex = -1
+			cmd.ReadCount = 0
 			main()
 		case "showall", "s":
+			cmd.SuccessMsg = ""
+			cmd.ErrorMsg = ""
 			cmd.PrintAllQuotes(&Database)
-			cmd.ReadCount = 1
+			cmd.ReadCount = 0
+			cmd.CurrentQuoteIndex = -1
 			util.PressAnyKey()
 			main()
 		case "stats":
+			cmd.SuccessMsg = ""
+			cmd.ErrorMsg = ""
 			cmd.PrintStatistics(&Database)
-			cmd.ReadCount = 1
+			cmd.ReadCount = 0
+			cmd.CurrentQuoteIndex = -1
 			util.PressAnyKey()
 			main()
 		case "q":
@@ -59,8 +72,11 @@ func main() {
 				cmd.FindByAuthor(&Database, command)
 				util.PressAnyKey()
 			}
-			cmd.CurrentQuoteIndex = -1
-			cmd.ReadCount += 1
+			
+			if cmd.CurrentQuoteIndex == -1 {
+				cmd.ReadCount += 1
+			}
+			
 			main()
 		}
 	}

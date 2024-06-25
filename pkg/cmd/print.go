@@ -19,14 +19,14 @@ import (
 func PrintCLI(Database *[]db.Quotes) {
 	PrintProgramNameAndVersion()
 	PrintReadCounter(Database)
-	PrintMainQuote(Database)
+	PrintRandomQuote(Database)
 	PrintMessage()
 	PrintCommands()
 	PrintAddCounter()
 	util.PrintYellow("=> ")
 }
 
-func PrintProgramNameAndVersion(){
+func PrintProgramNameAndVersion() {
 	white := color.New(color.FgCyan)
 	boldGreen := white.Add(color.Bold)
 	util.PrintGreen("\n|| ")
@@ -44,23 +44,15 @@ func PrintCommands() {
 	}
 }
 
-func PrintMainQuote(Database *[]db.Quotes) {
-	if CurrentQuoteIndex != -1 {
-		PrintQuote(CurrentQuoteIndex, Database)
-	} else if len(*Database) > 0 {
-		PrintRandomQuote(Database)
-	}
-}
-
 func PrintMessage() {
 	if SuccessMsg != "" {
 		util.PrintGreen("\n" + SuccessMsg + "\n")
-		SuccessMsg = ""
+		
 	}
 
 	if ErrorMsg != "" {
 		util.PrintRed("\n" + ErrorMsg + "\n")
-		ErrorMsg = ""
+		
 	}
 }
 
@@ -134,11 +126,18 @@ func PrintRandomQuote(Database *[]db.Quotes) {
 	}
 
 	/* Find and Print Quote */
-	for index := range *Database {
-		if index == randomIndex {
-			PrintQuote(index, Database)
-		}
+	if len(*Database) > 0 && CurrentQuoteIndex == -1{
+		for index := range *Database {
+			if index == randomIndex {
+				PrintQuote(index, Database)
+			}
 
+		}
+	}
+
+	/* Print edited quote */
+	if CurrentQuoteIndex != -1 {
+		PrintQuote(CurrentQuoteIndex, Database)
 	}
 
 	/* Empty the Slice if its full */

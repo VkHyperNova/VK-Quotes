@@ -68,7 +68,7 @@ func Delete(id int, Database *[]db.Quotes, DatabasePath string) bool {
 
 	db.SaveDB(Database, DatabasePath)
 
-	CurrentQuoteIndex = -1
+	
 
 	return true
 }
