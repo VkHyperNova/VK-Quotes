@@ -51,6 +51,12 @@ func main() {
 			cmd.ReadCount = 0
 			util.PressAnyKey()
 			main()
+		case "read", "r":
+			cmd.SuccessMsg = ""
+			cmd.ErrorMsg = ""
+			cmd.ReadCount = 0
+			cmd.CurrentQuoteIndex = -1
+			main()
 		case "q":
 			util.ClearScreen()
 			os.Exit(0)
