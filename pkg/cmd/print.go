@@ -47,12 +47,10 @@ func PrintCommands() {
 func PrintMessage() {
 	if SuccessMsg != "" {
 		util.PrintGreen("\n" + SuccessMsg + "\n")
-		
 	}
 
 	if ErrorMsg != "" {
 		util.PrintRed("\n" + ErrorMsg + "\n")
-		
 	}
 }
 

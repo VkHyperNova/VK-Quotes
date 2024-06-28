@@ -11,6 +11,9 @@ import (
 
 func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
+	ErrorMsg = ""
+	SuccessMsg = ""
+
 	NewQuote := db.Quotes{
 		ID:       db.FindID(Database),
 		QUOTE:    util.FillEmptyInput(inputs[0], "Unknown"),
@@ -43,6 +46,9 @@ func FindByAuthor(Database *[]db.Quotes, searchString string) {
 
 func Update(id int, inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
+	ErrorMsg = ""
+	SuccessMsg = ""
+
 	index := db.FindIndex(id, Database)
 
 	CurrentQuoteIndex = index
@@ -59,6 +65,9 @@ func Update(id int, inputs []string, Database *[]db.Quotes, DatabasePath string)
 }
 
 func Delete(id int, Database *[]db.Quotes, DatabasePath string) bool {
+
+	ErrorMsg = ""
+	SuccessMsg = ""
 
 	index := db.FindIndex(id, Database)
 
