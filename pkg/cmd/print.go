@@ -22,7 +22,6 @@ func PrintCLI(Database *[]db.Quotes) {
 	PrintRandomQuote(Database)
 	PrintMessage()
 	PrintCommands()
-	PrintAddCounter()
 	util.PrintYellow("=> ")
 }
 
@@ -70,16 +69,6 @@ func PrintReadCounter(Database *[]db.Quotes) {
 			i++
 		}
 		util.PrintGray("|")
-	}
-}
-
-func PrintAddCounter() {
-	if AddCount > 0 {
-		util.PrintGreen("\n|")
-		util.PrintPurple(strconv.Itoa(AddCount))
-		util.PrintGreen("|")
-	} else {
-		util.PrintGreen("\n|")
 	}
 }
 

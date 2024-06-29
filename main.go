@@ -25,7 +25,6 @@ func main() {
 			input, validation := cmd.UserInput(&Database, 0)
 			if validation {
 				cmd.Create(input, &Database, cmd.DatabasePath)
-				cmd.AddCount += 1
 			}
 			cmd.ReadCount = 0
 			main()
