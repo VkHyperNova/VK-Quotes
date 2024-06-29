@@ -22,8 +22,7 @@ func GetQuote(Database *[]db.Quotes, id int) (string, bool) {
 		util.PrintGreen("\n\"" + "Unknown" + "\"\n")
 	}
 
-	util.PrintCyan("Quote: ")
-	input := util.ScanUserInput()
+	input := util.ScanUserInputWithLiner("Quote: ")
 
 	if Abort(input) {
 		return "", false
@@ -47,8 +46,7 @@ func GetAuthor(Database *[]db.Quotes, id int) (string, bool) {
 		util.PrintGreen("\n\"" + "Unknown" + "\"\n")
 	}
 
-	util.PrintCyan("Author: ")
-	input := util.ScanUserInput()
+	input := util.ScanUserInputWithLiner("Author: ")
 
 	if Abort(input) {
 		return "", false
@@ -65,8 +63,7 @@ func GetLanguage(Database *[]db.Quotes, id int) (string, bool) {
 		util.PrintGreen("\n\"" + "English" + "\"\n")
 	}
 
-	util.PrintCyan("Language: ")
-	input := util.ScanUserInput()
+	input := util.ScanUserInputWithLiner("Language: ")
 
 	if Abort(input) {
 		return "", false
@@ -85,11 +82,19 @@ func UserInput(Database *[]db.Quotes, id int) ([]string, bool) {
 	if !validation {
 		return []string{""}, false
 	}
-	
+
 	language, validation := GetLanguage(Database, id)
 	if !validation {
 		return []string{""}, false
 	}
-	
+
 	return []string{quote, author, language}, true
+}
+
+func EditUserInput(Database *[]db.Quotes, id int) []string {
+	index := db.FindIndex(id, Database)
+	quote := util.EditUserInputWithLiner("Quote: ", (*Database)[index].QUOTE)
+	author := util.EditUserInputWithLiner("Author: ", (*Database)[index].AUTHOR)
+	language := util.EditUserInputWithLiner("Language: ", (*Database)[index].LANGUAGE)
+	return []string{quote, author, language}
 }

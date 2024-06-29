@@ -29,10 +29,8 @@ func main() {
 			cmd.ReadCount = 0
 			main()
 		case "update", "u":
-			input, validation := cmd.UserInput(&Database, id)
-			if validation {
-				cmd.Update(id, input, &Database, cmd.DatabasePath)
-			}
+			edited_input := cmd.EditUserInput(&Database, id)
+			cmd.Update(id, edited_input, &Database, cmd.DatabasePath)
 			cmd.ReadCount = 0
 			main()
 		case "delete", "d":
@@ -65,11 +63,11 @@ func main() {
 				cmd.FindByAuthor(&Database, command)
 				util.PressAnyKey()
 			}
-			
+
 			if cmd.CurrentQuoteIndex == -1 {
 				cmd.ReadCount += 1
 			}
-			
+
 			main()
 		}
 	}

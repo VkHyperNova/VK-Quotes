@@ -44,7 +44,7 @@ func FindByAuthor(Database *[]db.Quotes, searchString string) {
 	}
 }
 
-func Update(id int, inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
+func Update(id int, input []string, Database *[]db.Quotes, DatabasePath string) bool {
 
 	ErrorMsg = ""
 	SuccessMsg = ""
@@ -53,9 +53,9 @@ func Update(id int, inputs []string, Database *[]db.Quotes, DatabasePath string)
 
 	CurrentQuoteIndex = index
 
-	(*Database)[index].QUOTE = util.FillEmptyInput(inputs[0], (*Database)[index].QUOTE)
-	(*Database)[index].AUTHOR = util.FillEmptyInput(inputs[1], (*Database)[index].AUTHOR)
-	(*Database)[index].LANGUAGE = util.FillEmptyInput(inputs[2], (*Database)[index].LANGUAGE)
+	(*Database)[index].QUOTE = input[0]
+	(*Database)[index].AUTHOR = input[1]
+	(*Database)[index].LANGUAGE = input[2]
 
 	db.SaveDB(Database, DatabasePath)
 
