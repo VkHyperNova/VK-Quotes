@@ -5,20 +5,20 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	db "vk-quotes/pkg/db"
-	"vk-quotes/pkg/util"
+	db "vk-quotes/pkg/db" 
 )
 
 func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
+	ReadCount = 0
 	ErrorMsg = ""
 	SuccessMsg = ""
 
 	NewQuote := db.Quotes{
 		ID:       db.FindID(Database),
-		QUOTE:    util.FillEmptyInput(inputs[0], "Unknown"),
-		AUTHOR:   util.FillEmptyInput(inputs[1], "Unknown"),
-		LANGUAGE: util.FillEmptyInput(inputs[2], "English"),
+		QUOTE:    inputs[0],
+		AUTHOR:   inputs[1],
+		LANGUAGE: inputs[2],
 		DATE:     time.Now().Format("02.01.2006"),
 	}
 
@@ -46,6 +46,7 @@ func FindByAuthor(Database *[]db.Quotes, searchString string) {
 
 func Update(id int, input []string, Database *[]db.Quotes, DatabasePath string) bool {
 
+	ReadCount = 0
 	ErrorMsg = ""
 	SuccessMsg = ""
 
@@ -66,6 +67,8 @@ func Update(id int, input []string, Database *[]db.Quotes, DatabasePath string) 
 
 func Delete(id int, Database *[]db.Quotes, DatabasePath string) bool {
 
+	CurrentQuoteIndex = -1
+	ReadCount = 0
 	ErrorMsg = ""
 	SuccessMsg = ""
 

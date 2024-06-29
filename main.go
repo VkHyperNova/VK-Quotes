@@ -26,26 +26,20 @@ func main() {
 			if validation {
 				cmd.Create(input, &Database, cmd.DatabasePath)
 			}
-			cmd.ReadCount = 0
 			main()
 		case "update", "u":
 			edited_input := cmd.EditUserInput(&Database, id)
 			cmd.Update(id, edited_input, &Database, cmd.DatabasePath)
-			cmd.ReadCount = 0
 			main()
 		case "delete", "d":
 			cmd.Delete(id, &Database, cmd.DatabasePath)
-			cmd.CurrentQuoteIndex = -1
-			cmd.ReadCount = 0
 			main()
 		case "showall", "s":
 			cmd.PrintAllQuotes(&Database)
-			cmd.ReadCount = 0
 			util.PressAnyKey()
 			main()
 		case "stats":
 			cmd.PrintStatistics(&Database)
-			cmd.ReadCount = 0
 			util.PressAnyKey()
 			main()
 		case "read", "r":

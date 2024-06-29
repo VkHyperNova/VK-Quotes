@@ -97,6 +97,8 @@ func PrintAllQuotes(Database *[]db.Quotes) {
 	for key := range *Database {
 		PrintQuote(key, Database)
 	}
+
+	ReadCount = 0
 }
 
 func PrintRandomQuote(Database *[]db.Quotes) {
@@ -208,4 +210,5 @@ func PrintStatistics(Database *[]db.Quotes) {
 	util.PrintCyan("\n--------------------------------------------\n")
 	PrintLanguages(Database)
 	util.PrintCyan("\n\n--------------------------------------------\n")
+	ReadCount = 0
 }

@@ -28,7 +28,7 @@ func GetQuote(Database *[]db.Quotes) (string, bool) {
 		return "", false
 	}
 
-	return input, true
+	return util.FillEmptyInput(input, "Unknown"), true
 }
 
 func GetAuthor(Database *[]db.Quotes) (string, bool) {
@@ -38,7 +38,7 @@ func GetAuthor(Database *[]db.Quotes) (string, bool) {
 	if Abort(input) {
 		return "", false
 	}
-	return input, true
+	return util.FillEmptyInput(input, "Unknown"), true
 }
 
 func GetLanguage(Database *[]db.Quotes) (string, bool) {
