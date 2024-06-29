@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strconv"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
@@ -13,16 +14,9 @@ func Abort(input string) bool {
 	return false
 }
 
-func GetQuote(Database *[]db.Quotes, id int) (string, bool) {
+func GetQuote(Database *[]db.Quotes) (string, bool) {
 
-	if id > 0 {
-		index := db.FindIndex(id, Database)
-		util.PrintGreen("\n\"" + (*Database)[index].QUOTE + "\"\n")
-	} else {
-		util.PrintGreen("\n\"" + "Unknown" + "\"\n")
-	}
-
-	input := util.ScanUserInputWithLiner("Quote: ")
+	input := util.ScanUserInputWithLiner("   Quote: ")
 
 	if Abort(input) {
 		return "", false
@@ -37,16 +31,9 @@ func GetQuote(Database *[]db.Quotes, id int) (string, bool) {
 	return input, true
 }
 
-func GetAuthor(Database *[]db.Quotes, id int) (string, bool) {
+func GetAuthor(Database *[]db.Quotes) (string, bool) {
 
-	if id > 0 {
-		index := db.FindIndex(id, Database)
-		util.PrintGreen("\n\"" + (*Database)[index].AUTHOR + "\"\n")
-	} else {
-		util.PrintGreen("\n\"" + "Unknown" + "\"\n")
-	}
-
-	input := util.ScanUserInputWithLiner("Author: ")
+	input := util.ScanUserInputWithLiner("   Author: ")
 
 	if Abort(input) {
 		return "", false
@@ -54,16 +41,9 @@ func GetAuthor(Database *[]db.Quotes, id int) (string, bool) {
 	return input, true
 }
 
-func GetLanguage(Database *[]db.Quotes, id int) (string, bool) {
+func GetLanguage(Database *[]db.Quotes) (string, bool) {
 
-	if id > 0 {
-		index := db.FindIndex(id, Database)
-		util.PrintGreen("\n\"" + (*Database)[index].LANGUAGE + "\"\n")
-	} else {
-		util.PrintGreen("\n\"" + "English" + "\"\n")
-	}
-
-	input := util.ScanUserInputWithLiner("Language: ")
+	input := util.ScanUserInputWithLiner("   Language: ")
 
 	if Abort(input) {
 		return "", false
@@ -73,17 +53,19 @@ func GetLanguage(Database *[]db.Quotes, id int) (string, bool) {
 
 func UserInput(Database *[]db.Quotes, id int) ([]string, bool) {
 
-	quote, validation := GetQuote(Database, id)
+	util.PrintGray("\n(" + strconv.Itoa(len(*Database)) + ")\n")
+
+	quote, validation := GetQuote(Database)
 	if !validation {
 		return []string{""}, false
 	}
 
-	author, validation := GetAuthor(Database, id)
+	author, validation := GetAuthor(Database)
 	if !validation {
 		return []string{""}, false
 	}
 
-	language, validation := GetLanguage(Database, id)
+	language, validation := GetLanguage(Database)
 	if !validation {
 		return []string{""}, false
 	}
