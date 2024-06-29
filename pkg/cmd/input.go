@@ -43,7 +43,7 @@ func GetAuthor(Database *[]db.Quotes) (string, bool) {
 
 func GetLanguage(Database *[]db.Quotes) (string, bool) {
 
-	input := util.ScanUserInputWithLiner("   Language: ")
+	input := util.EditUserInputWithLiner("   Language: ", "English")
 
 	if Abort(input) {
 		return "", false
