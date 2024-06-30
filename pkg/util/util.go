@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/peterh/liner"
 )
 
 func ClearScreen() {
@@ -58,6 +60,29 @@ func ValidateRequiredFiles(DatabasePath string) {
 		_ = os.Mkdir("database", 0700)
 		HandleError(os.WriteFile(DatabasePath, []byte("[]"), 0644))
 		PrintRed("New Database Created!\n")
+	}
+}
+
+func Abort(a string) bool {
+	if a == "q" {
+		return true
+	}
+	return false
+}
+
+func ScanOrEditWithLiner(name string, editableString string) string {
+
+	line := liner.NewLiner()
+	defer line.Close()
+
+	if editableString != "" {
+		input, err := line.PromptWithSuggestion("   "+name+": ", editableString, -1)
+		HandleError(err)
+		return input
+	} else {
+		input, err := line.Prompt("   "+name+": ")
+		HandleError(err)
+		return input
 	}
 }
 
