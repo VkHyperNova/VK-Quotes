@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	db "vk-quotes/pkg/db" 
+	db "vk-quotes/pkg/db"
+	"vk-quotes/pkg/util"
 )
 
-func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
+func Add(Database *[]db.Quotes, DatabasePath string) bool {
 
 	ReadCount = 0
 	ErrorMsg = ""
@@ -16,9 +17,9 @@ func Create(inputs []string, Database *[]db.Quotes, DatabasePath string) bool {
 
 	NewQuote := db.Quotes{
 		ID:       db.FindID(Database),
-		QUOTE:    inputs[0],
-		AUTHOR:   inputs[1],
-		LANGUAGE: inputs[2],
+		QUOTE:    util.FillEmptyInput(Quote, "Unknown"),
+		AUTHOR:   util.FillEmptyInput(Author, "Unknown"),
+		LANGUAGE: util.FillEmptyInput(Language, "English"),
 		DATE:     time.Now().Format("02.01.2006"),
 	}
 
@@ -44,19 +45,19 @@ func FindByAuthor(Database *[]db.Quotes, searchString string) {
 	}
 }
 
-func Update(id int, input []string, Database *[]db.Quotes, DatabasePath string) bool {
+func Update(id int, Database *[]db.Quotes, DatabasePath string) bool {
 
 	ReadCount = 0
 	ErrorMsg = ""
 	SuccessMsg = ""
 
 	index := db.FindIndex(id, Database)
-
+	
 	CurrentQuoteIndex = index
 
-	(*Database)[index].QUOTE = input[0]
-	(*Database)[index].AUTHOR = input[1]
-	(*Database)[index].LANGUAGE = input[2]
+	(*Database)[index].QUOTE = util.FillEmptyInput(Quote, "Unknown")
+	(*Database)[index].AUTHOR = util.FillEmptyInput(Author, "Unknown")
+	(*Database)[index].LANGUAGE = util.FillEmptyInput(Language, "English")
 
 	db.SaveDB(Database, DatabasePath)
 
@@ -79,8 +80,6 @@ func Delete(id int, Database *[]db.Quotes, DatabasePath string) bool {
 	(*Database) = append((*Database)[:index], (*Database)[index+1:]...)
 
 	db.SaveDB(Database, DatabasePath)
-
-	
 
 	return true
 }

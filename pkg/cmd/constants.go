@@ -7,3 +7,7 @@ var SuccessMsg = ""
 var ErrorMsg = ""
 var ReadCount = 1
 var UsedIndexes []int
+
+var Quote = ""
+var Author = ""
+var Language = ""

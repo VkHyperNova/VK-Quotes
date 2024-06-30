@@ -84,7 +84,6 @@ func PrintQuote(index int, Database *[]db.Quotes) {
 	}
 
 	util.PrintCyan("\n\n" + strconv.Itoa((*Database)[index].ID) + ". ")
-
 	util.PrintCyan("\"")
 	util.PrintGray((*Database)[index].QUOTE)
 	util.PrintCyan("\"")
@@ -198,8 +197,7 @@ func PrintLanguages(Database *[]db.Quotes) {
 
 	/* Print */
 	for name, num := range languagesMap {
-		util.PrintGray("\n[" + strconv.Itoa(num) + "] ")
-		util.PrintGray(name)
+		util.PrintGray("\n[" + strconv.Itoa(num) + "] " + name)
 	}
 }
 
