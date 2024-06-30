@@ -5,8 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-
-	"github.com/peterh/liner"
 )
 
 func ClearScreen() {
@@ -63,20 +61,3 @@ func ValidateRequiredFiles(DatabasePath string) {
 	}
 }
 
-// Prompt with basic line editing features
-func ScanUserInputWithLiner(name string) string {
-	line := liner.NewLiner()
-	defer line.Close()
-	input, err := line.Prompt(name)
-	HandleError(err)
-	return input
-}
-
-func EditUserInputWithLiner(name string, updateString string) string {
-	line := liner.NewLiner()
-	defer line.Close()
-	input, err := line.PromptWithSuggestion(name, updateString, -1)
-	HandleError(err)
-	input = FillEmptyInput(input, "Unknown")
-	return input
-}

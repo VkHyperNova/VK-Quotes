@@ -22,14 +22,14 @@ func main() {
 	for {
 		switch command {
 		case "add", "a":
-			input, validation := cmd.UserInput(&Database, 0)
+			validation := cmd.UserInput(&Database, 0)
 			if validation {
-				cmd.Create(input, &Database, cmd.DatabasePath)
+				cmd.Add(&Database, cmd.DatabasePath)
 			}
 			main()
 		case "update", "u":
-			edited_input := cmd.EditUserInput(&Database, id)
-			cmd.Update(id, edited_input, &Database, cmd.DatabasePath)
+			cmd.EditUserInput(&Database, id)
+			cmd.Update(id, &Database, cmd.DatabasePath)
 			main()
 		case "delete", "d":
 			cmd.Delete(id, &Database, cmd.DatabasePath)

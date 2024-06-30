@@ -42,6 +42,10 @@ func FindID(Database *[]Quotes) int {
 
 func FindDublicates(quote string, Database *[]Quotes) int {
 
+	if quote == "Unknown" || quote == "" {
+		return -1
+	}
+
 	for index, value := range *Database {
 		if strings.EqualFold(value.QUOTE, quote) {
 			return index
