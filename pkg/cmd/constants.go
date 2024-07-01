@@ -1,13 +1,13 @@
 package cmd
 
-var Version = "1.1"
-var DatabasePath = "./database/quotes.json"
-var CurrentQuoteIndex = -1
-var SuccessMsg = ""
-var ErrorMsg = ""
-var ReadCount = 1
-var UsedIndexes []int
+var IsVersion = "1.1"
+var IsDatabasePath = "./database/quotes.json"
+var IsEditedQuote = -1
+var IsMessage = "<< Welcome >>"
+var IsReadCount = 0
+var IsReadMode = false
+var IsUsedIndexes []int
 
-var Quote = ""
-var Author = ""
-var Language = ""
+var IsQuote = ""
+var IsAuthor = ""
+var IsLanguage = ""

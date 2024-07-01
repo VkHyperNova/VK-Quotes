@@ -11,11 +11,11 @@ func TestAdd(t *testing.T) {
 
 	DatabaseTest := []db.Quotes{}
 
-	Quote = "Quote"
-	Author = "Author"
-	Language = "Language"
+	IsQuote = "Quote"
+	IsAuthor = "Author"
+	IsLanguage = "Language"
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		result := Add(&DatabaseTest, DatabasePathTest)
 		CompareBoolean(result, true, t)
 	}
@@ -27,9 +27,9 @@ func TestUpdate(t *testing.T) {
 
 	DatabaseTest := db.OpenDB(DatabasePathTest)
 
-	Quote = "Quote Updated"
-	Author = "Author Updated"
-	Language = "Language Updated"
+	IsQuote = "Quote Updated"
+	IsAuthor = "Author Updated"
+	IsLanguage = "Language Updated"
 
 	for i := 1; i <= 5; i++ {
 		result := Update(i, &DatabaseTest, DatabasePathTest)
@@ -43,7 +43,7 @@ func TestDelete(t *testing.T) {
 
 	DatabaseTest := db.OpenDB(DatabasePathTest)
 
-	for i := 1; i < 5; i++ {
+	for i := 5; i < 11; i++ {
 		result := Delete(i, &DatabaseTest, DatabasePathTest)
 		CompareBoolean(result, true, t)
 	}

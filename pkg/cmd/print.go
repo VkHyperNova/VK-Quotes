@@ -17,19 +17,29 @@ import (
 )
 
 func PrintCLI(Database *[]db.Quotes) {
+
 	PrintProgramNameAndVersion()
-	PrintReadCounter(Database)
-	PrintRandomQuote(Database)
+
+	/* Message */
 	PrintMessage()
+
+	/* Quote */
+	PrintRandomQuote(Database)
+	PrintEditedQuote(Database)
+	PrintLastQuoteInDatabase(Database)
+
+	/* ReadMode */
+	PrintReadCounter(Database)
+
+	/* Commands */
 	PrintCommands()
-	util.PrintYellow("=> ")
 }
 
 func PrintProgramNameAndVersion() {
 	white := color.New(color.FgCyan)
 	boldGreen := white.Add(color.Bold)
 	util.PrintGreen("\n|| ")
-	boldGreen.Print("VK-QUOTES " + Version)
+	boldGreen.Print("VK-QUOTES " + IsVersion)
 	util.PrintGreen(" ||")
 }
 
@@ -41,30 +51,33 @@ func PrintCommands() {
 		util.PrintYellow(value)
 		util.PrintGreen("| ")
 	}
+	util.PrintYellow("=> ")
 }
 
 func PrintMessage() {
-	if SuccessMsg != "" {
-		util.PrintGreen("\n" + SuccessMsg + "\n")
-	}
 
-	if ErrorMsg != "" {
-		util.PrintRed("\n" + ErrorMsg + "\n")
+	if IsMessage != "" {
+		length := len(IsMessage) + 5
+		dots := ""
+		for i := 1; i < length; i++ {
+			dots += "-"
+		}
+		util.PrintGreen("\n" + dots + "\n" + IsMessage + "\n" + dots)
 	}
 }
 
 func PrintReadCounter(Database *[]db.Quotes) {
 
-	if ReadCount > 1 {
+	if IsReadMode {
+		IsEditedQuote = -1
+		util.PrintGreen("\n[" + strconv.Itoa(IsReadCount) + "] ")
 
-		util.PrintGreen("\n\n[" + strconv.Itoa(ReadCount) + "] ")
-
-		percentage := float64(ReadCount) / float64(len(*Database)) * 100
+		percentage := float64(IsReadCount) / float64(len(*Database)) * 100
 		util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
 
 		i := 0
 		util.PrintGray("|")
-		for i < ReadCount {
+		for i < IsReadCount {
 			util.PrintGreen("-")
 			i++
 		}
@@ -97,48 +110,71 @@ func PrintAllQuotes(Database *[]db.Quotes) {
 		PrintQuote(key, Database)
 	}
 
-	ReadCount = 0
+	IsReadCount = 0
 }
 
 func PrintRandomQuote(Database *[]db.Quotes) {
 
+	/* Check if index exists and append to global variable 'IsUsedIndexes' */
+	
 	var randomIndex int
-	/* Validate Index */
 	isValid := false
+	
 	for !isValid {
 		randomIndex = rand.Intn(len(*Database))
-		if !util.ArrayContainsInt(UsedIndexes, randomIndex) {
-			UsedIndexes = append(UsedIndexes, randomIndex)
+		if !util.ArrayContainsInt(IsUsedIndexes, randomIndex) {
+			if IsReadMode {
+				IsUsedIndexes = append(IsUsedIndexes, randomIndex)
+			}
 			isValid = true
 		}
 	}
 
-	/* Find and Print Quote */
-	if len(*Database) > 0 && CurrentQuoteIndex == -1{
+	/* Find and print random quote */
+	
+	if len(*Database) > 0 && IsReadMode {
 		for index := range *Database {
 			if index == randomIndex {
 				PrintQuote(index, Database)
 			}
-
 		}
 	}
+}
 
-	/* Print edited quote */
-	if CurrentQuoteIndex != -1 {
-		PrintQuote(CurrentQuoteIndex, Database)
+func PrintEditedQuote(Database *[]db.Quotes) {
+	
+	/* Print last edited quote if exists */
+
+	if IsEditedQuote != -1 {
+		PrintQuote(IsEditedQuote, Database)
 	}
+}
+
+func DeleteUsedIndexes(Database *[]db.Quotes) {
 
 	/* Empty the Slice if its full */
-	if len(UsedIndexes) == len(*Database) {
-		SuccessMsg = "You Have Read Everything!"
-		UsedIndexes = UsedIndexes[:0]
-		ReadCount = 0
+
+	if len(IsUsedIndexes) == len(*Database) {
+		IsMessage = "<< You Have Read Everything! >>"
+		IsUsedIndexes = IsUsedIndexes[:0]
+		IsReadCount = 0
+		IsReadMode = false
+	}
+}
+
+func PrintLastQuoteInDatabase(Database *[]db.Quotes) {
+
+	/* Print last quote if not in reading mode */
+
+	if !IsReadMode && IsEditedQuote == -1 {
+		PrintQuote(len(*Database)-1, Database)
 	}
 }
 
 func PrintAuthors(Database *[]db.Quotes) {
 
-	/* Get All Author Names*/
+	/* Get All Author Names */
+
 	var authors []string
 	for _, value := range *Database {
 		if !util.ArrayContainsString(authors, value.AUTHOR) {
@@ -147,11 +183,10 @@ func PrintAuthors(Database *[]db.Quotes) {
 	}
 
 	/* Count Authors By Name */
-	authorsMap := make(map[string]int)
 
+	authorsMap := make(map[string]int)
 	for _, name := range authors {
 		for _, value := range *Database {
-
 			if value.AUTHOR == name {
 				authorsMap[name] += 1
 			}
@@ -159,6 +194,7 @@ func PrintAuthors(Database *[]db.Quotes) {
 	}
 
 	/* Make Pairs */
+
 	type pair struct {
 		name  string
 		count int
@@ -170,11 +206,13 @@ func PrintAuthors(Database *[]db.Quotes) {
 	}
 
 	/* Sort */
+
 	sort.Slice(pairs, func(i, j int) bool {
 		return pairs[i].count > pairs[j].count
 	})
 
 	/* Print */
+	
 	for i := 0; i < len(pairs) && i < 10; i++ {
 		util.PrintGray("[" + strconv.Itoa(pairs[i].count) + "] ")
 		util.PrintGreen(pairs[i].name + "\n")
@@ -208,5 +246,5 @@ func PrintStatistics(Database *[]db.Quotes) {
 	util.PrintCyan("\n--------------------------------------------\n")
 	PrintLanguages(Database)
 	util.PrintCyan("\n\n--------------------------------------------\n")
-	ReadCount = 0
+	IsReadCount = 0
 }

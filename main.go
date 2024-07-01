@@ -10,8 +10,8 @@ import (
 
 func main() {
 	util.ClearScreen()
-	util.ValidateRequiredFiles(cmd.DatabasePath)
-	Database := db.OpenDB(cmd.DatabasePath)
+	util.ValidateRequiredFiles(cmd.IsDatabasePath)
+	Database := db.OpenDB(cmd.IsDatabasePath)
 	cmd.PrintCLI(&Database)
 
 	var command string = ""
@@ -24,15 +24,15 @@ func main() {
 		case "add", "a":
 			validation := cmd.UserInput(&Database, 0)
 			if validation {
-				cmd.Add(&Database, cmd.DatabasePath)
+				cmd.Add(&Database, cmd.IsDatabasePath)
 			}
 			main()
 		case "update", "u":
 			cmd.EditUserInput(&Database, id)
-			cmd.Update(id, &Database, cmd.DatabasePath)
+			cmd.Update(id, &Database, cmd.IsDatabasePath)
 			main()
 		case "delete", "d":
-			cmd.Delete(id, &Database, cmd.DatabasePath)
+			cmd.Delete(id, &Database, cmd.IsDatabasePath)
 			main()
 		case "showall", "s":
 			cmd.PrintAllQuotes(&Database)
@@ -43,10 +43,7 @@ func main() {
 			util.PressAnyKey()
 			main()
 		case "read", "r":
-			cmd.SuccessMsg = ""
-			cmd.ErrorMsg = ""
-			cmd.ReadCount = 0
-			cmd.CurrentQuoteIndex = -1
+			cmd.Read()
 			main()
 		case "q":
 			util.ClearScreen()
@@ -57,9 +54,11 @@ func main() {
 				cmd.FindByAuthor(&Database, command)
 				util.PressAnyKey()
 			}
-
-			if cmd.CurrentQuoteIndex == -1 {
-				cmd.ReadCount += 1
+			
+			/* Read Mode On */
+			if cmd.IsReadMode {
+				cmd.DeleteUsedIndexes(&Database)
+				cmd.IsReadCount += 1
 			}
 
 			main()
