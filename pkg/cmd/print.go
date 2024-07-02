@@ -90,7 +90,7 @@ func PrintQuote(index int, Database *[]db.Quotes) {
 	util.PrintCyan("\"")
 	util.PrintGray((*Database)[index].QUOTE)
 	util.PrintCyan("\"")
-	util.PrintCyan("\n" + strings.Repeat(" ", 100) + " By " + (*Database)[index].AUTHOR + " (" + (*Database)[index].DATE + " " + (*Database)[index].LANGUAGE + ")\n")
+	util.PrintCyan("\n" + strings.Repeat(" ", 50) + " By " + (*Database)[index].AUTHOR + " (" + (*Database)[index].DATE + " " + (*Database)[index].LANGUAGE + ")\n")
 }
 
 func PrintAllQuotes(Database *[]db.Quotes) {
