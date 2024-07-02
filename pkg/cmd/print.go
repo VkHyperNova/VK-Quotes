@@ -45,7 +45,7 @@ func PrintProgramNameAndVersion() {
 
 func PrintCommands() {
 	Commands := [7]string{"add", "update", "delete", "read", "showall", "stats", "q"}
-	util.PrintCyan("\n")
+	util.PrintCyan("\n\n")
 	for _, value := range Commands {
 		util.PrintGreen("|")
 		util.PrintYellow(value)
