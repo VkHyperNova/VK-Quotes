@@ -9,14 +9,13 @@ import (
 	"math/rand"
 	"sort"
 	"strconv"
-	"strings"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 
 	"github.com/fatih/color"
 )
 
-func PrintCLI(Database *[]db.Quotes) {
+func PrintCLI(quotes *db.Quotes) {
 
 	PrintProgramNameAndVersion()
 
@@ -24,15 +23,26 @@ func PrintCLI(Database *[]db.Quotes) {
 	PrintMessage()
 
 	/* Quote */
-	PrintRandomQuote(Database)
-	PrintEditedQuote(Database)
-	PrintLastQuoteInDatabase(Database)
+	PrintLastQuote(quotes)
+	PrintEditedQuote(quotes)
+	PrintRandomQuote(quotes)
 
 	/* ReadMode */
-	PrintReadCounter(Database)
+	PrintReadCounter(quotes)
 
 	/* Commands */
 	PrintCommands()
+}
+
+func PrintLastQuote(quotes *db.Quotes) {
+	if !IsReadMode && MustPrintQuoteID == -1 {
+		index := quotes.QuotesCount() - 1
+		LastQuoteId, err := quotes.FindIDByIndex(index)
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+		quotes.PrintQuote(LastQuoteId)
+	}
 }
 
 func PrintProgramNameAndVersion() {
@@ -66,13 +76,13 @@ func PrintMessage() {
 	}
 }
 
-func PrintReadCounter(Database *[]db.Quotes) {
+func PrintReadCounter(quotes *db.Quotes) {
 
 	if IsReadMode {
-		IsEditedQuote = -1
+		MustPrintQuoteID = -1
 		util.PrintGreen("\n[" + strconv.Itoa(IsReadCount) + "] ")
-
-		percentage := float64(IsReadCount) / float64(len(*Database)) * 100
+		
+		percentage := float64(IsReadCount) / float64(quotes.QuotesCount()) * 100
 		util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
 
 		i := 0
@@ -85,66 +95,61 @@ func PrintReadCounter(Database *[]db.Quotes) {
 	}
 }
 
-func PrintQuote(index int, Database *[]db.Quotes) {
-	util.PrintCyan("\n\n" + strconv.Itoa((*Database)[index].ID) + ". ")
-	util.PrintCyan("\"")
-	util.PrintGray((*Database)[index].QUOTE)
-	util.PrintCyan("\"")
-	util.PrintCyan("\n" + strings.Repeat(" ", 50) + " By " + (*Database)[index].AUTHOR + " (" + (*Database)[index].DATE + " " + (*Database)[index].LANGUAGE + ")\n")
-}
-
-func PrintAllQuotes(Database *[]db.Quotes) {
+func PrintAllQuotes(quotes *db.Quotes) {
 	util.PrintCyan("\n\n<< All Quotes >>\n")
-
-	for key := range *Database {
-		PrintQuote(key, Database)
+	for key := range quotes.QUOTES {
+		quotes.PrintQuote(key)
 	}
-
-	IsReadCount = 0
 }
 
-func PrintRandomQuote(Database *[]db.Quotes) {
+func PrintRandomQuote(quotes *db.Quotes) {
 
 	/* Check if index exists and append to global variable 'IsUsedIndexes' */
-	
+
 	var randomIndex int
 	isValid := false
-	
-	for !isValid {
-		randomIndex = rand.Intn(len(*Database))
-		if !util.ArrayContainsInt(IsUsedIndexes, randomIndex) {
-			if IsReadMode {
-				IsUsedIndexes = append(IsUsedIndexes, randomIndex)
+
+	if quotes.QuotesCount() > 0 {
+		for !isValid {
+			randomIndex = rand.Intn(quotes.QuotesCount())
+			if !util.ArrayContainsInt(IsUsedIndexes, randomIndex) {
+				if IsReadMode {
+					IsUsedIndexes = append(IsUsedIndexes, randomIndex)
+				}
+				isValid = true
 			}
-			isValid = true
 		}
 	}
 
 	/* Find and print random quote */
-	
-	if len(*Database) > 0 && IsReadMode {
-		for index := range *Database {
+
+	if quotes.QuotesCount() > 0 && IsReadMode {
+		for index := range quotes.QUOTES {
 			if index == randomIndex {
-				PrintQuote(index, Database)
+				id, err := quotes.FindIDByIndex(index)
+				if err != nil {
+					util.PrintRed("Error: " + err.Error())
+				}
+				quotes.PrintQuote(id)
 			}
 		}
 	}
 }
 
-func PrintEditedQuote(Database *[]db.Quotes) {
-	
+func PrintEditedQuote(quotes *db.Quotes) {
+
 	/* Print last edited quote if exists */
 
-	if IsEditedQuote != -1 {
-		PrintQuote(IsEditedQuote, Database)
+	if MustPrintQuoteID != -1 {
+		quotes.PrintQuote(MustPrintQuoteID)
 	}
 }
 
-func DeleteUsedIndexes(Database *[]db.Quotes) {
+func DeleteUsedIndexes(quotes *db.Quotes) {
 
 	/* Empty the Slice if its full */
 
-	if len(IsUsedIndexes) == len(*Database) {
+	if len(IsUsedIndexes) == quotes.QuotesCount() {
 		IsMessage = "<< You Have Read Everything! >>"
 		IsUsedIndexes = IsUsedIndexes[:0]
 		IsReadCount = 0
@@ -152,21 +157,23 @@ func DeleteUsedIndexes(Database *[]db.Quotes) {
 	}
 }
 
-func PrintLastQuoteInDatabase(Database *[]db.Quotes) {
+/* Statistics */
 
-	/* Print last quote if not in reading mode */
-
-	if !IsReadMode && IsEditedQuote == -1 {
-		PrintQuote(len(*Database)-1, Database)
-	}
+func PrintStatistics(quotes *db.Quotes) {
+	util.PrintCyan("\n\n\t<< Statistics >>\n")
+	util.PrintCyan("\n--------------------------------------------\n\n")
+	PrintAuthors(quotes)
+	util.PrintCyan("\n--------------------------------------------\n")
+	PrintLanguages(quotes)
+	util.PrintCyan("\n\n--------------------------------------------\n")
 }
 
-func PrintAuthors(Database *[]db.Quotes) {
+func PrintAuthors(quotes *db.Quotes) {
 
 	/* Get All Author Names */
 
 	var authors []string
-	for _, value := range *Database {
+	for _, value := range quotes.QUOTES {
 		if !util.ArrayContainsString(authors, value.AUTHOR) {
 			authors = append(authors, value.AUTHOR)
 		}
@@ -176,7 +183,7 @@ func PrintAuthors(Database *[]db.Quotes) {
 
 	authorsMap := make(map[string]int)
 	for _, name := range authors {
-		for _, value := range *Database {
+		for _, value := range quotes.QUOTES {
 			if value.AUTHOR == name {
 				authorsMap[name] += 1
 			}
@@ -202,21 +209,21 @@ func PrintAuthors(Database *[]db.Quotes) {
 	})
 
 	/* Print */
-	
+
 	for i := 0; i < len(pairs) && i < 10; i++ {
 		util.PrintGray("[" + strconv.Itoa(pairs[i].count) + "] ")
 		util.PrintGreen(pairs[i].name + "\n")
 	}
 }
 
-func PrintLanguages(Database *[]db.Quotes) {
+func PrintLanguages(quotes *db.Quotes) {
 
 	languages := []string{"English", "Russian", "Estonian", "German"}
 
 	/* Count */
 	languagesMap := make(map[string]int)
 	for _, name := range languages {
-		for _, value := range *Database {
+		for _, value := range quotes.QUOTES {
 			if value.LANGUAGE == name {
 				languagesMap[name] += 1
 			}
@@ -227,14 +234,4 @@ func PrintLanguages(Database *[]db.Quotes) {
 	for name, num := range languagesMap {
 		util.PrintGray("\n[" + strconv.Itoa(num) + "] " + name)
 	}
-}
-
-func PrintStatistics(Database *[]db.Quotes) {
-	util.PrintCyan("\n\n\t<< Statistics >>\n")
-	util.PrintCyan("\n--------------------------------------------\n\n")
-	PrintAuthors(Database)
-	util.PrintCyan("\n--------------------------------------------\n")
-	PrintLanguages(Database)
-	util.PrintCyan("\n\n--------------------------------------------\n")
-	IsReadCount = 0
 }

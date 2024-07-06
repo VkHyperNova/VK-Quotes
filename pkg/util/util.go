@@ -55,10 +55,10 @@ func FillEmptyInput(a, b string) string {
 	return a
 }
 
-func ValidateRequiredFiles(DatabasePath string) {
+func CreateRequiredFiles(DatabasePath string) {
 	if _, err := os.Stat(DatabasePath); os.IsNotExist(err) {
 		_ = os.Mkdir("database", 0700)
-		HandleError(os.WriteFile(DatabasePath, []byte("[]"), 0644))
+		HandleError(os.WriteFile(DatabasePath, []byte(`{"quotes": []}`), 0644))
 		PrintRed("New Database Created!\n")
 	}
 }
@@ -80,9 +80,8 @@ func ScanOrEditWithLiner(name string, editableString string) string {
 		HandleError(err)
 		return input
 	} else {
-		input, err := line.Prompt("   "+name+": ")
+		input, err := line.Prompt("   " + name + ": ")
 		HandleError(err)
 		return input
 	}
 }
-
