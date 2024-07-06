@@ -14,7 +14,7 @@ func main() {
 	util.CreateRequiredFiles(cmd.IsSaveFilePath)
 
 	quotes := db.Quotes{}
-	err := quotes.LoadQuotes("./database/quotes.json")
+	err := quotes.LoadQuotes(cmd.IsSaveFilePath)
 	if err != nil {
 		fmt.Println("Error loading quotes:", err)
 	}
@@ -34,6 +34,7 @@ func main() {
 				newID := quotes.NewID()
 				quotes.AddQuote(db.Quote{ID: newID, QUOTE: inputs[0], AUTHOR: inputs[1], LANGUAGE: inputs[2], DATE: time.Now().Format("02.01.2006")})
 				quotes.SaveQuotes(cmd.IsSaveFilePath)
+				cmd.MustPrintQuoteID = -1
 				cmd.IsMessage = fmt.Sprintf("<< %d Quote Added! >>", newID)
 			}
 			main()
@@ -42,6 +43,7 @@ func main() {
 			updatedInputs := cmd.EditUserInput(&quotes, id)
 			quotes.UpdateQuote(db.Quote{ID: id, QUOTE: updatedInputs[0], AUTHOR: updatedInputs[1], LANGUAGE: updatedInputs[2], DATE: time.Now().Format("02.01.2006")})
 			quotes.SaveQuotes(cmd.IsSaveFilePath)
+			cmd.MustPrintQuoteID = id
 			cmd.IsMessage = fmt.Sprintf("<< %d Quote Updated! >>", id)
 			main()
 		case "delete", "d":
@@ -73,7 +75,7 @@ func main() {
 				quotes.FindByAuthor(command)
 				util.PressAnyKey()
 			}
-			
+
 			/* Read Mode On */
 			if cmd.IsReadMode {
 				cmd.DeleteUsedIndexes(&quotes)

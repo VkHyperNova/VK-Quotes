@@ -23,9 +23,9 @@ func PrintCLI(quotes *db.Quotes) {
 	PrintMessage()
 
 	/* Quote */
-	PrintLastQuote(quotes)
-	PrintEditedQuote(quotes)
 	PrintRandomQuote(quotes)
+	PrintEditedQuote(quotes)
+	PrintLastQuote(quotes)
 
 	/* ReadMode */
 	PrintReadCounter(quotes)
@@ -97,8 +97,13 @@ func PrintReadCounter(quotes *db.Quotes) {
 
 func PrintAllQuotes(quotes *db.Quotes) {
 	util.PrintCyan("\n\n<< All Quotes >>\n")
-	for key := range quotes.QUOTES {
-		quotes.PrintQuote(key)
+	
+	for index := range quotes.QUOTES {
+		id, err := quotes.FindIDByIndex(index)
+		if err != nil {
+			fmt.Println(err)
+		}
+		quotes.PrintQuote(id)
 	}
 }
 
