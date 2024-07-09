@@ -64,10 +64,11 @@ func CreateRequiredFiles(DatabasePath string) {
 }
 
 func Abort(a string) bool {
-	if a == "q" {
-		return true
-	}
-	return false
+	return a == "q"
+}
+
+func MoveBack(a string) bool {
+	return a == "b"
 }
 
 func ScanOrEditWithLiner(name string, editableString string) string {

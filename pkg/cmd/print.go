@@ -35,7 +35,7 @@ func PrintCLI(quotes *db.Quotes) {
 }
 
 func PrintLastQuote(quotes *db.Quotes) {
-	if !IsReadMode && MustPrintQuoteID == -1 {
+	if !IsReadMode && UpdatedQuoteID == -1 {
 		index := quotes.QuotesCount() - 1
 		LastQuoteId, err := quotes.FindIDByIndex(index)
 		if err != nil {
@@ -79,9 +79,9 @@ func PrintMessage() {
 func PrintReadCounter(quotes *db.Quotes) {
 
 	if IsReadMode {
-		MustPrintQuoteID = -1
+		UpdatedQuoteID = -1
 		util.PrintGreen("\n[" + strconv.Itoa(IsReadCount) + "] ")
-		
+
 		percentage := float64(IsReadCount) / float64(quotes.QuotesCount()) * 100
 		util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
 
@@ -97,7 +97,7 @@ func PrintReadCounter(quotes *db.Quotes) {
 
 func PrintAllQuotes(quotes *db.Quotes) {
 	util.PrintCyan("\n\n<< All Quotes >>\n")
-	
+
 	for index := range quotes.QUOTES {
 		id, err := quotes.FindIDByIndex(index)
 		if err != nil {
@@ -145,8 +145,8 @@ func PrintEditedQuote(quotes *db.Quotes) {
 
 	/* Print last edited quote if exists */
 
-	if MustPrintQuoteID != -1 {
-		quotes.PrintQuote(MustPrintQuoteID)
+	if UpdatedQuoteID != -1 {
+		quotes.PrintQuote(UpdatedQuoteID)
 	}
 }
 

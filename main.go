@@ -34,7 +34,7 @@ func main() {
 				newID := quotes.NewID()
 				quotes.AddQuote(db.Quote{ID: newID, QUOTE: inputs[0], AUTHOR: inputs[1], LANGUAGE: inputs[2], DATE: time.Now().Format("02.01.2006")})
 				quotes.SaveQuotes(cmd.IsSaveFilePath)
-				cmd.MustPrintQuoteID = -1
+				cmd.UpdatedQuoteID = -1
 				cmd.IsMessage = fmt.Sprintf("<< %d Quote Added! >>", newID)
 			}
 			main()
@@ -43,7 +43,7 @@ func main() {
 			updatedInputs := cmd.EditUserInput(&quotes, id)
 			quotes.UpdateQuote(db.Quote{ID: id, QUOTE: updatedInputs[0], AUTHOR: updatedInputs[1], LANGUAGE: updatedInputs[2], DATE: time.Now().Format("02.01.2006")})
 			quotes.SaveQuotes(cmd.IsSaveFilePath)
-			cmd.MustPrintQuoteID = id
+			cmd.UpdatedQuoteID = id
 			cmd.IsMessage = fmt.Sprintf("<< %d Quote Updated! >>", id)
 			main()
 		case "delete", "d":
@@ -63,7 +63,7 @@ func main() {
 		case "read", "r":
 			cmd.IsReadMode = true
 			cmd.IsMessage = "<< Reading >>"
-			cmd.MustPrintQuoteID = -1
+			cmd.UpdatedQuoteID = -1
 			main()
 		case "q":
 			util.ClearScreen()
