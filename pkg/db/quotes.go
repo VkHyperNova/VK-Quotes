@@ -23,11 +23,11 @@ type Quotes struct {
 	QUOTES []Quote `json:"quotes"`
 }
 
-func (q *Quotes) AddQuote(quote Quote) {
+func (q *Quotes) Add(quote Quote) {
 	q.QUOTES = append(q.QUOTES, quote)
 }
 
-func (q *Quotes) LoadQuotes(filename string) error {
+func (q *Quotes) ReadFromFile(filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (q *Quotes) LoadQuotes(filename string) error {
 	return nil
 }
 
-func (q *Quotes) SaveQuotes(filename string) error {
+func (q *Quotes) SaveToFile(filename string) error {
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (q *Quotes) SaveQuotes(filename string) error {
 	return nil
 }
 
-func (q *Quotes) UpdateQuote(updatedQuote Quote) error {
+func (q *Quotes) Update(updatedQuote Quote) error {
 	for i, quote := range q.QUOTES {
 		if quote.ID == updatedQuote.ID {
 			q.QUOTES[i] = updatedQuote
@@ -71,22 +71,18 @@ func (q *Quotes) UpdateQuote(updatedQuote Quote) error {
 	return errors.New("quote not found")
 }
 
-func (q *Quotes) DeleteQuote(id int) error {
+func (q *Quotes) Delete(id int) error {
 
-	index, err := q.FindIndexByID(id)
-	if err != nil {
-		return err
-	}
+	index := q.FindIndex(id)
 
 	q.QUOTES = append(q.QUOTES[:index], q.QUOTES[index+1:]...)
-	
+
 	return nil
 }
 
 func (q *Quotes) PrintQuotes() {
 	for _, quote := range q.QUOTES {
-		fmt.Printf("ID: %d\nQuote: %s\nAuthor: %s\nLanguage: %s\nDate: %s\n\n",
-			quote.ID, quote.QUOTE, quote.AUTHOR, quote.LANGUAGE, quote.DATE)
+		q.PrintQuote(quote.ID)
 	}
 }
 
@@ -102,11 +98,11 @@ func (q *Quotes) PrintQuote(id int) error {
 	return errors.New("quote not found")
 }
 
-func (q *Quotes) QuotesCount() int {
+func (q *Quotes) Size() int {
 	return len(q.QUOTES)
 }
 
-func (q *Quotes) FindDuplicates(searchQuote string) int {
+func (q *Quotes) Duplicates(searchQuote string) int {
 
 	if searchQuote == "" || searchQuote == "Unknown" {
 		return -1
@@ -119,23 +115,25 @@ func (q *Quotes) FindDuplicates(searchQuote string) int {
 	return -1
 }
 
-func (q *Quotes) FindIDByIndex(index int) (int, error) {
+func (q *Quotes) FindId(index int) (int, error) {
 	if index < 0 || index >= len(q.QUOTES) {
 		return 0, errors.New("index out of bounds")
 	}
 	return q.QUOTES[index].ID, nil
 }
 
-func (q *Quotes) FindIndexByID(id int) (int, error) {
+func (q *Quotes) FindIndex(id int) int {
+	
 	for i, quote := range q.QUOTES {
 		if quote.ID == id {
-			return i, nil
+			return i
 		}
 	}
-	return -1, errors.New("quote not found")
+	fmt.Println("quote not found")
+	return -1
 }
 
-func (q *Quotes) NewID() int {
+func (q *Quotes) CreateId() int {
 	maxID := 0
 	for _, quote := range q.QUOTES {
 		if quote.ID > maxID {
@@ -151,4 +149,24 @@ func (q *Quotes) FindByAuthor(author string) {
 			q.PrintQuote(quote.ID)
 		}
 	}
+}
+
+func (q *Quotes) FindIds() {
+	for _, quote := range q.QUOTES {
+		if !util.ArrayContainsInt(IDs, quote.ID) {
+			IDs = append(IDs, quote.ID)
+		}
+	}
+}
+
+func (q *Quotes) GetLastId() int {
+	index := q.Size() - 1
+
+	lastId, err := q.FindId(index)
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+
+	return lastId
 }

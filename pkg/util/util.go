@@ -2,9 +2,12 @@ package util
 
 import (
 	"bufio"
+	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 
 	"github.com/peterh/liner"
 )
@@ -58,7 +61,11 @@ func FillEmptyInput(a, b string) string {
 func CreateRequiredFiles(DatabasePath string) {
 	if _, err := os.Stat(DatabasePath); os.IsNotExist(err) {
 		_ = os.Mkdir("database", 0700)
-		HandleError(os.WriteFile(DatabasePath, []byte(`{"quotes": []}`), 0644))
+		err = os.WriteFile(DatabasePath, []byte(`{"quotes": []}`), 0644)
+		if err != nil {
+			fmt.Println("Error creating database file")
+			fmt.Println(err)
+		}
 		PrintRed("New Database Created!\n")
 	}
 }
@@ -71,18 +78,32 @@ func MoveBack(a string) bool {
 	return a == "b"
 }
 
-func ScanOrEditWithLiner(name string, editableString string) string {
+func PromptWithSuggestion(name string, editableString string) string {
 
 	line := liner.NewLiner()
 	defer line.Close()
 
-	if editableString != "" {
-		input, err := line.PromptWithSuggestion("   "+name+": ", editableString, -1)
-		HandleError(err)
-		return input
-	} else {
-		input, err := line.Prompt("   " + name + ": ")
-		HandleError(err)
-		return input
+	input, err := line.PromptWithSuggestion("   "+name+": ", editableString, -1)
+	if err != nil {
+		fmt.Println("Error reading input: ", err)
+		return ""
 	}
+	return input
+}
+
+func Prompt(name string) string {
+	line := liner.NewLiner()
+	defer line.Close()
+	input, err := line.Prompt("   " + name + ": ")
+	if err != nil {
+		fmt.Println("Error reading input: ", err)
+		return ""
+	}
+	return input
+}
+
+func GetRandomNumber(arraySize int) int {
+	source := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(source)
+	return r.Intn(arraySize)
 }
