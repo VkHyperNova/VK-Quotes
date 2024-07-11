@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
@@ -57,7 +58,13 @@ author:
 	return inputs, true
 }
 
-func UpdateUserInput(quotes *db.Quotes, index int) []string {
+func UpdateUserInput(quotes *db.Quotes, id int) ([]string, bool) {
+	
+	index := quotes.FindIndex(id)
+	if index == -1 {
+		PrintMessage = fmt.Sprintf("<< %d Index Not Found! >>", id)
+		return []string{}, false
+	}
 
 	var updatedInputs []string
 
@@ -69,5 +76,5 @@ func UpdateUserInput(quotes *db.Quotes, index int) []string {
 	updatedInputs = append(updatedInputs, util.FillEmptyInput(updatedAuthor, "Unknown"))
 	updatedInputs = append(updatedInputs, updatedLanguage)
 
-	return updatedInputs
+	return updatedInputs, true
 }

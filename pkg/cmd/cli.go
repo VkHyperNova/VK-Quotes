@@ -20,8 +20,11 @@ func PrintCLI(quotes *db.Quotes, version string) {
 
 	PrintProgramNameAndVersion(version)
 	PrintProgramMessage()
-
-	CheckReadMode(quotes.Size(), quotes.GetLastId())
+	
+	if db.ReadMode {
+		SetRandomID(quotes.Size(), quotes.GetLastId())
+	}
+	
 	quotes.PrintQuote(PrintID)
 
 	PrintCommands()
@@ -45,15 +48,11 @@ func PrintProgramMessage() {
 	}
 }
 
-func CheckReadMode(dbsize int, latestId int) {
-	if db.ReadMode {
-		randomIndex := util.GetRandomNumber(len(db.IDs))
-		PrintID = db.IDs[randomIndex]
-		PrintReadCounter(dbsize)
-		db.IDs = append(db.IDs[:randomIndex], db.IDs[randomIndex+1:]...)
-	} else {
-		PrintID = latestId
-	}
+func SetRandomID(dbsize int, latestId int) {
+	randomIndex := util.GetRandomNumber(len(db.IDs))
+	PrintID = db.IDs[randomIndex]
+	PrintReadCounter(dbsize)
+	db.IDs = append(db.IDs[:randomIndex], db.IDs[randomIndex+1:]...)
 }
 
 func PrintReadCounter(dbsize int) {

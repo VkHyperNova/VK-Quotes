@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ProgramVersion = "1.22"
+	ProgramVersion = "1.23"
 	SaveFilePath   = "./database/quotes.json"
 )
 
@@ -29,10 +29,16 @@ func main() {
 	for {
 		switch command {
 		case "add", "a":
-			cmd.Add(&quotes, SaveFilePath)
+			inputs, validation := cmd.UserInput(&quotes)
+			if validation {
+				cmd.Add(&quotes, inputs, SaveFilePath)
+			}
 			main()
 		case "update", "u":
-			cmd.Update(&quotes, id, SaveFilePath)
+			inputs, validation := cmd.UpdateUserInput(&quotes, id)
+			if validation {
+				cmd.Update(&quotes, inputs, id, SaveFilePath)
+			}
 			main()
 		case "delete", "d":
 			cmd.Delete(&quotes, id, SaveFilePath)

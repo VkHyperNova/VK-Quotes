@@ -16,30 +16,19 @@ func LoadQuotes(filepath string) db.Quotes {
 	return quotes
 }
 
-func Add(quotes *db.Quotes, saveFilePath string) bool {
-	db.ReadMode = false
-	inputs, validation := UserInput(quotes)
-	if validation {
+func Add(quotes *db.Quotes,inputs []string, saveFilePath string) bool {
 		newID := quotes.CreateId()
 		quotes.Add(db.Quote{ID: newID, QUOTE: inputs[0], AUTHOR: inputs[1], LANGUAGE: inputs[2], DATE: time.Now().Format("02.01.2006")})
 		quotes.SaveToFile(saveFilePath)
 		quotes.GetLastId()
+		db.ReadMode = false
 		PrintMessage = fmt.Sprintf("<< %d Quote Added! >>", newID)
-		return true
-	}
-	return false
+		return true	
 }
 
-func Update(quotes *db.Quotes, id int, saveFilePath string) bool {
+func Update(quotes *db.Quotes, inputs []string, id int, saveFilePath string) bool {
 
-	index := quotes.FindIndex(id)
-	if index == -1 {
-		PrintMessage = fmt.Sprintf("<< %d Index Not Found! >>", id)
-		return false
-	}
-	
-	updatedInputs := UpdateUserInput(quotes, index)
-	quotes.Update(db.Quote{ID: id, QUOTE: updatedInputs[0], AUTHOR: updatedInputs[1], LANGUAGE: updatedInputs[2], DATE: time.Now().Format("02.01.2006")})
+	quotes.Update(db.Quote{ID: id, QUOTE: inputs[0], AUTHOR: inputs[1], LANGUAGE: inputs[2], DATE: time.Now().Format("02.01.2006")})
 	quotes.SaveToFile(saveFilePath)
 
 	/* Set */
