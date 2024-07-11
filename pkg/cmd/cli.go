@@ -20,9 +20,14 @@ func PrintCLI(quotes *db.Quotes, version string) {
 
 	PrintProgramNameAndVersion(version)
 	PrintProgramMessage()
+
 	
 	if db.ReadMode {
 		SetRandomID(quotes.Size(), quotes.GetLastId())
+	}
+	
+	if PrintID == -1 {
+		PrintID = quotes.GetLastId()
 	}
 	
 	quotes.PrintQuote(PrintID)
