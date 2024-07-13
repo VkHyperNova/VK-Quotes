@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"vk-quotes/pkg/cmd"
+	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
 
@@ -16,7 +17,11 @@ func main() {
 	util.ClearScreen()
 	util.CreateRequiredFiles(SaveFilePath)
 
-	quotes := cmd.LoadQuotes(SaveFilePath)
+	quotes := db.Quotes{}
+	err := quotes.ReadFromFile(SaveFilePath)
+	if err != nil {
+		fmt.Println("Error loading quotes:", err)
+	}
 
 	cmd.PrintCLI(&quotes, ProgramVersion)
 

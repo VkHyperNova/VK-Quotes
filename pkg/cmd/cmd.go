@@ -7,16 +7,6 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-func LoadQuotes(filepath string) db.Quotes {
-	quotes := db.Quotes{}
-	err := quotes.ReadFromFile(filepath)
-	if err != nil {
-		fmt.Println("Error loading quotes:", err)
-	}
-
-	return quotes
-}
-
 func Add(quotes *db.Quotes, inputs []string, saveFilePath string) bool {
 	newID := quotes.CreateId()
 	quotes.Add(db.Quote{ID: newID, QUOTE: inputs[0], AUTHOR: inputs[1], LANGUAGE: inputs[2], DATE: time.Now().Format("02.01.2006")})
