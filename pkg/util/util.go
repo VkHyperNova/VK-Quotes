@@ -8,8 +8,6 @@ import (
 	"os/exec"
 	"runtime"
 	"time"
-
-	"github.com/peterh/liner"
 )
 
 func ClearScreen() {
@@ -70,36 +68,8 @@ func CreateRequiredFiles(DatabasePath string) {
 	}
 }
 
-func Abort(a string) bool {
-	return a == "q"
-}
-
 func MoveBack(a string) bool {
 	return a == "b"
-}
-
-func PromptWithSuggestion(name string, editableString string) string {
-
-	line := liner.NewLiner()
-	defer line.Close()
-
-	input, err := line.PromptWithSuggestion("   "+name+": ", editableString, -1)
-	if err != nil {
-		fmt.Println("Error reading input: ", err)
-		return ""
-	}
-	return input
-}
-
-func Prompt(name string) string {
-	line := liner.NewLiner()
-	defer line.Close()
-	input, err := line.Prompt("   " + name + ": ")
-	if err != nil {
-		fmt.Println("Error reading input: ", err)
-		return ""
-	}
-	return input
 }
 
 func GetRandomNumber(arraySize int) int {

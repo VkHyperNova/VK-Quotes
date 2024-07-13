@@ -11,26 +11,20 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-var (
-	PrintID      = -1
-	PrintMessage = "<< Welcome >>"
-)
-
 func PrintCLI(quotes *db.Quotes, version string) {
 
 	PrintProgramNameAndVersion(version)
 	PrintProgramMessage()
 
-	
-	if db.ReadMode {
-		SetRandomID(quotes.Size(), quotes.GetLastId())
+	if util.ReadMode {
+		SetRandomID(quotes.Size(), quotes.FindLastId())
 	}
-	
-	if PrintID == -1 {
-		PrintID = quotes.GetLastId()
+
+	if util.ID == -1 {
+		util.ID = quotes.FindLastId()
 	}
-	
-	quotes.PrintQuote(PrintID)
+
+	quotes.PrintQuote(util.ID)
 
 	PrintCommands()
 }
@@ -43,28 +37,28 @@ func PrintProgramNameAndVersion(version string) {
 
 func PrintProgramMessage() {
 
-	if PrintMessage != "" {
-		length := len(PrintMessage) + 5
+	if util.Message != "" {
+		length := len(util.Message) + 5
 		dots := ""
 		for i := 1; i < length; i++ {
 			dots += "-"
 		}
-		util.PrintGreen("\n" + dots + "\n" + PrintMessage + "\n" + dots)
+		util.PrintGreen("\n" + dots + "\n" + util.Message + "\n" + dots)
 	}
 }
 
 func SetRandomID(dbsize int, latestId int) {
-	randomIndex := util.GetRandomNumber(len(db.IDs))
-	PrintID = db.IDs[randomIndex]
+	randomIndex := util.GetRandomNumber(len(util.IDs))
+	util.ID = util.IDs[randomIndex]
 	PrintReadCounter(dbsize)
-	db.IDs = append(db.IDs[:randomIndex], db.IDs[randomIndex+1:]...)
+	util.IDs = append(util.IDs[:randomIndex], util.IDs[randomIndex+1:]...)
 }
 
 func PrintReadCounter(dbsize int) {
 
-	util.PrintGreen("\n[" + strconv.Itoa(db.ReadCounter) + "] ")
+	util.PrintGreen("\n[" + strconv.Itoa(util.ReadCounter) + "] ")
 
-	percentage := float64(db.ReadCounter) / float64(dbsize) * 100
+	percentage := float64(util.ReadCounter) / float64(dbsize) * 100
 
 	util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
 
@@ -72,7 +66,7 @@ func PrintReadCounter(dbsize int) {
 
 	util.PrintGray("|")
 
-	for i < db.ReadCounter {
+	for i < util.ReadCounter {
 		util.PrintGreen("-")
 		i++
 	}

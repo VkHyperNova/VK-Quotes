@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"vk-quotes/pkg/util"
+
+	"github.com/peterh/liner"
 )
 
 type Quote struct {
@@ -102,17 +104,20 @@ func (q *Quotes) Size() int {
 	return len(q.QUOTES)
 }
 
-func (q *Quotes) Duplicates(searchQuote string) int {
+func (q *Quotes) Duplicates(searchQuote string) bool {
 
 	if searchQuote == "" || searchQuote == "Unknown" {
-		return -1
+		return false
 	}
+
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
-			return quote.ID
+			util.Message = "<< there are dublicates in database. >>"
+			util.ID = quote.ID
+			return true
 		}
 	}
-	return -1
+	return false
 }
 
 func (q *Quotes) FindId(index int) (int, error) {
@@ -123,13 +128,13 @@ func (q *Quotes) FindId(index int) (int, error) {
 }
 
 func (q *Quotes) FindIndex(id int) int {
-	
+
 	for i, quote := range q.QUOTES {
 		if quote.ID == id {
 			return i
 		}
 	}
-	fmt.Println("quote not found")
+	util.Message = fmt.Sprintf("<< %d Index Not Found! >>", id)
 	return -1
 }
 
@@ -153,13 +158,13 @@ func (q *Quotes) FindByAuthor(author string) {
 
 func (q *Quotes) FindIds() {
 	for _, quote := range q.QUOTES {
-		if !util.ArrayContainsInt(IDs, quote.ID) {
-			IDs = append(IDs, quote.ID)
+		if !util.ArrayContainsInt(util.IDs, quote.ID) {
+			util.IDs = append(util.IDs, quote.ID)
 		}
 	}
 }
 
-func (q *Quotes) GetLastId() int {
+func (q *Quotes) FindLastId() int {
 	index := q.Size() - 1
 
 	lastId, err := q.FindId(index)
@@ -169,4 +174,59 @@ func (q *Quotes) GetLastId() int {
 	}
 
 	return lastId
+}
+
+func (q *Quotes) PromptWithSuggestion(name string, editableString string) bool {
+
+	line := liner.NewLiner()
+	defer line.Close()
+
+	input, err := line.PromptWithSuggestion("   "+name+": ", editableString, -1)
+	if err != nil {
+		fmt.Println("Error reading input: ", err)
+		return false
+	}
+
+	if input == "q" {
+		util.Message = "<< previous action aborted by user. >>"
+		return false
+	}
+
+	if name == "Quote" && q.Duplicates(input) {
+		return false
+	}
+
+	util.UserInputs = append(util.UserInputs, util.FillEmptyInput(input, "Unknown"))
+
+	return true
+}
+
+func (q *Quotes) UserInput(id int) bool {
+
+	if len(util.UserInputs) > 0 {
+		util.UserInputs = util.UserInputs[:0] // Empty the slice
+	}
+
+	type Pairs struct {
+		First  string
+		Second string
+	}
+
+	questions := [3]Pairs{{"Quote", ""}, {"Author", ""}, {"Language", "English"}}
+
+	if id > 0 {
+		index := q.FindIndex(id)
+		if index == -1 {
+			return false
+		}
+		questions = [3]Pairs{{"Quote", q.QUOTES[index].QUOTE}, {"Author", q.QUOTES[index].AUTHOR}, {"Language", q.QUOTES[index].LANGUAGE}}
+	}
+
+	for _, question := range questions {
+		validation := q.PromptWithSuggestion(question.First, question.Second)
+		if !validation {
+			return false
+		}
+	}
+	return true
 }

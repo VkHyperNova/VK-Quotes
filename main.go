@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"vk-quotes/pkg/cmd"
-	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
 
@@ -29,15 +28,15 @@ func main() {
 	for {
 		switch command {
 		case "add", "a":
-			inputs, validation := cmd.UserInput(&quotes)
+			validation := quotes.UserInput(0)
 			if validation {
-				cmd.Add(&quotes, inputs, SaveFilePath)
+				cmd.Add(&quotes, util.UserInputs, SaveFilePath)
 			}
 			main()
 		case "update", "u":
-			inputs, validation := cmd.UpdateUserInput(&quotes, id)
+			validation := quotes.UserInput(id)
 			if validation {
-				cmd.Update(&quotes, inputs, id, SaveFilePath)
+				cmd.Update(&quotes, util.UserInputs, id, SaveFilePath)
 			}
 			main()
 		case "delete", "d":
@@ -53,8 +52,8 @@ func main() {
 			main()
 		case "read", "r":
 			quotes.FindIds()
-			db.ReadMode = true
-			cmd.PrintMessage = "<< Reading >>"
+			util.ReadMode = true
+			util.Message = "<< Reading >>"
 			main()
 		case "q":
 			util.ClearScreen()
@@ -62,21 +61,21 @@ func main() {
 		default:
 			util.ClearScreen()
 			if command != "" {
-				db.ReadMode = false
+				util.ReadMode = false
 				quotes.FindByAuthor(command)
 				util.PressAnyKey()
 			}
 
 			/* Read Mode On */
-			if db.ReadMode {
-				if len(db.IDs) == 0 {
-					cmd.PrintMessage = "<< You Have Read Everything! >>"
-					db.ReadCounter = 0
-					db.ReadMode = false
-					quotes.GetLastId()
+			if util.ReadMode {
+				if len(util.IDs) == 0 {
+					util.Message = "<< You Have Read Everything! >>"
+					util.ReadCounter = 0
+					util.ReadMode = false
+					quotes.FindLastId()
 				}
 
-				db.ReadCounter += 1
+				util.ReadCounter += 1
 			}
 			main()
 		}
