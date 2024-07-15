@@ -23,7 +23,6 @@ func CommandPrompt() (string, int) {
 
 	if err != nil {
 		Message = "<< Error reading input >>"
-		return "", -1
 	}
 
 	parts := strings.Fields(input)

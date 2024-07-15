@@ -25,24 +25,24 @@ func main() {
 
 	cmd.PrintCLI(&quotes, ProgramVersion)
 
-	command, id := util.CommandPrompt()
+	util.Command, util.ID = util.CommandPrompt()
 
 	for {
-		switch command {
+		switch util.Command {
 		case "add", "a":
-			validation := quotes.UserInput(-1)
+			validation := quotes.UserInput()
 			if validation {
 				cmd.Add(&quotes, util.UserInputs, SaveFilePath)
 			}
 			main()
 		case "update", "u":
-			validation := quotes.UserInput(id)
+			validation := quotes.UserInput()
 			if validation {
-				cmd.Update(&quotes, util.UserInputs, id, SaveFilePath)
+				cmd.Update(&quotes, util.UserInputs, SaveFilePath)
 			}
 			main()
 		case "delete", "d":
-			cmd.Delete(&quotes, id, SaveFilePath)
+			cmd.Delete(&quotes, SaveFilePath)
 			main()
 		case "showall", "s":
 			quotes.PrintQuotes()
@@ -62,9 +62,9 @@ func main() {
 			os.Exit(0)
 		default:
 			util.ClearScreen()
-			if command != "" {
+			if util.Command != "" {
 				util.ReadMode = false
-				quotes.FindByAuthor(command)
+				quotes.FindByAuthor(util.Command)
 				util.PressAnyKey()
 			}
 

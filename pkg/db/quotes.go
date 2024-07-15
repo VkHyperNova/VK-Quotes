@@ -201,10 +201,10 @@ func (q *Quotes) PromptWithSuggestion(name string, editableString string) bool {
 	return true
 }
 
-func (q *Quotes) UserInput(id int) bool {
+func (q *Quotes) UserInput() bool {
 
 	if len(util.UserInputs) > 0 {
-		util.UserInputs = util.UserInputs[:0] // Empty the slice
+		util.UserInputs = util.UserInputs[:0] 
 	}
 
 	type Pairs struct {
@@ -214,8 +214,9 @@ func (q *Quotes) UserInput(id int) bool {
 
 	questions := [3]Pairs{{"Quote", ""}, {"Author", ""}, {"Language", "English"}}
 
-	if id != -1 {
-		index := q.FindIndex(id)
+	/* If Update */
+	if util.ID != -1 {
+		index := q.FindIndex(util.ID)
 		if index == -1 {
 			return false
 		}
