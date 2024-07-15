@@ -7,8 +7,38 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/peterh/liner"
 )
+
+func CommandPrompt() (string, int) {
+
+	line := liner.NewLiner()
+	defer line.Close()
+
+	input, err := line.Prompt("=> ")
+
+	if err != nil {
+		Message = "<< Error reading input >>"
+		return "", -1
+	}
+
+	parts := strings.Fields(input)
+
+	if len(parts) > 1 {
+		IsInteger, err := strconv.Atoi(parts[1])
+		if err != nil {
+			return input, -1
+		}
+		return parts[0], IsInteger
+	}
+
+	return input, -1
+}
+
 
 func ClearScreen() {
 

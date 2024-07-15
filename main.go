@@ -25,15 +25,12 @@ func main() {
 
 	cmd.PrintCLI(&quotes, ProgramVersion)
 
-	var command string = ""
-	var id int = 0
-
-	fmt.Scanln(&command, &id)
+	command, id := util.CommandPrompt()
 
 	for {
 		switch command {
 		case "add", "a":
-			validation := quotes.UserInput(0)
+			validation := quotes.UserInput(-1)
 			if validation {
 				cmd.Add(&quotes, util.UserInputs, SaveFilePath)
 			}

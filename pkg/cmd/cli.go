@@ -82,5 +82,4 @@ func PrintCommands() {
 		util.PrintYellow(value)
 		util.PrintGreen("| ")
 	}
-	util.PrintYellow("=> ")
 }

@@ -214,7 +214,7 @@ func (q *Quotes) UserInput(id int) bool {
 
 	questions := [3]Pairs{{"Quote", ""}, {"Author", ""}, {"Language", "English"}}
 
-	if id > 0 {
+	if id != -1 {
 		index := q.FindIndex(id)
 		if index == -1 {
 			return false
