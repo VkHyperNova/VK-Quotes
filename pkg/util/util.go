@@ -2,7 +2,6 @@ package util
 
 import (
 	"bufio"
-	"fmt"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -14,7 +13,17 @@ import (
 	"github.com/peterh/liner"
 )
 
-func CommandPrompt() (string, int) {
+type Settings struct {
+	RandomIDs    []int
+	ID           int
+	UserInputs   []string
+	Command      string
+	Message      string
+	ReadCounter  int
+}
+
+
+func CommandPrompt(settings *Settings) (string, int) {
 
 	line := liner.NewLiner()
 	defer line.Close()
@@ -22,7 +31,7 @@ func CommandPrompt() (string, int) {
 	input, err := line.Prompt("=> ")
 
 	if err != nil {
-		Message = "<< Error reading input >>"
+		settings.Message = "<< Error reading input >>"
 	}
 
 	parts := strings.Fields(input)
@@ -37,7 +46,6 @@ func CommandPrompt() (string, int) {
 
 	return input, -1
 }
-
 
 func ClearScreen() {
 
@@ -85,24 +93,20 @@ func FillEmptyInput(a, b string) string {
 	return a
 }
 
-func CreateRequiredFiles(DatabasePath string) {
-	if _, err := os.Stat(DatabasePath); os.IsNotExist(err) {
-		_ = os.Mkdir("database", 0700)
-		err = os.WriteFile(DatabasePath, []byte(`{"quotes": []}`), 0644)
-		if err != nil {
-			fmt.Println("Error creating database file")
-			fmt.Println(err)
-		}
-		PrintRed("New Database Created!\n")
-	}
-}
-
 func MoveBack(a string) bool {
 	return a == "b"
 }
 
-func GetRandomNumber(arraySize int) int {
+func SetRandomID(settings *Settings) {
+
+	/* Get random int */
 	source := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(source)
-	return r.Intn(arraySize)
+	randomIndex := r.Intn(len(settings.RandomIDs))
+	
+	/* Set id */
+	settings.ID = settings.RandomIDs[randomIndex]
+
+	/* Remove this id from list */
+	settings.RandomIDs = append(settings.RandomIDs[:randomIndex], settings.RandomIDs[randomIndex+1:]...)
 }

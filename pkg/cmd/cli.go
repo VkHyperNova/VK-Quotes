@@ -11,54 +11,56 @@ import (
 	"vk-quotes/pkg/util"
 )
 
-func PrintCLI(quotes *db.Quotes, version string) {
+func PrintCLI(quotes *db.Quotes, settings *util.Settings) {
 
-	PrintProgramNameAndVersion(version)
-	PrintProgramMessage()
+	util.ClearScreen()
+	fmt.Println(settings.ID)
+	PrintProgramNameAndVersion()
+	PrintProgramMessage(settings)
 
-	if util.ReadMode {
-		SetRandomID(quotes.Size(), quotes.FindLastId())
-	}
-
-	if util.ID == -1 {
-		util.ID = quotes.FindLastId()
-	}
-
-	quotes.PrintQuote(util.ID)
-
+	PrintQuote(settings, quotes)
 	PrintCommands()
 }
 
-func PrintProgramNameAndVersion(version string) {
+func PrintProgramNameAndVersion() {
 	util.PrintGreen("\n|| ")
-	util.PrintCyan("VK-QUOTES " + version)
+	util.PrintCyan("VK-QUOTES 1.24")
 	util.PrintGreen(" ||")
 }
 
-func PrintProgramMessage() {
+func PrintProgramMessage(settings *util.Settings) {
 
-	if util.Message != "" {
-		length := len(util.Message) + 5
+	if settings.Message == "" {
+		settings.Message = "Hello, world!"
+	}
+
+	if settings.Message != "" {
+		length := len(settings.Message) + 5
 		dots := ""
 		for i := 1; i < length; i++ {
 			dots += "-"
 		}
-		util.PrintGreen("\n" + dots + "\n" + util.Message + "\n" + dots)
+		util.PrintGreen("\n" + dots + "\n" + settings.Message + "\n" + dots)
 	}
 }
 
-func SetRandomID(dbsize int, latestId int) {
-	randomIndex := util.GetRandomNumber(len(util.IDs))
-	util.ID = util.IDs[randomIndex]
-	PrintReadCounter(dbsize)
-	util.IDs = append(util.IDs[:randomIndex], util.IDs[randomIndex+1:]...)
+func PrintQuote(settings *util.Settings, quotes *db.Quotes) {
+
+	if len(settings.RandomIDs) > 0 {
+		util.SetRandomID(settings)
+		PrintReadCounter(settings, quotes)
+	} else {
+		quotes.SetToLastID(settings)
+	}
+
+	quotes.PrintQuote(settings.ID)
 }
 
-func PrintReadCounter(dbsize int) {
+func PrintReadCounter(settings *util.Settings, quotes *db.Quotes) {
 
-	util.PrintGreen("\n[" + strconv.Itoa(util.ReadCounter) + "] ")
+	util.PrintGreen("\n[" + strconv.Itoa(settings.ReadCounter) + "] ")
 
-	percentage := float64(util.ReadCounter) / float64(dbsize) * 100
+	percentage := float64(settings.ReadCounter) / float64(quotes.Size()) * 100
 
 	util.PrintGray(fmt.Sprintf("%.2f", percentage) + "% ")
 
@@ -66,7 +68,7 @@ func PrintReadCounter(dbsize int) {
 
 	util.PrintGray("|")
 
-	for i < util.ReadCounter {
+	for i < settings.ReadCounter {
 		util.PrintGreen("-")
 		i++
 	}
@@ -82,4 +84,5 @@ func PrintCommands() {
 		util.PrintYellow(value)
 		util.PrintGreen("| ")
 	}
+	util.PrintCyan("\n")
 }
