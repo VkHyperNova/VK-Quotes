@@ -14,11 +14,12 @@ import (
 func PrintCLI(quotes *db.Quotes, settings *util.Settings) {
 
 	util.ClearScreen()
-	fmt.Println(settings.ID)
+	
 	PrintProgramNameAndVersion()
 	PrintProgramMessage(settings)
 
 	PrintQuote(settings, quotes)
+
 	PrintCommands()
 }
 
@@ -49,10 +50,11 @@ func PrintQuote(settings *util.Settings, quotes *db.Quotes) {
 	if len(settings.RandomIDs) > 0 {
 		util.SetRandomID(settings)
 		PrintReadCounter(settings, quotes)
-	} else {
+	} 
+
+	if settings.ID == 0 || settings.ID == -1 {
 		quotes.SetToLastID(settings)
 	}
-
 	quotes.PrintQuote(settings.ID)
 }
 

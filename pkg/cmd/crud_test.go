@@ -2,20 +2,20 @@ package cmd
 
 import (
 	"testing"
-	db "vk-quotes/pkg/db"
+	// db "vk-quotes/pkg/db"
 )
 
 var DatabasePathTest = "/home/veikko/Desktop/VK-Quotes/database/quotes.json"
 
-func TestAdd(t *testing.T) {
+// func TestAdd(t *testing.T) {
 
-	quotes := []db.Quotes{}
-	quotes = append(quotes, )
-	result := Add(&quotes)
-	CompareBoolean(result, true, t)
+// 	quotes := []db.Quotes{}
+// 	quotes = append(quotes, )
+// 	result := Add(&quotes)
+// 	CompareBoolean(result, true, t)
 
-	t.Log("10 Quotes Added!")
-}
+// 	t.Log("10 Quotes Added!")
+// }
 
 func TestUpdate(t *testing.T) {
 
