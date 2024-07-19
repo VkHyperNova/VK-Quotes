@@ -127,9 +127,11 @@ func (q *Quotes) Duplicates(searchQuote string, settings *util.Settings) bool {
 
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
-			settings.Message = "<< there are dublicates in database. >>"
-			settings.ID = quote.ID
-			return true
+			if quote.ID != settings.ID {
+				settings.Message = "<< there are dublicates in database. >>"
+				settings.ID = quote.ID
+				return true
+			}
 		}
 	}
 	return false

@@ -14,12 +14,9 @@ import (
 func PrintCLI(quotes *db.Quotes, settings *util.Settings) {
 
 	util.ClearScreen()
-	
 	PrintProgramNameAndVersion()
 	PrintProgramMessage(settings)
-
 	PrintQuote(settings, quotes)
-
 	PrintCommands()
 }
 
