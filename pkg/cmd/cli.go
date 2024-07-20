@@ -76,7 +76,7 @@ func PrintReadCounter(settings *util.Settings, quotes *db.Quotes) {
 }
 
 func PrintCommands() {
-	Commands := [7]string{"add", "update", "delete", "read", "showall", "stats", "q"}
+	Commands := [8]string{"add", "update", "delete", "read", "showall", "stats", "similar", "q"}
 	util.PrintCyan("\n\n")
 	for _, value := range Commands {
 		util.PrintGreen("|")

@@ -42,6 +42,9 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 		case "read", "r":
 			Read(quotes, settings)
 			CMD(quotes, settings)
+		case "similar":
+			similarities(quotes)
+			CMD(quotes, settings)
 		case "q":
 			util.ClearScreen()
 			os.Exit(0)
