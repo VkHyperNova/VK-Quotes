@@ -79,7 +79,7 @@ func (s *SimilarQuotes) Add(quote SimilarQuotePairs) {
 
 // SaveToFile marshals the SimilarQuotes instance to JSON format and saves it to a file.
 // It returns an error if any step in the process fails.
-func (q *SimilarQuotes) SaveToFile() error {
+func (q *SimilarQuotes) SaveToFile(settings *util.Settings) error {
 	// Marshal the SimilarQuotes instance to a JSON byte slice with indentation for readability.
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
@@ -88,7 +88,7 @@ func (q *SimilarQuotes) SaveToFile() error {
 	}
 
 	// Write the JSON byte slice to a file named "similarquotes.json" with read/write permissions for the owner, and read permissions for others.
-	err = os.WriteFile("./similarquotes.json", byteValue, 0644)
+	err = os.WriteFile(settings.SaveSimilarPath, byteValue, 0644)
 	if err != nil {
 		// Return the error if writing to the file fails.
 		return err
@@ -119,7 +119,7 @@ func waitGroupDone(wg *sync.WaitGroup) <-chan struct{} {
 
 // processSimilarQuotes finds and processes similar quotes from the provided quotes database,
 // then adds the similar quote pairs to the SimilarQuotes collection and saves the results.
-func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
+func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes, settings *util.Settings) {
 
 	// Step 1: Extract all quote strings from the quotes database into a slice.
 	sentences := quotes.GetAllQuotes()
@@ -155,7 +155,7 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 	}
 
 	// Step 5: Save the similar quotes data to a file.
-	similar.SaveToFile()
+	similar.SaveToFile(settings)
 
 	// Print a confirmation message to indicate the process is complete.
 	util.PrintGreen("Process Done!:\n\n")
@@ -296,7 +296,7 @@ func findSimilarSentences(sentences []string, tfidfVectors []map[string]float64,
 
 // RunTaskWithProgress runs a long-running task with a progress bar to indicate progress.
 // It processes quotes and updates the progress bar until the task is complete.
-func RunTaskWithProgress(quotes *Quotes) {
+func RunTaskWithProgress(quotes *Quotes, settings *util.Settings) {
 
 	// Create an instance of SimilarQuotes to hold similar quotes.
 	similar := SimilarQuotes{}
@@ -313,7 +313,7 @@ func RunTaskWithProgress(quotes *Quotes) {
 		// Defer the Done call to ensure the WaitGroup counter is decremented when the task completes.
 		defer wg.Done()
 		// Process similar quotes, a long-running task.
-		processSimilarQuotes(quotes, &similar)
+		processSimilarQuotes(quotes, &similar, settings)
 	}()
 
 	// Run the progress bar updates in a separate goroutine.

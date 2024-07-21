@@ -8,12 +8,15 @@ import (
 )
 
 func main() {
-	
+	/* Problem with paths. */
 	settings := util.Settings{}
-	quotes := db.Quotes{}
+	settings.SaveQuotesPath = "./QuotesDB/quotes.json"
+	settings.SaveSimilarPath = "./QuotesDB/similar.json"
+	settings.SaveFolderPath = "QuotesDB"
 
-	err := quotes.ReadFromFile()
-	if err != nil {
+	quotes := db.Quotes{}
+	err := quotes.ReadFromFile(&settings)
+	if err != nil {	
 		fmt.Println("Error loading quotes:", err)
 	}
 	

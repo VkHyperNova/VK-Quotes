@@ -43,7 +43,7 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			Read(quotes, settings)
 			CMD(quotes, settings)
 		case "similar":
-			db.RunTaskWithProgress(quotes)
+			db.RunTaskWithProgress(quotes, settings)
 			util.PressAnyKey()
 			CMD(quotes, settings)
 		case "q":
@@ -63,7 +63,7 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 func Add(quotes *db.Quotes, settings *util.Settings) bool {
 	newID := quotes.CreateId()
 	quotes.Add(db.Quote{ID: newID, QUOTE: settings.UserInputs[0], AUTHOR: settings.UserInputs[1], LANGUAGE: settings.UserInputs[2], DATE: time.Now().Format("02.01.2006")})
-	quotes.SaveToFile()
+	quotes.SaveToFile(settings)
 	settings.Message = fmt.Sprintf("<< %d Quote Added! >>", newID)
 
 	return true
@@ -72,7 +72,7 @@ func Add(quotes *db.Quotes, settings *util.Settings) bool {
 func Update(quotes *db.Quotes, settings *util.Settings) bool {
 
 	quotes.Update(db.Quote{ID: settings.ID, QUOTE: settings.UserInputs[0], AUTHOR: settings.UserInputs[1], LANGUAGE: settings.UserInputs[2], DATE: time.Now().Format("02.01.2006")})
-	quotes.SaveToFile()
+	quotes.SaveToFile(settings)
 	settings.Message = fmt.Sprintf("<< %d Quote Updated! >>", settings.ID)
 
 	return true
@@ -80,7 +80,7 @@ func Update(quotes *db.Quotes, settings *util.Settings) bool {
 
 func Delete(quotes *db.Quotes, settings *util.Settings) bool {
 	quotes.Delete(settings)
-	quotes.SaveToFile()
+	quotes.SaveToFile(settings)
 	settings.Message = fmt.Sprintf("<< %d Quote Deleted! >>", settings.ID)
 	return true
 }

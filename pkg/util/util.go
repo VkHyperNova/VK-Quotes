@@ -14,14 +14,16 @@ import (
 )
 
 type Settings struct {
-	RandomIDs    []int
-	ID           int
-	UserInputs   []string
-	Command      string
-	Message      string
-	ReadCounter  int
+	RandomIDs       []int
+	ID              int
+	UserInputs      []string
+	Command         string
+	Message         string
+	ReadCounter     int
+	SaveQuotesPath  string
+	SaveSimilarPath string
+	SaveFolderPath  string
 }
-
 
 func CommandPrompt(settings *Settings) (string, int) {
 
@@ -103,7 +105,7 @@ func SetRandomID(settings *Settings) {
 	source := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(source)
 	randomIndex := r.Intn(len(settings.RandomIDs))
-	
+
 	/* Set id */
 	settings.ID = settings.RandomIDs[randomIndex]
 

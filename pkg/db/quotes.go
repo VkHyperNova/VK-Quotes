@@ -35,14 +35,15 @@ func (q *Quotes) Add(quote Quote) {
 
 // ReadFromFile reads quotes from a JSON file and populates the Quotes struct.
 // It creates a new file with an empty quotes array if the file does not exist.
-func (q *Quotes) ReadFromFile() error {
+func (q *Quotes) ReadFromFile(settings *util.Settings) error {
 	// Define the path to the JSON file where quotes are stored.
-	path := "./database/quotes.json"
+	path := settings.SaveQuotesPath
+	folder := settings.SaveFolderPath
 
 	// Check if the file exists at the specified path.
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		// If the file does not exist, create the "database" directory.
-		_ = os.Mkdir("database", 0700)
+		_ = os.Mkdir(folder, 0700)
 
 		// Create the JSON file with an initial empty quotes array.
 		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
@@ -81,13 +82,13 @@ func (q *Quotes) ReadFromFile() error {
 	return nil
 }
 
-func (q *Quotes) SaveToFile() error {
+func (q *Quotes) SaveToFile(settings *util.Settings) error {
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile("./database/quotes.json", byteValue, 0644)
+	err = os.WriteFile(settings.SaveQuotesPath, byteValue, 0644)
 	if err != nil {
 		return err
 	}
