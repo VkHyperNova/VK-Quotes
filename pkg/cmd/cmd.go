@@ -43,7 +43,8 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			Read(quotes, settings)
 			CMD(quotes, settings)
 		case "similar":
-			similarities(quotes)
+			db.RunTaskWithProgress(quotes)
+			util.PressAnyKey()
 			CMD(quotes, settings)
 		case "q":
 			util.ClearScreen()
@@ -53,7 +54,6 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 				quotes.PrintByAuthor(settings.Command)
 				util.PressAnyKey()
 			}
-
 			CMD(quotes, settings)
 		}
 	}
@@ -87,7 +87,7 @@ func Delete(quotes *db.Quotes, settings *util.Settings) bool {
 
 func Read(quotes *db.Quotes, settings *util.Settings) {
 
-	quotes.FindIDs(settings)
+	quotes.AppendRandomIDs(settings)
 	settings.Message = "<< Reading Mode >>"
 
 	for len(settings.RandomIDs) != 0 {
@@ -98,7 +98,7 @@ func Read(quotes *db.Quotes, settings *util.Settings) {
 		if quit == "q" {
 			settings.Message = "<< Reading Mode Off >>"
 			settings.ReadCounter = 0
-			quotes.SetToLastID(settings)
+			quotes.ResetID(settings)
 			if len(settings.RandomIDs) > 0 {
 				settings.RandomIDs = settings.RandomIDs[:0]
 			}

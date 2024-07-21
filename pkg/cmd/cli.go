@@ -47,10 +47,10 @@ func PrintQuote(settings *util.Settings, quotes *db.Quotes) {
 	if len(settings.RandomIDs) > 0 {
 		util.SetRandomID(settings)
 		PrintReadCounter(settings, quotes)
-	} 
+	}
 
 	if settings.ID == 0 || settings.ID == -1 {
-		quotes.SetToLastID(settings)
+		quotes.ResetID(settings)
 	}
 	quotes.PrintQuote(settings.ID)
 }
