@@ -10,7 +10,7 @@ import (
 
 func CMD(quotes *db.Quotes, settings *util.Settings) {
 
-	PrintCLI(quotes, settings)
+	CLI(quotes, settings)
 
 	settings.Command, settings.ID = util.CommandPrompt(settings)
 
@@ -51,13 +51,39 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			os.Exit(0)
 		default:
 			if settings.Command != "" {
-				quotes.PrintByAuthor(settings.Command)
+				quotes.Find(settings.Command)
 				util.PressAnyKey()
 			}
 			CMD(quotes, settings)
 		}
 	}
 
+}
+
+func CLI(quotes *db.Quotes, settings *util.Settings) {
+
+	util.ClearScreen()
+
+	// If there are random IDs available, set a random ID and print the read counter.
+	if len(settings.RandomIDs) > 0 {
+		util.SetRandomID(settings)
+	}
+
+	// Reset the ID if it's set to 0 or -1.
+	if settings.ID == 0 || settings.ID == -1 {
+		quotes.ResetID(settings)
+	}
+
+	format := "|| VK-QUOTES %s || \n%s \n%s \n%s \n\n %s \n"
+
+	cli := fmt.Sprintf(format,
+		settings.Version,
+		settings.Message,
+		util.ReadCounter(settings.ReadCounter, quotes.Size()),
+		quotes.Quote(settings.ID),
+		"add update delete read showall stats similar quit")
+
+	fmt.Print(cli)
 }
 
 func Add(quotes *db.Quotes, settings *util.Settings) bool {
@@ -91,7 +117,7 @@ func Read(quotes *db.Quotes, settings *util.Settings) {
 	settings.Message = "<< Reading Mode >>"
 
 	for len(settings.RandomIDs) != 0 {
-		PrintCLI(quotes, settings)
+		CLI(quotes, settings)
 		settings.ReadCounter += 1
 		var quit string
 		fmt.Scanln(&quit)

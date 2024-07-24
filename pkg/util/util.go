@@ -2,6 +2,7 @@ package util
 
 import (
 	"bufio"
+	"fmt"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -23,6 +24,7 @@ type Settings struct {
 	SaveQuotesPath  string
 	SaveSimilarPath string
 	SaveFolderPath  string
+	Version         string
 }
 
 func CommandPrompt(settings *Settings) (string, int) {
@@ -30,7 +32,7 @@ func CommandPrompt(settings *Settings) (string, int) {
 	line := liner.NewLiner()
 	defer line.Close()
 
-	input, err := line.Prompt("=> ")
+	input, err := line.Prompt("")
 
 	if err != nil {
 		settings.Message = "<< Error reading input >>"
@@ -112,3 +114,13 @@ func SetRandomID(settings *Settings) {
 	/* Remove this id from list */
 	settings.RandomIDs = append(settings.RandomIDs[:randomIndex], settings.RandomIDs[randomIndex+1:]...)
 }
+
+// ReadCounter generates a formatted string displaying the read counter and the read percentage.
+func ReadCounter(count int, size int) string {
+    // Calculate the read percentage.
+    percentage := float64(count) / float64(size) * 100
+    
+    // Return the formatted read counter string.
+    return fmt.Sprintf("\n[%d] %.0f%%\n", count, percentage)
+}
+

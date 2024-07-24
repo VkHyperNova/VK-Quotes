@@ -10,9 +10,11 @@ import (
 func main() {
 	/* Problem with paths. */
 	settings := util.Settings{}
+	settings.Version = "1.24"
 	settings.SaveQuotesPath = "./QuotesDB/quotes.json"
 	settings.SaveSimilarPath = "./QuotesDB/similar.json"
 	settings.SaveFolderPath = "QuotesDB"
+	settings.Message = "Hello, World!"
 
 	quotes := db.Quotes{}
 	err := quotes.ReadFromFile(&settings)

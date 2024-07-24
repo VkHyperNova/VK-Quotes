@@ -1,6 +1,7 @@
 package db
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -119,21 +120,40 @@ func (q *Quotes) Delete(settings *util.Settings) error {
 }
 
 func (q *Quotes) PrintQuotes() {
+
+	util.ClearScreen()
 	for _, quote := range q.QUOTES {
-		q.PrintQuote(quote.ID)
+		fmt.Print(q.Quote(quote.ID))
 	}
 }
 
-func (q *Quotes) PrintQuote(id int) error {
+func (q *Quotes) Quote(id int) string {
+
+	var quote bytes.Buffer
+
+	var formattedQuote string
+
+	stringFormat := "\n" + util.Cyan + "%s" + "." + " " + "\"" + util.Reset + "%s" + util.Cyan + "\"" + "\n" + "%s" + " " + "By" + " " + "%s" + " " + "(" + "%s" + " " + "%s" + ")" + util.Reset + "\n"
+
 	for _, quote := range q.QUOTES {
 		if quote.ID == id {
-			util.PrintCyan("\n\n" + strconv.Itoa((quote.ID)) + ". \"")
-			util.PrintGray(quote.QUOTE)
-			util.PrintCyan("\"\n" + strings.Repeat(" ", 50) + " By " + quote.AUTHOR + " (" + quote.DATE + " " + quote.LANGUAGE + ")\n")
-			return nil
+			formattedQuote = fmt.Sprintf(
+				stringFormat,
+				strconv.Itoa((quote.ID)),
+				quote.QUOTE,
+				strings.Repeat(" ", 50),
+				quote.AUTHOR,
+				quote.DATE,
+				quote.LANGUAGE)
+
 		}
 	}
-	return errors.New("quote not found")
+
+	// Write the formatted quote into the buffer.
+	quote.WriteString(formattedQuote)
+
+	// Return the formatted quote string.
+	return quote.String()
 }
 
 func (q *Quotes) Size() int {
@@ -185,11 +205,17 @@ func (q *Quotes) CreateId() int {
 	return maxID + 1
 }
 
-func (q *Quotes) PrintByAuthor(author string) {
+func (q *Quotes) Find(searchString string) {
+
+	util.ClearScreen()
 	for _, quote := range q.QUOTES {
-		if strings.Contains(strings.ToUpper(quote.AUTHOR), strings.ToUpper(author)) {
-			q.PrintQuote(quote.ID)
+		if strings.Contains(strings.ToUpper(quote.AUTHOR), strings.ToUpper(searchString)) {
+			fmt.Print(q.Quote(quote.ID))
 		}
+		if strings.Contains(strings.ToUpper(quote.QUOTE), strings.ToUpper(searchString)) {
+			fmt.Print(q.Quote(quote.ID))
+		}
+		
 	}
 }
 
@@ -201,7 +227,6 @@ func (q *Quotes) AppendRandomIDs(settings *util.Settings) {
 	}
 }
 
-
 // ResetID updates the provided settings with the ID of the last quote in the Quotes collection.
 // This method is typically used to set or reset the settings to reference the last quote.
 // It returns an error if retrieving the ID fails.
@@ -211,7 +236,7 @@ func (q *Quotes) ResetID(settings *util.Settings) error {
 	// so subtracting 1 gives the index of the last quote.
 	index := q.Size() - 1
 
-	// Retrieve the ID of the quote at the calculated index.	
+	// Retrieve the ID of the quote at the calculated index.
 	lastId, err := q.IdOf(index)
 
 	// Check if an error occurred while retrieving the ID.
