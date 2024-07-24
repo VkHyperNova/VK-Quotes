@@ -74,14 +74,14 @@ func CLI(quotes *db.Quotes, settings *util.Settings) {
 		quotes.ResetID(settings)
 	}
 
-	format := "|| VK-QUOTES %s || \n%s \n%s \n%s \n\n %s \n"
+	format := "%s %s %s %s %s"
+	version := util.Cyan + "VK-Quotes" + " " + settings.Version + util.Reset
+	message := util.Yellow + "\n\n" + settings.Message + "\n" + util.Reset
+	counter := ""
+	quote := quotes.Quote(settings.ID)
+	commands := util.Yellow + "\n" + "add update delete read showall stats similar quit" + "\n" + util.Reset
 
-	cli := fmt.Sprintf(format,
-		settings.Version,
-		settings.Message,
-		util.ReadCounter(settings.ReadCounter, quotes.Size()),
-		quotes.Quote(settings.ID),
-		"add update delete read showall stats similar quit")
+	cli := fmt.Sprintf(format, version, message, counter, quote, commands)
 
 	fmt.Print(cli)
 }
