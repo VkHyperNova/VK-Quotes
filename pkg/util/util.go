@@ -42,6 +42,7 @@ func CommandPrompt(settings *Settings) (string, int) {
 }
 
 func ParseIDFromInput(input string) (string, int) {
+	
 	parts := strings.Fields(input)
 
 	if len(parts) > 1 {

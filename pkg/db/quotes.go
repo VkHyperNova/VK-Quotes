@@ -237,9 +237,6 @@ func (q *Quotes) AppendRandomIDs(settings *util.Settings) {
 	}
 }
 
-// ResetID updates the provided settings with the ID of the last quote in the Quotes collection.
-// This method is typically used to set or reset the settings to reference the last quote.
-// It returns an error if retrieving the ID fails.
 func (q *Quotes) ResetID(settings *util.Settings) error {
 
 	// Calculate the index of the last quote. `Size()` returns the total number of quotes,
