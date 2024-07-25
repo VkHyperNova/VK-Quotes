@@ -208,14 +208,24 @@ func (q *Quotes) CreateId() int {
 func (q *Quotes) Find(searchString string) {
 
 	util.ClearScreen()
+
 	for _, quote := range q.QUOTES {
+
+		// Find by Author
 		if strings.Contains(strings.ToUpper(quote.AUTHOR), strings.ToUpper(searchString)) {
 			fmt.Print(q.Quote(quote.ID))
 		}
+
+		// Find by Quote
 		if strings.Contains(strings.ToUpper(quote.QUOTE), strings.ToUpper(searchString)) {
 			fmt.Print(q.Quote(quote.ID))
 		}
-		
+
+		// Find by ID
+		if quote.ID == util.StringToInt(searchString) {
+			fmt.Print(q.Quote(quote.ID))
+		}
+
 	}
 }
 

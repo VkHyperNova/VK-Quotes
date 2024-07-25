@@ -38,17 +38,29 @@ func CommandPrompt(settings *Settings) (string, int) {
 		settings.Message = "<< Error reading input >>"
 	}
 
+	return ParseIDFromInput(input)
+}
+
+func ParseIDFromInput(input string) (string, int) {
 	parts := strings.Fields(input)
 
 	if len(parts) > 1 {
-		IsInteger, err := strconv.Atoi(parts[1])
-		if err != nil {
-			return input, -1
+		if IsInteger(parts[1]) {
+			integer := StringToInt(parts[1])
+			return parts[0], integer
 		}
-		return parts[0], IsInteger
 	}
-
 	return input, -1
+}
+
+func IsInteger(a string) bool {
+	_, err := strconv.Atoi(a)
+	return err == nil
+}
+
+func StringToInt(a string) int {
+	i, _ := strconv.Atoi(a)
+	return i
 }
 
 func ClearScreen() {
@@ -117,10 +129,9 @@ func SetRandomID(settings *Settings) {
 
 // ReadCounter generates a formatted string displaying the read counter and the read percentage.
 func ReadCounter(count int, size int) string {
-    // Calculate the read percentage.
-    percentage := float64(count) / float64(size) * 100
-    
-    // Return the formatted read counter string.
-    return fmt.Sprintf("\n[%d] %.0f%%\n", count, percentage)
-}
+	// Calculate the read percentage.
+	percentage := float64(count) / float64(size) * 100
 
+	// Return the formatted read counter string.
+	return fmt.Sprintf("\n[%d] %.0f%%\n", count, percentage)
+}

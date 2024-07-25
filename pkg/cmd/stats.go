@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	
 	"sort"
 	"strconv"
 	db "vk-quotes/pkg/db"
@@ -9,13 +10,14 @@ import (
 
 /* Statistics */
 
-func PrintStatistics(quotes *db.Quotes) {
-	util.PrintCyan("\n\n\t<< Statistics >>\n")
-	util.PrintCyan("\n--------------------------------------------\n\n")
+func Stats(quotes *db.Quotes) {
+	// format := "%s %s"
+	// name := util.Cyan + "Statistics" + util.Reset
+	
+	// stats := fmt.Sprintf(format, name)
 	PrintAuthors(quotes)
-	util.PrintCyan("\n--------------------------------------------\n")
 	PrintLanguages(quotes)
-	util.PrintCyan("\n\n--------------------------------------------\n")
+
 }
 
 func PrintAuthors(quotes *db.Quotes) {

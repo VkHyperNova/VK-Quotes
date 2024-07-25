@@ -36,7 +36,7 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			util.PressAnyKey()
 			CMD(quotes, settings)
 		case "stats":
-			PrintStatistics(quotes)
+			Stats(quotes)
 			util.PressAnyKey()
 			CMD(quotes, settings)
 		case "read", "r":
