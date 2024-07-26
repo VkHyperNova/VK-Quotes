@@ -14,7 +14,6 @@ import (
 	"github.com/peterh/liner"
 )
 
-// Quote represents a single quote with its associated details.
 type Quote struct {
 	ID       int    `json:"id"`       // Unique identifier for the quote.
 	QUOTE    string `json:"quote"`    // The text of the quote.
@@ -23,19 +22,15 @@ type Quote struct {
 	DATE     string `json:"date"`     // The date when the quote was made or published.
 }
 
-// Quotes represents a collection of quotes.
 type Quotes struct {
 	QUOTES []Quote `json:"quotes"` // Slice containing multiple Quote instances.
 }
 
-// Add appends a new Quote to the Quotes collection.
 func (q *Quotes) Add(quote Quote) {
 	// Append the provided quote to the QUOTES slice.
 	q.QUOTES = append(q.QUOTES, quote)
 }
 
-// ReadFromFile reads quotes from a JSON file and populates the Quotes struct.
-// It creates a new file with an empty quotes array if the file does not exist.
 func (q *Quotes) ReadFromFile(settings *util.Settings) error {
 	// Define the path to the JSON file where quotes are stored.
 	path := settings.SaveQuotesPath
@@ -332,4 +327,15 @@ func (q *Quotes) GetAllQuotes() []string {
 		sentences = append(sentences, value.QUOTE)
 	}
 	return sentences
+}
+
+func (q *Quotes) ReArrangeIDs(settings *util.Settings) {
+
+	for key := range q.QUOTES {
+		q.QUOTES[key].ID = key + 1
+	}
+
+	q.SaveToFile(settings)
+
+	fmt.Println("Rearraging IDs Done!")
 }

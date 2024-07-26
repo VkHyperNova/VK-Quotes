@@ -39,6 +39,10 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			printStats(quotes)
 			util.PressAnyKey()
 			CMD(quotes, settings)
+		case "test", "t":
+			quotes.ReArrangeIDs(settings)
+			util.PressAnyKey()
+			CMD(quotes,settings)
 		case "read", "r":
 			Read(quotes, settings)
 			CMD(quotes, settings)
