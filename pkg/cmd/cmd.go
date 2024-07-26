@@ -39,7 +39,7 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			printStats(quotes)
 			util.PressAnyKey()
 			CMD(quotes, settings)
-		case "test", "t":
+		case "rearrange":
 			quotes.ReArrangeIDs(settings)
 			util.PressAnyKey()
 			CMD(quotes,settings)
@@ -83,7 +83,7 @@ func CLI(quotes *db.Quotes, settings *util.Settings) {
 	message := util.Yellow + "\n\n" + settings.Message + "\n" + util.Reset
 	counter := ""
 	quote := quotes.Quote(settings.ID)
-	commands := util.Yellow + "\n" + "add update delete read showall stats similar quit" + "\n" + util.Reset
+	commands := util.Yellow + "\n" + "add, update, delete, read, showall, stats, similar, reaarange, quit" + "\n" + util.Reset
 
 	cli := fmt.Sprintf(format, version, message, counter, quote, commands)
 
