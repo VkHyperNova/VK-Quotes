@@ -12,7 +12,7 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 
 	CLI(quotes, settings)
 
-	settings.Command, settings.ID = util.CommandPrompt(settings)
+	settings.Command, settings.ID = util.CommandPrompt(settings, "> ")
 
 	for {
 		switch settings.Command {
@@ -42,7 +42,7 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 		case "rearrange":
 			quotes.ReArrangeIDs(settings)
 			util.PressAnyKey()
-			CMD(quotes,settings)
+			CMD(quotes, settings)
 		case "read", "r":
 			Read(quotes, settings)
 			CMD(quotes, settings)
@@ -82,7 +82,7 @@ func CLI(quotes *db.Quotes, settings *util.Settings) {
 	version := util.Cyan + "VK-Quotes" + " " + settings.Version + util.Reset
 	message := util.Yellow + "\n\n" + settings.Message + "\n" + util.Reset
 	counter := ""
-	quote := quotes.Quote(settings.ID)
+	quote := quotes.PrintQuote(settings.ID)
 	commands := util.Yellow + "\n" + "add, update, delete, read, showall, stats, similar, reaarange, quit" + "\n" + util.Reset
 
 	cli := fmt.Sprintf(format, version, message, counter, quote, commands)
@@ -109,10 +109,16 @@ func Update(quotes *db.Quotes, settings *util.Settings) bool {
 }
 
 func Delete(quotes *db.Quotes, settings *util.Settings) bool {
-	quotes.Delete(settings)
-	quotes.SaveToFile(settings)
-	settings.Message = fmt.Sprintf("<< %d Quote Deleted! >>", settings.ID)
-	return true
+	fmt.Println(quotes.PrintQuote(settings.ID))
+	confirm, _ := util.CommandPrompt(settings, "(y/n) ")
+	if confirm == "y" {
+		quotes.Delete(settings)
+		quotes.SaveToFile(settings)
+		settings.Message = fmt.Sprintf("<< %d Quote Deleted! >>", settings.ID)
+		return true
+	}
+	
+	return false
 }
 
 func Read(quotes *db.Quotes, settings *util.Settings) {

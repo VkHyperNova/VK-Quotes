@@ -118,11 +118,11 @@ func (q *Quotes) PrintQuotes() {
 
 	util.ClearScreen()
 	for _, quote := range q.QUOTES {
-		fmt.Print(q.Quote(quote.ID))
+		fmt.Print(q.PrintQuote(quote.ID))
 	}
 }
 
-func (q *Quotes) Quote(id int) string {
+func (q *Quotes) PrintQuote(id int) string {
 
 	var quote bytes.Buffer
 
@@ -208,17 +208,17 @@ func (q *Quotes) Find(searchString string) {
 
 		// Find by Author
 		if strings.Contains(strings.ToUpper(quote.AUTHOR), strings.ToUpper(searchString)) {
-			fmt.Print(q.Quote(quote.ID))
+			fmt.Print(q.PrintQuote(quote.ID))
 		}
 
 		// Find by Quote
 		if strings.Contains(strings.ToUpper(quote.QUOTE), strings.ToUpper(searchString)) {
-			fmt.Print(q.Quote(quote.ID))
+			fmt.Print(q.PrintQuote(quote.ID))
 		}
 
 		// Find by ID
 		if quote.ID == util.StringToInt(searchString) {
-			fmt.Print(q.Quote(quote.ID))
+			fmt.Print(q.PrintQuote(quote.ID))
 		}
 
 	}

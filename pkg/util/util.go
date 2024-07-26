@@ -27,12 +27,12 @@ type Settings struct {
 	Version         string
 }
 
-func CommandPrompt(settings *Settings) (string, int) {
+func CommandPrompt(settings *Settings, prompt string) (string, int) {
 
 	line := liner.NewLiner()
 	defer line.Close()
 
-	input, err := line.Prompt("")
+	input, err := line.Prompt(prompt)
 
 	if err != nil {
 		settings.Message = "<< Error reading input >>"
@@ -78,7 +78,7 @@ func ClearScreen() {
 }
 
 func PressAnyKey() {
-	PrintGray("\nPress Any Key To Continue...")
+	PrintGray("\nPress Any Key To Continue...\n")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	ClearScreen()
