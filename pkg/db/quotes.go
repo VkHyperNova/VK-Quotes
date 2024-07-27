@@ -124,11 +124,13 @@ func (q *Quotes) PrintQuotes() {
 
 func (q *Quotes) PrintQuote(id int) string {
 
-	var quote bytes.Buffer
+	var (
+		quoteBuffer    bytes.Buffer
+		formattedQuote string
+	)
 
-	var formattedQuote string
-
-	stringFormat := "\n" + util.Cyan + "%s" + "." + " " + "\"" + util.Reset + "%s" + util.Cyan + "\"" + "\n" + "%s" + " " + "By" + " " + "%s" + " " + "(" + "%s" + " " + "%s" + ")" + util.Reset + "\n"
+	stringFormat := `` + "\n" + util.Cyan + `%s. ` + "\"" + util.Reset + `%s` + `` + util.Cyan + "\"" +
+		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + util.Reset + ``
 
 	for _, quote := range q.QUOTES {
 		if quote.ID == id {
@@ -136,19 +138,17 @@ func (q *Quotes) PrintQuote(id int) string {
 				stringFormat,
 				strconv.Itoa((quote.ID)),
 				quote.QUOTE,
-				strings.Repeat(" ", 50),
 				quote.AUTHOR,
 				quote.DATE,
 				quote.LANGUAGE)
 
 		}
 	}
-
 	// Write the formatted quote into the buffer.
-	quote.WriteString(formattedQuote)
+	quoteBuffer.WriteString(formattedQuote)
 
 	// Return the formatted quote string.
-	return quote.String()
+	return quoteBuffer.String()
 }
 
 func (q *Quotes) Size() int {

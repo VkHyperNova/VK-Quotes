@@ -44,7 +44,7 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			util.PressAnyKey()
 			CMD(quotes, settings)
 		case "read", "r":
-			Read(quotes, settings)
+			View(quotes, settings)
 			CMD(quotes, settings)
 		case "similar":
 			db.RunTaskWithProgress(quotes, settings)
@@ -109,7 +109,9 @@ func Update(quotes *db.Quotes, settings *util.Settings) bool {
 }
 
 func Delete(quotes *db.Quotes, settings *util.Settings) bool {
+
 	fmt.Println(quotes.PrintQuote(settings.ID))
+	
 	confirm, _ := util.CommandPrompt(settings, "(y/n) ")
 	if confirm == "y" {
 		quotes.Delete(settings)
@@ -121,7 +123,7 @@ func Delete(quotes *db.Quotes, settings *util.Settings) bool {
 	return false
 }
 
-func Read(quotes *db.Quotes, settings *util.Settings) {
+func View(quotes *db.Quotes, settings *util.Settings) {
 
 	quotes.AppendRandomIDs(settings)
 	settings.Message = "<< Reading Mode >>"
