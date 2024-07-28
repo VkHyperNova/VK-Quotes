@@ -82,7 +82,7 @@ func CLI(quotes *db.Quotes, settings *util.Settings) {
 	version := util.Cyan + "VK-Quotes" + " " + settings.Version + util.Reset
 	message := util.Yellow + "\n\n" + settings.Message + "\n" + util.Reset
 	counter := ""
-	quote := quotes.PrintQuote(settings.ID)
+	quote := quotes.Quote(settings.ID)
 	commands := util.Yellow + "\n" + "add, update, delete, read, showall, stats, similar, reaarange, quit" + "\n" + util.Reset
 
 	cli := fmt.Sprintf(format, version, message, counter, quote, commands)
@@ -110,17 +110,23 @@ func Update(quotes *db.Quotes, settings *util.Settings) bool {
 
 func Delete(quotes *db.Quotes, settings *util.Settings) bool {
 
-	fmt.Println(quotes.PrintQuote(settings.ID))
-	
-	confirm, _ := util.CommandPrompt(settings, "(y/n) ")
-	if confirm == "y" {
-		quotes.Delete(settings)
-		quotes.SaveToFile(settings)
-		settings.Message = fmt.Sprintf("<< %d Quote Deleted! >>", settings.ID)
-		return true
+	// Check if this ID exists in database
+	index := quotes.IndexOf(settings.ID)
+	if index == -1 {
+		settings.Message = "No Quote with this ID exists!"
+		return false
 	}
-	
-	return false
+
+	fmt.Println(quotes.Quote(settings.ID))
+	confirm, _ := util.CommandPrompt(settings, "(y/n) ")
+	if confirm != "y" {
+		return false
+	}
+
+	quotes.Remove(index)
+	quotes.SaveToFile(settings)
+	settings.Message = fmt.Sprintf("<< %d Quote Deleted! >>", settings.ID)
+	return true
 }
 
 func View(quotes *db.Quotes, settings *util.Settings) {

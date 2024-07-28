@@ -102,27 +102,19 @@ func (q *Quotes) Update(updatedQuote Quote) error {
 	return errors.New("quote not found")
 }
 
-func (q *Quotes) Delete(settings *util.Settings) error {
-
-	index := q.IndexOf(settings.ID)
-	if index == -1 {
-		settings.Message = fmt.Sprintf("<< %d Index Not Found! >>", settings.ID)
-	}
-
+func (q *Quotes) Remove(index int) {
 	q.QUOTES = append(q.QUOTES[:index], q.QUOTES[index+1:]...)
-
-	return nil
 }
 
 func (q *Quotes) PrintQuotes() {
 
 	util.ClearScreen()
 	for _, quote := range q.QUOTES {
-		fmt.Print(q.PrintQuote(quote.ID))
+		fmt.Print(q.Quote(quote.ID))
 	}
 }
 
-func (q *Quotes) PrintQuote(id int) string {
+func (q *Quotes) Quote(id int) string {
 
 	var (
 		quoteBuffer    bytes.Buffer
@@ -200,25 +192,25 @@ func (q *Quotes) CreateId() int {
 	return maxID + 1
 }
 
-func (q *Quotes) Find(searchString string) {
+func (q *Quotes) Find(input string) {
 
 	util.ClearScreen()
 
 	for _, quote := range q.QUOTES {
 
 		// Find by Author
-		if strings.Contains(strings.ToUpper(quote.AUTHOR), strings.ToUpper(searchString)) {
-			fmt.Print(q.PrintQuote(quote.ID))
+		if strings.Contains(strings.ToUpper(quote.AUTHOR), strings.ToUpper(input)) {
+			fmt.Print(q.Quote(quote.ID))
 		}
 
 		// Find by Quote
-		if strings.Contains(strings.ToUpper(quote.QUOTE), strings.ToUpper(searchString)) {
-			fmt.Print(q.PrintQuote(quote.ID))
+		if strings.Contains(strings.ToUpper(quote.QUOTE), strings.ToUpper(input)) {
+			fmt.Print(q.Quote(quote.ID))
 		}
 
 		// Find by ID
-		if quote.ID == util.StringToInt(searchString) {
-			fmt.Print(q.PrintQuote(quote.ID))
+		if quote.ID == util.StringToInt(input) {
+			fmt.Print(q.Quote(quote.ID))
 		}
 
 	}
