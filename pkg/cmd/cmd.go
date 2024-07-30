@@ -5,55 +5,57 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"vk-quotes/pkg/config"
 	db "vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 
-	"github.com/peterh/liner"
 	"math/rand"
+
+	"github.com/peterh/liner"
 )
 
-func CMD(quotes *db.Quotes, settings *util.Settings) {
+func CMD(quotes *db.Quotes) {
 
-	CLI(quotes, settings)
+	CLI(quotes)
 
-	command, commandID := util.CommandPrompt(settings, "> ")
+	command, commandID := util.CommandPrompt("> ")
 
 	for {
 		switch command {
 		case "add", "a":
-			validation := quotes.UserInput(settings, commandID)
+			validation := quotes.UserInput(commandID)
 			if validation {
-				Add(quotes, settings)
+				Add(quotes)
 			}
-			CMD(quotes, settings)
+			CMD(quotes)
 		case "update", "u":
-			validation := quotes.UserInput(settings, commandID)
+			validation := quotes.UserInput(commandID)
 			if validation {
-				Update(quotes, settings, commandID)
+				Update(quotes, commandID)
 			}
-			CMD(quotes, settings)
+			CMD(quotes)
 		case "delete", "d":
-			Delete(quotes, settings, commandID)
-			CMD(quotes, settings)
+			Delete(quotes, commandID)
+			CMD(quotes)
 		case "showall", "s":
 			quotes.PrintAllQuotes()
 			util.PressAnyKey()
-			CMD(quotes, settings)
+			CMD(quotes)
 		case "stats":
 			printStats(quotes)
 			util.PressAnyKey()
-			CMD(quotes, settings)
-		case "rearrange":
-			quotes.ReArrangeIDs(settings)
+			CMD(quotes)
+		case "resetids":
+			quotes.ResetIDs(quotes)
 			util.PressAnyKey()
-			CMD(quotes, settings)
+			CMD(quotes)
 		case "read", "r":
-			Read(quotes, settings)
-			CMD(quotes, settings)
+			Read(quotes)
+			CMD(quotes)
 		case "similar":
-			db.RunTaskWithProgress(quotes, settings)
+			db.RunTaskWithProgress(quotes)
 			util.PressAnyKey()
-			CMD(quotes, settings)
+			CMD(quotes)
 		case "q":
 			util.ClearScreen()
 			os.Exit(0)
@@ -61,180 +63,154 @@ func CMD(quotes *db.Quotes, settings *util.Settings) {
 			foundQuote := quotes.Search(command)
 			formattedQuote := quotes.FormatQuote(foundQuote)
 			fmt.Print(formattedQuote)
-			CMD(quotes, settings)
+			CMD(quotes)
 		}
 	}
 
 }
 
-func CLI(quotes *db.Quotes, settings *util.Settings) {
+func CLI(quotes *db.Quotes) {
 
 	util.ClearScreen()
 
 	// Reset the ID if it's set to 0 or -1.
-	if settings.ID == 0 || settings.ID == -1 {
-		quotes.ResetID(settings)
+	if config.ID <= 0 {
+		config.ID = quotes.LastID()
 	}
 
-	format := "%s %s %s %s %s"
-	version := util.Cyan + "VK-Quotes" + " " + settings.Version + util.Reset
-	message := util.Yellow + "\n\n" + settings.Message + "\n" + util.Reset
-	counter := ""
-	foundQuote := quotes.Search(strconv.Itoa(settings.ID))
+	format := "%s %s %s %s"
+	version := util.Cyan + "VK-Quotes" + " " + config.ProgramVersion + util.Reset
+	message := util.Yellow + "\n\n" + config.Message + "\n" + util.Reset
+	foundQuote := quotes.Search(strconv.Itoa(config.ID))
 	formattedQuote := quotes.FormatQuote(foundQuote)
-	commands := util.Yellow + "\n" + "add, update, delete, read, showall, stats, similar, reaarange, quit" + "\n" + util.Reset
+	commands := util.Yellow + "\n" + "add, update, delete, read, showall, stats, similar, resetids, quit" + "\n" + util.Reset
 
-	cli := fmt.Sprintf(format, version, message, counter, formattedQuote, commands)
+	cli := fmt.Sprintf(format, version, message, formattedQuote, commands)
 
 	fmt.Print(cli)
 }
 
-func Add(quotes *db.Quotes, settings *util.Settings) bool {
+func Add(quotes *db.Quotes) bool {
+
 	newID := quotes.CreateId()
-	quotes.AppendQuote(db.Quote{ID: newID, QUOTE: settings.UserInputs[0], AUTHOR: settings.UserInputs[1], LANGUAGE: settings.UserInputs[2], DATE: time.Now().Format("02.01.2006")})
-	quotes.SaveToFile(settings)
-	settings.ID = newID
-	settings.Message = fmt.Sprintf("<< %d Quote Added! >>", newID)
+
+	quotes.AppendQuote(db.Quote{
+		ID:       newID,
+		QUOTE:    config.UserInputs[0],
+		AUTHOR:   config.UserInputs[1],
+		LANGUAGE: config.UserInputs[2],
+		DATE:     time.Now().Format("02.01.2006")})
+
+	quotes.SaveToFile(config.SaveQuotesPath)
+	config.ID = newID
+	config.Message = fmt.Sprintf("<< %d Quote Added! >>", newID)
 
 	return true
 }
 
-func Update(quotes *db.Quotes, settings *util.Settings, updateID int) bool {
+func Update(quotes *db.Quotes, updateID int) bool {
 
 	quotes.Update(db.Quote{
 		ID:       updateID,
-		QUOTE:    settings.UserInputs[0],
-		AUTHOR:   settings.UserInputs[1],
-		LANGUAGE: settings.UserInputs[2],
+		QUOTE:    config.UserInputs[0],
+		AUTHOR:   config.UserInputs[1],
+		LANGUAGE: config.UserInputs[2],
 		DATE:     time.Now().Format("02.01.2006")})
 
-	quotes.SaveToFile(settings)
+	quotes.SaveToFile(config.SaveQuotesPath)
 
-	settings.ID = updateID
+	config.ID = updateID
 
-	settings.Message = fmt.Sprintf("<< %d Quote Updated! >>", updateID)
+	config.Message = fmt.Sprintf("<< %d Quote Updated! >>", updateID)
 
 	return true
 }
 
-func Delete(quotes *db.Quotes, settings *util.Settings, deleteID int) bool {
-	/*
-		Delete removes a quote from the database if it exists, with user confirmation.
-		It returns true if the quote was successfully deleted, otherwise false.
-	*/
-
-	// Check if the quote ID exists in the database
+func Delete(quotes *db.Quotes, deleteID int) bool {
 
 	index := quotes.IndexOf(deleteID)
 
 	if index == -1 {
-		settings.Message = "Index Not Found!"
+		config.Message = "Index Not Found!"
 		return false
 	}
-
-	// Convert ID to String and Search for the quote
 
 	quote := quotes.Search(strconv.Itoa(deleteID))
 
-	// Print the quote to the console for user verification
+	formattedQuote := quotes.FormatQuote(quote)
 
-	fmt.Println(quotes.FormatQuote(quote))
-
-	// Initialize a new line reader for user input
+	fmt.Println(formattedQuote)
 
 	line := liner.NewLiner()
 
-	// Ensure the line reader is closed to free resources
-
 	defer line.Close()
-
-	// Prompt the user for confirmation to delete the quote
 
 	confirm, err := line.Prompt("(y/n)")
 
-	// Handle any errors from the prompt
-
 	if err != nil {
-		settings.Message = err.Error()
+		config.Message = err.Error()
 		return false
 	}
-
-	// If the user did not confirm with 'y', abort the deletion
 
 	if confirm != "y" {
 		return false
 	}
 
-	// Remove the quote from the database
-
 	quotes.Remove(index)
 
-	// Save the updated quotes database to file
+	quotes.SaveToFile(config.SaveQuotesPath)
 
-	quotes.SaveToFile(settings)
+	config.ID = quotes.LastID()
 
-	// Reset IDs after deletion
-
-	quotes.ResetID(settings)
-
-	// Set a success message in settings
-
-	settings.Message = fmt.Sprintf("<< %d Quote Deleted! >>", deleteID)
-
-	// Indicate successful deletion
+	config.Message = fmt.Sprintf("<< %d Quote Deleted! >>", deleteID)
 
 	return true
 }
 
-/* Random IDs bug */
-func Read(quotes *db.Quotes, settings *util.Settings) {
+func Read(quotes *db.Quotes) {
 
-	quotes.AppendRandomIDs(settings)
+	quotes.AppendRandomIDs()
 
-	for len(settings.RandomIDs) != 0 {
+	for len(config.RandomIDs) != 0 {
+
+		config.ReadCounter += 1
 
 		source := rand.NewSource(time.Now().UnixNano())
 
 		r := rand.New(source)
 
-		randomIndex := r.Intn(len(settings.RandomIDs))
+		randomIndex := r.Intn(len(config.RandomIDs))
 
-	
-		// asd = append(asd, settings.RandomIDs[randomIndex]) //
+		config.ID = config.RandomIDs[randomIndex]
 
-		settings.ID = settings.RandomIDs[randomIndex]
+		config.RandomIDs = append(config.RandomIDs[:randomIndex], config.RandomIDs[randomIndex+1:]...)
 
-		settings.RandomIDs = append(settings.RandomIDs[:randomIndex], settings.RandomIDs[randomIndex+1:]...)
-
-
-		count := settings.ReadCounter
+		count := config.ReadCounter
 		size := quotes.Size()
 		percentage := float64(count) / float64(size) * 100
-		settings.Message = fmt.Sprintf("Reading:[%d] [%d] %.0f%%", count, percentage)
+		config.Message = fmt.Sprintf("<< Reading [%d] %.0f%% >>", count, percentage)
 
-		CLI(quotes, settings)
-
-		settings.ReadCounter += 1
+		CLI(quotes)
 
 		var quit string
 		fmt.Scanln(&quit)
 
 		if quit == "q" {
-			settings.Message = "<< Reading Mode Off >>"
+			config.Message = "<< Reading Mode Off >>"
 
-			settings.ReadCounter = 0
+			config.ReadCounter = 0
 
-			quotes.ResetID(settings)
+			config.ID = quotes.LastID()
 
-			if len(settings.RandomIDs) > 0 {
-				settings.RandomIDs = settings.RandomIDs[:0]
+			if len(config.RandomIDs) > 0 {
+				config.RandomIDs = config.RandomIDs[:0]
 			}
 
-			CMD(quotes, settings)
+			CMD(quotes)
 		}
 	}
 
-	settings.Message = "<< Read 100% >>"
+	config.Message = "<< Read 100% >>"
 
-	settings.ReadCounter = 0
+	config.ReadCounter = 0
 }

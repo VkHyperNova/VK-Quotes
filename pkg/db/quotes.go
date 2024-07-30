@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/util"
 
 	"github.com/peterh/liner"
@@ -30,12 +31,7 @@ func (q *Quotes) AppendQuote(quote Quote) {
 	q.QUOTES = append(q.QUOTES, quote)
 }
 
-func (q *Quotes) ReadFromFile(settings *util.Settings) error {
-
-	// Define the path to the JSON file where quotes are stored.
-
-	path := settings.SaveQuotesPath
-	folder := settings.SaveFolderPath
+func (q *Quotes) ReadFromFile(path string, folder string) error {
 
 	// Check if the file exists at the specified path.
 
@@ -100,13 +96,13 @@ func (q *Quotes) ReadFromFile(settings *util.Settings) error {
 	return nil
 }
 
-func (q *Quotes) SaveToFile(settings *util.Settings) error {
+func (q *Quotes) SaveToFile(path string) error {
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile(settings.SaveQuotesPath, byteValue, 0644)
+	err = os.WriteFile(path, byteValue, 0644)
 	if err != nil {
 		return err
 	}
@@ -144,7 +140,7 @@ func (q *Quotes) FormatQuote(quote Quote) string {
 	)
 
 	stringFormat := `` + "\n" + util.Cyan + `%d. ` + "\"" + util.Reset + `%s` + `` + util.Cyan + "\"" +
-		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + util.Reset + "\n"  + ``
+		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + util.Reset + "\n" + ``
 
 	formattedQuote = fmt.Sprintf(
 		stringFormat,
@@ -165,7 +161,7 @@ func (q *Quotes) Size() int {
 	return len(q.QUOTES)
 }
 
-func (q *Quotes) Duplicates(searchQuote string, settings *util.Settings) bool {
+func (q *Quotes) Duplicates(searchQuote string) bool {
 
 	if searchQuote == "" || searchQuote == "Unknown" {
 		return false
@@ -173,9 +169,9 @@ func (q *Quotes) Duplicates(searchQuote string, settings *util.Settings) bool {
 
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
-			if quote.ID != settings.ID {
-				settings.Message = "<< there are dublicates in database. >>"
-				settings.ID = quote.ID
+			if quote.ID != config.ID {
+				config.Message = "<< there are dublicates in database. >>"
+				config.ID = quote.ID
 				return true
 			}
 		}
@@ -183,7 +179,7 @@ func (q *Quotes) Duplicates(searchQuote string, settings *util.Settings) bool {
 	return false
 }
 
-func (q *Quotes) IdOf(index int) (int, error) {
+func (q *Quotes) FindIdByIndex(index int) (int, error) {
 	if index < 0 || index >= len(q.QUOTES) {
 		return 0, errors.New("index out of bounds")
 	}
@@ -222,6 +218,7 @@ func (q *Quotes) Search(command string) Quote {
 
 		if quote.ID == isID {
 			foundQuote = quote
+			break
 		}
 
 		normalizedAuthor := strings.ToUpper(quote.AUTHOR)
@@ -240,36 +237,28 @@ func (q *Quotes) Search(command string) Quote {
 	return foundQuote
 }
 
-func (q *Quotes) AppendRandomIDs(settings *util.Settings) {
+func (q *Quotes) AppendRandomIDs() {
 	for _, quote := range q.QUOTES {
-		if !util.ArrayContainsInt(settings.RandomIDs, quote.ID) {
-			settings.RandomIDs = append(settings.RandomIDs, quote.ID)
+		if !util.ArrayContainsInt(config.RandomIDs, quote.ID) {
+			config.RandomIDs = append(config.RandomIDs, quote.ID)
 		}
 	}
 }
 
-func (q *Quotes) ResetID(settings *util.Settings) error {
+func (q *Quotes) LastID() int {
 
-	// Calculate the index of the last quote. `Size()` returns the total number of quotes,
-	// so subtracting 1 gives the index of the last quote.
 	index := q.Size() - 1
 
-	// Retrieve the ID of the quote at the calculated index.
-	lastId, err := q.IdOf(index)
+	lastId, err := q.FindIdByIndex(index)
 
-	// Check if an error occurred while retrieving the ID.
 	if err != nil {
-		return err
+		return 0
 	}
 
-	// Set the retrieved last quote's ID into the provided settings.
-	settings.ID = lastId
-
-	// Return nil to indicate that the operation was successful and the settings were updated correctly.
-	return nil
+	return lastId
 }
 
-func (q *Quotes) PromptWithSuggestion(name string, edit string, settings *util.Settings) bool {
+func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 
 	line := liner.NewLiner()
 	defer line.Close()
@@ -281,24 +270,24 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string, settings *util.S
 	}
 
 	if input == "q" {
-		settings.Message = "<< previous action aborted by user. >>"
+		config.Message = "<< previous action aborted by user. >>"
 		return false
 	}
 
-	if name == "Quote" && q.Duplicates(input, settings) {
+	if name == "Quote" && q.Duplicates(input) {
 		return false
 	}
 
-	settings.UserInputs = append(settings.UserInputs, util.FillEmptyInput(input, "Unknown"))
+	config.UserInputs = append(config.UserInputs, util.FillEmptyInput(input, "Unknown"))
 
 	return true
 }
 
-func (q *Quotes) UserInput(settings *util.Settings, id int) bool {
+func (q *Quotes) UserInput(id int) bool {
 
 	// empty the old input before getting new values
-	if len(settings.UserInputs) > 0 {
-		settings.UserInputs = settings.UserInputs[:0]
+	if len(config.UserInputs) > 0 {
+		config.UserInputs = config.UserInputs[:0]
 	}
 
 	type questionPairs struct {
@@ -320,7 +309,7 @@ func (q *Quotes) UserInput(settings *util.Settings, id int) bool {
 
 	// prompt all three questions
 	for _, question := range questions {
-		validation := q.PromptWithSuggestion(question.First, question.Second, settings)
+		validation := q.PromptWithSuggestion(question.First, question.Second)
 		if !validation {
 			return false
 		}
@@ -345,13 +334,15 @@ func (q *Quotes) GetAllQuotes() []string {
 	return sentences
 }
 
-func (q *Quotes) ReArrangeIDs(settings *util.Settings) {
+func (q *Quotes) ResetIDs(quotes *Quotes) {
 
 	for key := range q.QUOTES {
 		q.QUOTES[key].ID = key + 1
 	}
 
-	q.SaveToFile(settings)
+	q.SaveToFile(config.SaveQuotesPath)
 
-	fmt.Println("Rearraging IDs Done!")
+	config.ID = q.LastID()
+
+	fmt.Println("Reset IDs Done!")
 }

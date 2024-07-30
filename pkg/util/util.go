@@ -8,23 +8,12 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"vk-quotes/pkg/config"
 
 	"github.com/peterh/liner"
 )
 
-type Settings struct {
-	RandomIDs       []int
-	ID              int
-	UserInputs      []string
-	Message         string
-	ReadCounter     int
-	SaveQuotesPath  string
-	SaveSimilarPath string
-	SaveFolderPath  string
-	Version         string
-}
-
-func CommandPrompt(settings *Settings, prompt string) (string, int) {
+func CommandPrompt(prompt string) (string, int) {
 	/*
 		CommandPrompt prompts the user for input and parses it into a command and an optional ID.
 		It returns the command as a string and the ID as an integer. If an error occurs,
@@ -46,7 +35,7 @@ func CommandPrompt(settings *Settings, prompt string) (string, int) {
 	// Handle any errors from the prompt
 
 	if err != nil {
-		settings.Message = err.Error()
+		config.Message = err.Error()
 	}
 
 	// Initialize the command and commandID variables
