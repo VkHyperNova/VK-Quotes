@@ -3,13 +3,11 @@ package util
 import (
 	"bufio"
 	"fmt"
-	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/peterh/liner"
 )
@@ -18,7 +16,6 @@ type Settings struct {
 	RandomIDs       []int
 	ID              int
 	UserInputs      []string
-	Command         string
 	Message         string
 	ReadCounter     int
 	SaveQuotesPath  string
@@ -28,40 +25,62 @@ type Settings struct {
 }
 
 func CommandPrompt(settings *Settings, prompt string) (string, int) {
+	/*
+		CommandPrompt prompts the user for input and parses it into a command and an optional ID.
+		It returns the command as a string and the ID as an integer. If an error occurs,
+		it sets an error message in the settings.
+	*/
+
+	// Initialize a new line reader for user input
 
 	line := liner.NewLiner()
+
+	// Ensure the line reader is closed to free resources
+
 	defer line.Close()
+
+	// Prompt the user with the given prompt string and read input
 
 	input, err := line.Prompt(prompt)
 
+	// Handle any errors from the prompt
+
 	if err != nil {
-		settings.Message = "<< Error reading input >>"
+		settings.Message = err.Error()
 	}
 
-	return ParseIDFromInput(input)
-}
+	// Initialize the command and commandID variables
 
-func ParseIDFromInput(input string) (string, int) {
-	
+	command := input
+	commandID := 0
+
+	// Split the input into parts based on whitespace
+
 	parts := strings.Fields(input)
 
-	if len(parts) > 1 {
-		if IsInteger(parts[1]) {
-			integer := StringToInt(parts[1])
-			return parts[0], integer
+	// Check if the input contains exactly two parts
+
+	if len(parts) == 2 {
+
+		// Assume the first part is the command
+
+		isCommand := parts[0]
+
+		// Try to convert the second part to an integer
+
+		isID, err := strconv.Atoi(parts[1])
+
+		// If the conversion is successful, update the command and commandID
+
+		if err == nil {
+			command = isCommand
+			commandID = isID
 		}
 	}
-	return input, -1
-}
 
-func IsInteger(a string) bool {
-	_, err := strconv.Atoi(a)
-	return err == nil
-}
+	// Return the parsed command and commandID
 
-func StringToInt(a string) int {
-	i, _ := strconv.Atoi(a)
-	return i
+	return command, commandID
 }
 
 func ClearScreen() {
@@ -114,25 +133,11 @@ func MoveBack(a string) bool {
 	return a == "b"
 }
 
-func SetRandomID(settings *Settings) {
+func FormattedReadCounter(count int, size int) string {
 
-	/* Get random int */
-	source := rand.NewSource(time.Now().UnixNano())
-	r := rand.New(source)
-	randomIndex := r.Intn(len(settings.RandomIDs))
-
-	/* Set id */
-	settings.ID = settings.RandomIDs[randomIndex]
-
-	/* Remove this id from list */
-	settings.RandomIDs = append(settings.RandomIDs[:randomIndex], settings.RandomIDs[randomIndex+1:]...)
-}
-
-// ReadCounter generates a formatted string displaying the read counter and the read percentage.
-func ReadCounter(count int, size int) string {
-	// Calculate the read percentage.
 	percentage := float64(count) / float64(size) * 100
 
-	// Return the formatted read counter string.
-	return fmt.Sprintf("\n[%d] %.0f%%\n", count, percentage)
+	readCounter := fmt.Sprintf("Reading: [%d] %.0f%%", count, percentage)
+
+	return readCounter
 }

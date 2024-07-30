@@ -5,10 +5,10 @@ import (
 	"sort"
 	"strconv"
 	db "vk-quotes/pkg/db"
-	"vk-quotes/pkg/util"
+	"vk-quotes/pkg/util" 
 )
 
-/* Statistics */
+/* Statistics mby move me to methods*/
 
 func printStats(quotes *db.Quotes) {
 	util.ClearScreen()
@@ -59,6 +59,7 @@ func topAuthors(quotes *db.Quotes) string {
 	for i := 0; i < len(pairs) && i < 10; i++ {
 		authorsString += "\n" + strconv.Itoa(pairs[i].count) + " " + util.Cyan + pairs[i].name + util.Reset
 	}
+
 	return authorsString
 }
 

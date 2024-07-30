@@ -26,55 +26,77 @@ type Quotes struct {
 	QUOTES []Quote `json:"quotes"` // Slice containing multiple Quote instances.
 }
 
-func (q *Quotes) Add(quote Quote) {
-	// Append the provided quote to the QUOTES slice.
+func (q *Quotes) AppendQuote(quote Quote) {
 	q.QUOTES = append(q.QUOTES, quote)
 }
 
 func (q *Quotes) ReadFromFile(settings *util.Settings) error {
+
 	// Define the path to the JSON file where quotes are stored.
+
 	path := settings.SaveQuotesPath
 	folder := settings.SaveFolderPath
 
 	// Check if the file exists at the specified path.
+
 	if _, err := os.Stat(path); os.IsNotExist(err) {
+
 		// If the file does not exist, create the "database" directory.
+
 		_ = os.Mkdir(folder, 0700)
 
 		// Create the JSON file with an initial empty quotes array.
+
 		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
 		if err != nil {
+
 			// Print any error that occurs during file creation.
+
 			fmt.Println(err)
 		}
 		// Print a message indicating that a new database file has been created.
+
 		util.PrintRed("New Database Created!\n")
 	}
 
 	// Open the file for reading.
+
 	file, err := os.Open(path)
+
 	if err != nil {
+
 		// Return an error if the file could not be opened.
+
 		return err
 	}
+
 	// Ensure the file is closed after reading.
+
 	defer file.Close()
 
 	// Read the contents of the file into a byte slice.
+
 	byteValue, err := io.ReadAll(file)
+
 	if err != nil {
+
 		// Return an error if reading the file fails.
+
 		return err
 	}
 
 	// Unmarshal the JSON byte slice into the Quotes struct.
+
 	err = json.Unmarshal(byteValue, q)
 	if err != nil {
+
 		// Return an error if JSON unmarshalling fails.
+
 		return err
 	}
 
 	// Return nil to indicate that the operation was successful.
+
 	return nil
 }
 
@@ -106,36 +128,32 @@ func (q *Quotes) Remove(index int) {
 	q.QUOTES = append(q.QUOTES[:index], q.QUOTES[index+1:]...)
 }
 
-func (q *Quotes) PrintQuotes() {
+func (q *Quotes) PrintAllQuotes() {
 
 	util.ClearScreen()
 	for _, quote := range q.QUOTES {
-		fmt.Print(q.Quote(quote.ID))
+		fmt.Print(q.FormatQuote(quote))
 	}
 }
 
-func (q *Quotes) Quote(id int) string {
+func (q *Quotes) FormatQuote(quote Quote) string {
 
 	var (
 		quoteBuffer    bytes.Buffer
 		formattedQuote string
 	)
 
-	stringFormat := `` + "\n" + util.Cyan + `%s. ` + "\"" + util.Reset + `%s` + `` + util.Cyan + "\"" +
-		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + util.Reset + ``
+	stringFormat := `` + "\n" + util.Cyan + `%d. ` + "\"" + util.Reset + `%s` + `` + util.Cyan + "\"" +
+		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + util.Reset + "\n"  + ``
 
-	for _, quote := range q.QUOTES {
-		if quote.ID == id {
-			formattedQuote = fmt.Sprintf(
-				stringFormat,
-				strconv.Itoa((quote.ID)),
-				quote.QUOTE,
-				quote.AUTHOR,
-				quote.DATE,
-				quote.LANGUAGE)
+	formattedQuote = fmt.Sprintf(
+		stringFormat,
+		quote.ID,
+		quote.QUOTE,
+		quote.AUTHOR,
+		quote.DATE,
+		quote.LANGUAGE)
 
-		}
-	}
 	// Write the formatted quote into the buffer.
 	quoteBuffer.WriteString(formattedQuote)
 
@@ -192,28 +210,34 @@ func (q *Quotes) CreateId() int {
 	return maxID + 1
 }
 
-func (q *Quotes) Find(input string) {
+func (q *Quotes) Search(command string) Quote {
 
-	util.ClearScreen()
+	var foundQuote Quote
+
+	normalizedCommand := strings.ToUpper(command)
 
 	for _, quote := range q.QUOTES {
 
-		// Find by Author
-		if strings.Contains(strings.ToUpper(quote.AUTHOR), strings.ToUpper(input)) {
-			fmt.Print(q.Quote(quote.ID))
+		isID, _ := strconv.Atoi(command)
+
+		if quote.ID == isID {
+			foundQuote = quote
 		}
 
-		// Find by Quote
-		if strings.Contains(strings.ToUpper(quote.QUOTE), strings.ToUpper(input)) {
-			fmt.Print(q.Quote(quote.ID))
+		normalizedAuthor := strings.ToUpper(quote.AUTHOR)
+
+		if strings.Contains(normalizedAuthor, normalizedCommand) {
+			foundQuote = quote
 		}
 
-		// Find by ID
-		if quote.ID == util.StringToInt(input) {
-			fmt.Print(q.Quote(quote.ID))
-		}
+		normalizedQuote := strings.ToUpper(quote.QUOTE)
 
+		if strings.Contains(normalizedQuote, normalizedCommand) {
+			foundQuote = quote
+		}
 	}
+
+	return foundQuote
 }
 
 func (q *Quotes) AppendRandomIDs(settings *util.Settings) {
@@ -270,7 +294,7 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string, settings *util.S
 	return true
 }
 
-func (q *Quotes) UserInput(settings *util.Settings) bool {
+func (q *Quotes) UserInput(settings *util.Settings, id int) bool {
 
 	// empty the old input before getting new values
 	if len(settings.UserInputs) > 0 {
@@ -286,8 +310,8 @@ func (q *Quotes) UserInput(settings *util.Settings) bool {
 	questions := [3]questionPairs{{"Quote", ""}, {"Author", ""}, {"Language", "English"}}
 
 	// pairs for updating
-	if settings.ID > 0 {
-		index := q.IndexOf(settings.ID)
+	if id > 0 {
+		index := q.IndexOf(id)
 		if index == -1 {
 			return false
 		}
