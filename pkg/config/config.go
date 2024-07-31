@@ -3,11 +3,14 @@ package config
 var ProgramVersion = "1.24"
 
 /* All Paths */
-var SaveQuotesPath = "./QuotesDB/quotes.json"
-var SaveSimilarPath = "./QuotesDB/similar.json"
-var SaveFolderName = "QuotesDB"
-var CopyFilePathLinux = "/media/veikko/VK DATA/DATABASES/QUOTESdb/quotes.json"
-var CopyFilePathWindows = "D:\\DATABASES\\QUOTESdb\\quotes.json"
+
+var FolderName = "QUOTES"
+
+var SimilarQuotesLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/similarQuotes.json"
+var FilePathLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/quotes.json"
+
+var FilePathWindows = "D:\\DATABASES\\QUOTES\\quotes.json"
+var SimilarQuotesWindows = "D:\\DATABASES\\QUOTES\\quotes.json"
 
 var ReadCounter string
 var Counter int

@@ -74,7 +74,7 @@ func (s *SimilarQuotes) Add(quote SimilarQuotePairs) {
 	s.SimilarQuotes = append(s.SimilarQuotes, quote)
 }
 
-func (s *SimilarQuotes) SaveToFile(path string) error {
+func (s *SimilarQuotes) SaveToFile() error {
 
 	byteValue, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
@@ -82,7 +82,7 @@ func (s *SimilarQuotes) SaveToFile(path string) error {
 		return err
 	}
 
-	err = os.WriteFile(path, byteValue, 0644)
+	err = os.WriteFile(config.SimilarQuotesLinux, byteValue, 0644)
 	if err != nil {
 		config.Messages = append(config.Messages, err.Error())
 		return err
@@ -130,7 +130,7 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 		similar.Add(SimilarQuotePairs)
 	}
 
-	similar.SaveToFile(config.SaveSimilarPath)
+	similar.SaveToFile()
 
 	config.Messages = append(config.Messages, "<< Find Similar Quotes Process Done! >>")
 }

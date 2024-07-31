@@ -33,38 +33,32 @@ func (q *Quotes) AppendQuote(quote Quote) {
 	q.QUOTES = append(q.QUOTES, quote)
 }
 
-func (q *Quotes) ReadFromFile(path string, folder string) error {
+func (q *Quotes) ReadFromFile() error {
+	
+	path := config.FilePathLinux
+	folder := config.FolderName
 
 	// Check if the file exists at the specified path.
-
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 
 		// If the file does not exist, create the "database" directory.
-
 		_ = os.Mkdir(folder, 0700)
 
 		// Create the JSON file with an initial empty quotes array.
-
 		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
 		if err != nil {
-
 			// Print any error that occurs during file creation.
-
-			fmt.Println(err)
+			config.Messages = append(config.Messages, err.Error())
 		}
+		
 		// Print a message indicating that a new database file has been created.
-
 		config.Messages = append(config.Messages, "<< New Database Created! >>")
 	}
 
 	// Open the file for reading.
-
 	file, err := os.Open(path)
-
 	if err != nil {
-
 		// Return an error if the file could not be opened.
-
 		return err
 	}
 
@@ -98,26 +92,20 @@ func (q *Quotes) ReadFromFile(path string, folder string) error {
 	return nil
 }
 
-func (q *Quotes) SaveToFile(path string) error {
+func (q *Quotes) SaveToFile() error {
 
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile(path, byteValue, 0644)
-	if err != nil {
-		config.Messages = append(config.Messages, err.Error())
-		return err
-	}
-
-	copyPath := config.CopyFilePathLinux
+	path := config.FilePathLinux
 
 	if runtime.GOOS == "windows" {
-		copyPath = config.CopyFilePathWindows
+		path = config.FilePathWindows
 	}
 
-	err = os.WriteFile(copyPath, byteValue, 0644)
+	err = os.WriteFile(path, byteValue, 0644)
 	if err != nil {
 		config.Messages = append(config.Messages, "Copy to hdd error: "+err.Error())
 		return err
@@ -354,7 +342,7 @@ func (q *Quotes) ResetIDs(quotes *Quotes) {
 		q.QUOTES[key].ID = key + 1
 	}
 
-	q.SaveToFile(config.SaveQuotesPath)
+	q.SaveToFile()
 
 	config.MainQuoteID = q.LastID()
 

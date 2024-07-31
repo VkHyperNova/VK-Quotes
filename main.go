@@ -2,13 +2,13 @@ package main
 
 import (
 	"vk-quotes/pkg/cmd"
-	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/db"
 )
 
 func main() {
+	
 	quotes := db.Quotes{}
-	err := quotes.ReadFromFile(config.SaveQuotesPath, config.SaveFolderName)
+	err := quotes.ReadFromFile()
 	if err != nil {
 		panic(err)
 	}

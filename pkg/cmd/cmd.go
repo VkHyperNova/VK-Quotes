@@ -125,7 +125,7 @@ func add(quotes *db.Quotes) bool {
 		LANGUAGE: config.UserInputs[2],
 		DATE:     time.Now().Format("02.01.2006")})
 
-	quotes.SaveToFile(config.SaveQuotesPath)
+	quotes.SaveToFile()
 
 	config.MainQuoteID = newID
 
@@ -143,7 +143,7 @@ func update(quotes *db.Quotes, updateID int) bool {
 		LANGUAGE: config.UserInputs[2],
 		DATE:     time.Now().Format("02.01.2006")})
 
-	quotes.SaveToFile(config.SaveQuotesPath)
+	quotes.SaveToFile()
 
 	config.MainQuoteID = updateID
 
@@ -185,7 +185,7 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 
 	quotes.Remove(index)
 
-	quotes.SaveToFile(config.SaveQuotesPath)
+	quotes.SaveToFile()
 
 	config.MainQuoteID = quotes.LastID()
 
