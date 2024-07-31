@@ -13,5 +13,5 @@ func main() {
 		panic(err)
 	}
 
-	cmd.CMD(&quotes)
+	cmd.CommandLine(&quotes)
 }

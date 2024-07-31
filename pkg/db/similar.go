@@ -51,7 +51,6 @@ import (
 	"sync"
 	"time"
 	"vk-quotes/pkg/config"
-	"vk-quotes/pkg/util"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/jdkato/prose/v2"
@@ -133,7 +132,7 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	similar.SaveToFile(config.SaveSimilarPath)
 
-	util.PrintGreen("Process Done!:\n\n")
+	config.Messages = append(config.Messages, "<< Find Similar Quotes Process Done! >>")
 }
 
 func calculateTFIDF(sentences []string) []map[string]float64 {

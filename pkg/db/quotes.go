@@ -54,7 +54,7 @@ func (q *Quotes) ReadFromFile(path string, folder string) error {
 		}
 		// Print a message indicating that a new database file has been created.
 
-		util.PrintRed("New Database Created!\n")
+		config.Messages = append(config.Messages, "<< New Database Created! >>")
 	}
 
 	// Open the file for reading.
@@ -119,7 +119,7 @@ func (q *Quotes) SaveToFile(path string) error {
 
 	err = os.WriteFile(copyPath, byteValue, 0644)
 	if err != nil {
-		config.Messages = append(config.Messages, "Copy to hdd error: " +  err.Error())
+		config.Messages = append(config.Messages, "Copy to hdd error: "+err.Error())
 		return err
 	}
 
@@ -141,8 +141,6 @@ func (q *Quotes) Remove(index int) {
 }
 
 func (q *Quotes) PrintAllQuotes() {
-
-	util.ClearScreen()
 	for _, quote := range q.QUOTES {
 		fmt.Print(q.FormatQuote(quote))
 	}
@@ -155,8 +153,8 @@ func (q *Quotes) FormatQuote(quote Quote) string {
 		formattedQuote string
 	)
 
-	stringFormat := `` + "\n" + util.Cyan + `%d. ` + "\"" + util.Reset + `%s` + `` + util.Cyan + "\"" +
-		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + util.Reset + "\n" + ``
+	stringFormat := `` + "\n" + config.Cyan + `%d. ` + "\"" + config.Reset + `%s` + `` + config.Cyan + "\"" +
+		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + config.Reset + "\n" + ``
 
 	formattedQuote = fmt.Sprintf(
 		stringFormat,
@@ -185,9 +183,9 @@ func (q *Quotes) Duplicates(searchQuote string) bool {
 
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
-			if quote.ID != config.ID {
+			if quote.ID != config.MainQuoteID {
 				config.Messages = append(config.Messages, "<< there are dublicates in database. >>")
-				config.ID = quote.ID
+				config.MainQuoteID = quote.ID
 				return true
 			}
 		}
@@ -358,9 +356,9 @@ func (q *Quotes) ResetIDs(quotes *Quotes) {
 
 	q.SaveToFile(config.SaveQuotesPath)
 
-	config.ID = q.LastID()
+	config.MainQuoteID = q.LastID()
 
-	fmt.Println("Reset IDs Done!")
+	config.Messages = append(config.Messages, "<< IDs Reset! >>")
 }
 
 func (q *Quotes) TopAuthors() string {
@@ -402,7 +400,7 @@ func (q *Quotes) TopAuthors() string {
 	// Make a string
 	authorsString := ""
 	for i := 0; i < len(pairs) && i < 10; i++ {
-		authorsString += "\n" + strconv.Itoa(pairs[i].count) + " " + util.Cyan + pairs[i].name + util.Reset
+		authorsString += "\n" + strconv.Itoa(pairs[i].count) + " " + config.Cyan + pairs[i].name + config.Reset
 	}
 
 	return authorsString
@@ -425,7 +423,7 @@ func (q *Quotes) TopLanguages() string {
 	// Make a string
 	languagesString := ""
 	for name, num := range languagesMap {
-		languagesString += "\n" + strconv.Itoa(num) + " " + util.Yellow + name + util.Reset
+		languagesString += "\n" + strconv.Itoa(num) + " " + config.Yellow + name + config.Reset
 	}
 	return languagesString
 }

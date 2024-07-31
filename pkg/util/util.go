@@ -85,7 +85,7 @@ func ClearScreen() {
 }
 
 func PressAnyKey() {
-	PrintGray("\nPress Any Key To Continue...\n")
+	fmt.Println("\nPress Any Key To Continue...")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	ClearScreen()
