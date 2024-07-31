@@ -68,12 +68,13 @@ func CommandLine(quotes *db.Quotes) {
 			read(quotes)        // Call the read function.
 			CommandLine(quotes) // Restart command processing.
 
-		case "dublicates", "dub": // Find similar Quotes in the database and save them to file.
+		case "similarquotes", "sim": // Find similar Quotes in the database and save them to file.
 			db.RunTaskWithProgress(quotes) // Run a task to find similar quotes.
 			CommandLine(quotes)            // Restart command processing.
 
-		case "q", "quit":
-			os.Exit(0) // Exit the program.
+		case "q", "quit": // Exit the program.
+			util.ClearScreen()
+			os.Exit(0) 
 
 		default:
 			foundQuote := quotes.Search(command)             // Search for a quote based on the command input.
