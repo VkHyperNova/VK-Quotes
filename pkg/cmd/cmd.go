@@ -28,31 +28,31 @@ func CMD(quotes *db.Quotes) {
 		case "add", "a":
 			validation := quotes.UserInput(commandID)
 			if validation {
-				Add(quotes)
+				add(quotes)
 			}
 			CMD(quotes)
 		case "update", "u":
 			validation := quotes.UserInput(commandID)
 			if validation {
-				Update(quotes, commandID)
+				update(quotes, commandID)
 			}
 			CMD(quotes)
 		case "delete", "d":
-			Delete(quotes, commandID)
+			delete(quotes, commandID)
 			CMD(quotes)
 		case "showall", "s":
 			quotes.PrintAllQuotes()
 			util.PressAnyKey()
 			CMD(quotes)
 		case "stats":
-			printStats(quotes)
+			printStatistics(quotes)
 			util.PressAnyKey()
 			CMD(quotes)
 		case "resetids":
 			quotes.ResetIDs(quotes)
 			CMD(quotes)
 		case "read", "r":
-			Read(quotes)
+			read(quotes)
 			CMD(quotes)
 		case "similar", "similarquotes":
 			db.RunTaskWithProgress(quotes)
@@ -92,7 +92,7 @@ func CLI(quotes *db.Quotes) {
 	fmt.Print(cli)
 }
 
-func Add(quotes *db.Quotes) bool {
+func add(quotes *db.Quotes) bool {
 
 	newID := quotes.CreateId()
 
@@ -110,7 +110,7 @@ func Add(quotes *db.Quotes) bool {
 	return true
 }
 
-func Update(quotes *db.Quotes, updateID int) bool {
+func update(quotes *db.Quotes, updateID int) bool {
 
 	quotes.Update(db.Quote{
 		ID:       updateID,
@@ -128,7 +128,7 @@ func Update(quotes *db.Quotes, updateID int) bool {
 	return true
 }
 
-func Delete(quotes *db.Quotes, deleteID int) bool {
+func delete(quotes *db.Quotes, deleteID int) bool {
 
 	index := quotes.IndexOf(deleteID)
 
@@ -170,7 +170,7 @@ func Delete(quotes *db.Quotes, deleteID int) bool {
 	return true
 }
 
-func Read(quotes *db.Quotes) {
+func read(quotes *db.Quotes) {
 
     // Append a set of random IDs to the quotes object
 	quotes.AppendRandomIDs()
@@ -241,4 +241,17 @@ func Read(quotes *db.Quotes) {
 
 	// Reset the read counter after finishing
 	config.ResetReadCounter()
+}
+
+func printStatistics(quotes *db.Quotes) {
+
+	util.ClearScreen()
+
+	format := "%s%s%s"
+
+	name := util.Cyan + "Statistics: " + util.Reset
+
+	stats := fmt.Sprintf(format, name, quotes.TopAuthors(), quotes.TopLanguages())
+	
+	fmt.Println(stats)
 }
