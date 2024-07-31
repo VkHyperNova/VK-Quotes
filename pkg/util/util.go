@@ -35,7 +35,7 @@ func CommandPrompt(prompt string) (string, int) {
 	// Handle any errors from the prompt
 
 	if err != nil {
-		config.Message = err.Error()
+		config.Messages = append(config.Messages, err.Error())
 	}
 
 	// Initialize the command and commandID variables
@@ -74,15 +74,14 @@ func CommandPrompt(prompt string) (string, int) {
 
 func ClearScreen() {
 
-	if runtime.GOOS == "linux" {
-		cmd := exec.Command("clear")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	} else if runtime.GOOS == "windows" {
-		cmd := exec.Command("cmd", "/c", "cls")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
+	cmd := exec.Command("clear")
+
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/c", "cls")
 	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 }
 
 func PressAnyKey() {

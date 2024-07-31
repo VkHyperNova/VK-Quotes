@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 	"vk-quotes/pkg/config"
 	db "vk-quotes/pkg/db"
@@ -20,8 +21,10 @@ func CMD(quotes *db.Quotes) {
 
 	command, commandID := util.CommandPrompt("> ")
 
+	command = strings.ToLower(command)
+
 	for {
-		switch command {
+		switch  command {
 		case "add", "a":
 			validation := quotes.UserInput(commandID)
 			if validation {
@@ -47,14 +50,12 @@ func CMD(quotes *db.Quotes) {
 			CMD(quotes)
 		case "resetids":
 			quotes.ResetIDs(quotes)
-			util.PressAnyKey()
 			CMD(quotes)
 		case "read", "r":
 			Read(quotes)
 			CMD(quotes)
-		case "similar":
+		case "similar", "similarquotes":
 			db.RunTaskWithProgress(quotes)
-			util.PressAnyKey()
 			CMD(quotes)
 		case "q":
 			util.ClearScreen()
@@ -78,14 +79,15 @@ func CLI(quotes *db.Quotes) {
 		config.ID = quotes.LastID()
 	}
 
-	format := "%s %s %s %s"
-	version := util.Cyan + "VK-Quotes" + " " + config.ProgramVersion + util.Reset
-	message := util.Yellow + "\n\n" + config.Message + "\n" + util.Reset
+	format := "%s %s %s %s %s"
+	version := util.Cyan + "VK-Quotes" + " " + config.ProgramVersion + util.Reset + "\n\n"
+	message := config.FormatMessages()
+	readCounter := util.Cyan + config.ReadCounter + util.Reset
 	foundQuote := quotes.Search(strconv.Itoa(config.ID))
 	formattedQuote := quotes.FormatQuote(foundQuote)
-	commands := util.Yellow + "\n" + "add, update, delete, read, showall, stats, similar, resetids, quit" + "\n" + util.Reset
+	commands := util.Yellow + "\n" + "Add Update Delete Read Showall Stats SimilarQuotes ResetIDs Quit" + "\n" + util.Reset
 
-	cli := fmt.Sprintf(format, version, message, formattedQuote, commands)
+	cli := fmt.Sprintf(format, version, message, readCounter, formattedQuote, commands)
 
 	fmt.Print(cli)
 }
@@ -103,7 +105,7 @@ func Add(quotes *db.Quotes) bool {
 
 	quotes.SaveToFile(config.SaveQuotesPath)
 	config.ID = newID
-	config.Message = fmt.Sprintf("<< %d Quote Added! >>", newID)
+	config.Messages = append(config.Messages, fmt.Sprintf("<< %d Quote Added! >>", newID))
 
 	return true
 }
@@ -121,7 +123,7 @@ func Update(quotes *db.Quotes, updateID int) bool {
 
 	config.ID = updateID
 
-	config.Message = fmt.Sprintf("<< %d Quote Updated! >>", updateID)
+	config.Messages = append(config.Messages, fmt.Sprintf("<< %d Quote Updated! >>", updateID))
 
 	return true
 }
@@ -131,7 +133,7 @@ func Delete(quotes *db.Quotes, deleteID int) bool {
 	index := quotes.IndexOf(deleteID)
 
 	if index == -1 {
-		config.Message = "Index Not Found!"
+		config.Messages = append(config.Messages, "Index Not Found!")
 		return false
 	}
 
@@ -148,11 +150,12 @@ func Delete(quotes *db.Quotes, deleteID int) bool {
 	confirm, err := line.Prompt("(y/n)")
 
 	if err != nil {
-		config.Message = err.Error()
+		config.Messages = append(config.Messages, err.Error())
 		return false
 	}
 
 	if confirm != "y" {
+		config.Messages = append(config.Messages, "<< Delete Canceled! >>")
 		return false
 	}
 
@@ -162,55 +165,80 @@ func Delete(quotes *db.Quotes, deleteID int) bool {
 
 	config.ID = quotes.LastID()
 
-	config.Message = fmt.Sprintf("<< %d Quote Deleted! >>", deleteID)
+	config.Messages = append(config.Messages, fmt.Sprintf("<< %d Quote Deleted! >>", deleteID))
 
 	return true
 }
 
 func Read(quotes *db.Quotes) {
 
+    // Append a set of random IDs to the quotes object
 	quotes.AppendRandomIDs()
 
+	// Loop until all random IDs are processed
 	for len(config.RandomIDs) != 0 {
 
-		config.ReadCounter += 1
+		// Increment the counter for each iteration
+		config.Counter += 1
 
+		// Create a new random source based on the current time in nanoseconds
 		source := rand.NewSource(time.Now().UnixNano())
 
+		// Initialize a new random number generator with the source
 		r := rand.New(source)
 
+		// Generate a random index based on the length of RandomIDs
 		randomIndex := r.Intn(len(config.RandomIDs))
 
+		// Select a random ID from RandomIDs using the random index
 		config.ID = config.RandomIDs[randomIndex]
 
+		// Remove the selected ID from RandomIDs
 		config.RandomIDs = append(config.RandomIDs[:randomIndex], config.RandomIDs[randomIndex+1:]...)
 
-		count := config.ReadCounter
-		size := quotes.Size()
-		percentage := float64(count) / float64(size) * 100
-		config.Message = fmt.Sprintf("<< Reading [%d] %.0f%% >>", count, percentage)
+		// Get the current count of processed items
+		count := config.Counter
 
+		// Get the total size of the quotes
+		size := quotes.Size()
+		
+		// Calculate the percentage of completed readings
+		percentage := float64(count) / float64(size) * 100
+
+		// Update the read counter message
+		config.ReadCounter = fmt.Sprintf("<< Reading [%d] %.0f%% >>", count, percentage)
+
+		// Call the CLI function to process/display the quotes
 		CLI(quotes)
 
+		// Wait for user input to continue or quit
 		var quit string
 		fmt.Scanln(&quit)
 
+		// If the user inputs "q", exit the reading mode
 		if quit == "q" {
-			config.Message = "<< Reading Mode Off >>"
+			// Append a message indicating the reading mode is off
+			config.Messages = append(config.Messages, "<< Reading Mode Off >>")
 
-			config.ReadCounter = 0
+			// Reset the read counter
+			config.ResetReadCounter()
 
-			config.ID = quotes.LastID()
+			// Set the current ID to the last ID in quotes
+			config.ID = quotes.LastID() 
 
+			// Clear the remaining RandomIDs if there are any left
 			if len(config.RandomIDs) > 0 {
 				config.RandomIDs = config.RandomIDs[:0]
 			}
 
+			// Call the CMD function to process the command
 			CMD(quotes)
 		}
 	}
 
-	config.Message = "<< Read 100% >>"
+	// Append a message indicating 100% of readings are done
+	config.Messages = append(config.Messages, "<< Read 100% >>")
 
-	config.ReadCounter = 0
+	// Reset the read counter after finishing
+	config.ResetReadCounter()
 }

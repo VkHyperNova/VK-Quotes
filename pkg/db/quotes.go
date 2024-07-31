@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"vk-quotes/pkg/config"
@@ -97,6 +98,7 @@ func (q *Quotes) ReadFromFile(path string, folder string) error {
 }
 
 func (q *Quotes) SaveToFile(path string) error {
+
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
 		return err
@@ -104,6 +106,19 @@ func (q *Quotes) SaveToFile(path string) error {
 
 	err = os.WriteFile(path, byteValue, 0644)
 	if err != nil {
+		config.Messages = append(config.Messages, err.Error())
+		return err
+	}
+
+	copyPath := config.CopyFilePathLinux
+
+	if runtime.GOOS == "windows" {
+		copyPath = config.CopyFilePathWindows
+	}
+
+	err = os.WriteFile(copyPath, byteValue, 0644)
+	if err != nil {
+		config.Messages = append(config.Messages, "Copy to hdd error: " +  err.Error())
 		return err
 	}
 
@@ -170,7 +185,7 @@ func (q *Quotes) Duplicates(searchQuote string) bool {
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
 			if quote.ID != config.ID {
-				config.Message = "<< there are dublicates in database. >>"
+				config.Messages = append(config.Messages, "<< there are dublicates in database. >>")
 				config.ID = quote.ID
 				return true
 			}
@@ -270,7 +285,7 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 	}
 
 	if input == "q" {
-		config.Message = "<< previous action aborted by user. >>"
+		config.Messages = append(config.Messages, "<< previous action aborted by user. >>")
 		return false
 	}
 

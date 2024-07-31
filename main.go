@@ -8,8 +8,8 @@ import (
 
 func main() {
 	quotes := db.Quotes{}
-	err := quotes.ReadFromFile(config.SaveQuotesPath, config.SaveFolder)
-	if err != nil {	
+	err := quotes.ReadFromFile(config.SaveQuotesPath, config.SaveFolderName)
+	if err != nil {
 		panic(err)
 	}
 

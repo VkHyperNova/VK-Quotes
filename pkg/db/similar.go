@@ -79,11 +79,13 @@ func (s *SimilarQuotes) SaveToFile(path string) error {
 
 	byteValue, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
+		config.Messages = append(config.Messages, err.Error())
 		return err
 	}
 
 	err = os.WriteFile(path, byteValue, 0644)
 	if err != nil {
+		config.Messages = append(config.Messages, err.Error())
 		return err
 	}
 
