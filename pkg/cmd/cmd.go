@@ -21,32 +21,32 @@ func CommandLine(quotes *db.Quotes) {
 
 	cli(quotes) // Initial display of the command line interface.
 
-	command, commandID := util.CommandPrompt("> ") // Retrieve the user's command input and corresponding ID if applicable.
+	input, inputID := util.CommandPrompt("> ") // Retrieve the user's command input and corresponding ID if applicable.
 
-	command = strings.ToLower(command) // Convert command to lowercase for uniformity.
+	input = strings.ToLower(input) // Convert command to lowercase for uniformity.
 
 	// Enter an infinite loop to continuously process user commands.
 
 	for {
-		switch command {
+		switch input {
 
 		case "add", "a": // Add a new quote to the database.
-			validation := quotes.UserInput(commandID) // Validate the user input for the add command.
+			validation := quotes.UserInput(inputID) // Validate the user input for the add command.
 			if validation {
 				add(quotes) // Call the add function if validation passes.
 			}
 			CommandLine(quotes) // Restart command processing.
 
 		case "update", "u": // Update a Quote in the database.
-			validation := quotes.UserInput(commandID) // Validate the user input for the update command.
+			validation := quotes.UserInput(inputID) // Validate the user input for the update command.
 			if validation {
-				update(quotes, commandID) // Call the update function if validation passes.
+				update(quotes, inputID) // Call the update function if validation passes.
 			}
 			CommandLine(quotes) // Restart command processing.
 
 		case "delete", "d": // Delete a Quote from the database.
-			delete(quotes, commandID) // Call the delete function.
-			CommandLine(quotes)       // Restart command processing.
+			delete(quotes, inputID) // Call the delete function.
+			CommandLine(quotes)     // Restart command processing.
 
 		case "showall", "s": // Print all Quotes from the database.
 			util.ClearScreen()      // Clear the screen in terminal.
@@ -74,13 +74,14 @@ func CommandLine(quotes *db.Quotes) {
 
 		case "q", "quit": // Exit the program.
 			util.ClearScreen()
-			os.Exit(0) 
+			os.Exit(0)
 
 		default:
-			foundQuote := quotes.Search(command)             // Search for a quote based on the command input.
-			formattedQuote := quotes.FormatQuote(foundQuote) // Format the found quote.
-			fmt.Print(formattedQuote)                        // Print the formatted quote.
-			CommandLine(quotes)                              // Restart command processing.
+			if input != "" {
+				quotes.PrintQuote(input) // Search and Print a quote based on the command input.
+				util.PressAnyKey()
+			}
+			CommandLine(quotes) // Restart command processing.
 		}
 	}
 }
@@ -94,18 +95,16 @@ func cli(quotes *db.Quotes) {
 		config.MainQuoteID = quotes.LastID() // If so, set it to the ID of the last quote.
 	}
 
-	
 	stringFormat := `` + // Define the string format for displaying the CLI information.
-		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n\n" + 
+		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n\n" +
 		"%s" +
-		config.Cyan + `%s` + config.Reset + 
-		"%s" + 
-		config.Yellow + `%s` + config.Reset + 
+		config.Cyan + `%s` + config.Reset +
+		"%s" +
+		config.Yellow + `%s` + config.Reset +
 		``
 
-	foundQuote := quotes.Search(strconv.Itoa(config.MainQuoteID)) // Search for the quote with the current main quote ID.
-
-	formattedQuote := quotes.FormatQuote(foundQuote) // Format the found Quote.
+	quote := quotes.FindByID(config.MainQuoteID)
+	formattedQuote := quotes.FormatQuote(quote)
 
 	commands := "\nAdd Update Delete Read Showall Stats SimilarQuotes ResetIDs Quit\n" // Define the commands available to the user with color formatting.
 
@@ -161,11 +160,7 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 		return false
 	}
 
-	quote := quotes.Search(strconv.Itoa(deleteID))
-
-	formattedQuote := quotes.FormatQuote(quote)
-
-	fmt.Println(formattedQuote)
+	quotes.PrintQuote(strconv.Itoa(deleteID))
 
 	line := liner.NewLiner()
 

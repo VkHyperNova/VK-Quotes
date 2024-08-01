@@ -34,7 +34,7 @@ func (q *Quotes) AppendQuote(quote Quote) {
 }
 
 func (q *Quotes) ReadFromFile() error {
-	
+
 	path := config.FilePathLinux
 	folder := config.FolderName
 
@@ -50,7 +50,7 @@ func (q *Quotes) ReadFromFile() error {
 			// Print any error that occurs during file creation.
 			config.Messages = append(config.Messages, err.Error())
 		}
-		
+
 		// Print a message indicating that a new database file has been created.
 		config.Messages = append(config.Messages, "<< New Database Created! >>")
 	}
@@ -152,10 +152,8 @@ func (q *Quotes) FormatQuote(quote Quote) string {
 		quote.DATE,
 		quote.LANGUAGE)
 
-	// Write the formatted quote into the buffer.
 	quoteBuffer.WriteString(formattedQuote)
 
-	// Return the formatted quote string.
 	return quoteBuffer.String()
 }
 
@@ -208,34 +206,37 @@ func (q *Quotes) CreateId() int {
 	return maxID + 1
 }
 
-func (q *Quotes) Search(command string) Quote {
-
-	var foundQuote Quote
-
-	normalizedCommand := strings.ToUpper(command)
+func (q *Quotes) PrintQuote(command string) {
 
 	for _, quote := range q.QUOTES {
 
 		isID, _ := strconv.Atoi(command)
-
 		if quote.ID == isID {
-			foundQuote = quote
+			fmt.Println(q.FormatQuote(quote))
 			break
 		}
 
-		normalizedAuthor := strings.ToUpper(quote.AUTHOR)
-
-		if strings.Contains(normalizedAuthor, normalizedCommand) {
-			foundQuote = quote
+		normalizedAuthor := strings.ToLower(quote.AUTHOR)
+		if strings.Contains(normalizedAuthor, command) {
+			fmt.Println(q.FormatQuote(quote))
 		}
 
-		normalizedQuote := strings.ToUpper(quote.QUOTE)
+		normalizedQuote := strings.ToLower(quote.QUOTE)
+		if strings.Contains(normalizedQuote, command) {
+			fmt.Println(q.FormatQuote(quote))
+		}
+	}
+}
 
-		if strings.Contains(normalizedQuote, normalizedCommand) {
+func (q *Quotes) FindByID(id int) Quote {
+
+	var foundQuote Quote
+
+	for _, quote := range q.QUOTES {
+		if quote.ID == id {
 			foundQuote = quote
 		}
 	}
-
 	return foundQuote
 }
 
