@@ -5,12 +5,14 @@ var ProgramVersion = "1.24"
 /* All Paths */
 
 var FolderName = "QUOTES"
+var SaveFileName = "quotes.json"
+var SimilarFileName = "similiar.json"
 
-var SimilarQuotesLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/similarQuotes.json"
-var FilePathLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/quotes.json"
+var CopyFilePathLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/quotes"
+var CopySimilarQuotesLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/similarQuotes.json"
 
-var FilePathWindows = "D:\\DATABASES\\QUOTES\\quotes.json"
-var SimilarQuotesWindows = "D:\\DATABASES\\QUOTES\\quotes.json"
+var CopyFilePathWindows = "D:\\DATABASES\\QUOTES\\quotes.json"
+var CopySimilarQuotesWindows = "D:\\DATABASES\\QUOTES\\quotes.json"
 
 var ReadCounter string
 var Counter int
@@ -35,7 +37,7 @@ func FormatMessages() string {
 
 	formattedString := ""
 	for _, m := range Messages {
-		formattedString += m + "\n"
+		formattedString += m +"\n"
 	}
 
 	return formattedString

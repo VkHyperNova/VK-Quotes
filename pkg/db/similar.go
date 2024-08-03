@@ -47,6 +47,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -74,21 +75,19 @@ func (s *SimilarQuotes) Add(quote SimilarQuotePairs) {
 	s.SimilarQuotes = append(s.SimilarQuotes, quote)
 }
 
-func (s *SimilarQuotes) SaveToFile() error {
+func (s *SimilarQuotes) SaveToFile() {
 
 	byteValue, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
-		config.Messages = append(config.Messages, err.Error())
-		return err
+		panic(err)
 	}
 
-	err = os.WriteFile(config.SimilarQuotesLinux, byteValue, 0644)
+	localPath := filepath.Join(".", config.FolderName, config.SimilarFileName)
+
+	err = os.WriteFile(localPath, byteValue, 0644)
 	if err != nil {
-		config.Messages = append(config.Messages, err.Error())
-		return err
+		panic(err)
 	}
-
-	return nil
 }
 
 func waitGroupDone(wg *sync.WaitGroup) <-chan struct{} {
@@ -132,7 +131,7 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	similar.SaveToFile()
 
-	config.Messages = append(config.Messages, "<< Find Similar Quotes Process Done! >>")
+	config.Messages = append(config.Messages, config.Green + "<< Find Similar Quotes Process Done! >>" + config.Reset)
 }
 
 func calculateTFIDF(sentences []string) []map[string]float64 {
@@ -223,7 +222,7 @@ func findSimilarSentences(sentences []string, tfidfVectors []map[string]float64,
 	return similarPairs
 }
 
-func RunTaskWithProgress(quotes *Quotes) {
+func FindSimilarQuotes(quotes *Quotes) {
 
 	similar := SimilarQuotes{}
 

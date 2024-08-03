@@ -3,15 +3,13 @@ package main
 import (
 	"vk-quotes/pkg/cmd"
 	"vk-quotes/pkg/db"
+	"vk-quotes/pkg/util"
 )
 
 func main() {
 	
 	quotes := db.Quotes{}
-	err := quotes.ReadFromFile()
-	if err != nil {
-		panic(err)
-	}
-
+	util.CreateDirectory()
+	quotes.ReadFromFile()
 	cmd.CommandLine(&quotes)
 }

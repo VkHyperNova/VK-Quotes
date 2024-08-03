@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -15,26 +16,22 @@ import (
 
 func CommandPrompt(prompt string) (string, int) {
 
-	// Initialize a new line reader for user input
 	line := liner.NewLiner()
-
-	// Ensure the line reader is closed to free resources
 	defer line.Close()
 
-	// Prompt the user with the given prompt string and read input
-	input, err := line.Prompt(prompt)
-
-	// Handle any errors from the prompt
+	// Prompt the user with the given prompt string and read userInput
+	userInput, err := line.Prompt(prompt)
 	if err != nil {
 		config.Messages = append(config.Messages, err.Error())
+		return "", 0
 	}
 
-	// Initialize the command and commandID variables
-	command := input
-	commandID := 0
+	// Initialize default values
+	input := userInput
+	inputID := 0
 
 	// Split the input into parts based on whitespace
-	parts := strings.Fields(input)
+	parts := strings.Fields(userInput)
 
 	// Check if the input contains exactly two parts
 	if len(parts) == 2 {
@@ -47,32 +44,55 @@ func CommandPrompt(prompt string) (string, int) {
 
 		// If the conversion is successful, update the command and commandID
 		if err == nil {
-			command = isCommand
-			commandID = isID
+			input = isCommand
+			inputID = isID
 		}
 	}
 
-	// Return the parsed command and commandID
-	return command, commandID
+	// Convert the input to lowercase
+	input = strings.ToLower(input)
+
+	return input, inputID
 }
 
 func ClearScreen() {
 
-	cmd := exec.Command("clear")
+	var cmd *exec.Cmd
 
+	// Determine the command to clear the screen based on the OS
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("cmd", "/c", "cls")
+	} else {
+		cmd = exec.Command("clear")
 	}
 
+	// Set the command output to the standard output
 	cmd.Stdout = os.Stdout
-	cmd.Run()
+
+	// Run the command and handle any errors
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintln(os.Stderr, "Error clearing screen:", err)
+	}
 }
 
 func PressAnyKey() {
-	fmt.Println("\nPress Any Key To Continue...")
+
+	fmt.Println("\nPress any key to continue...")
+
+	// Create a new scanner to read from standard input
 	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	ClearScreen()
+
+	// Scan the next token (line) from standard input
+	if scanner.Scan() {
+		// Successfully read input; can handle further actions here if needed
+		return
+	}
+
+	// Check for scanning errors
+	if err := scanner.Err(); err != nil {
+		// Print the error message to standard error
+		fmt.Fprintln(os.Stderr, "Error reading input:", err)
+	}
 }
 
 func ArrayContainsString(arr []string, name string) bool {
@@ -112,4 +132,21 @@ func FormattedReadCounter(count int, size int) string {
 	readCounter := fmt.Sprintf("Reading: [%d] %.0f%%", count, percentage)
 
 	return readCounter
+}
+
+func CreateDirectory() {
+
+	localPath := filepath.Join(".", config.FolderName, config.SaveFileName)
+
+	if _, err := os.Stat(localPath); os.IsNotExist(err) {
+
+		_ = os.Mkdir(config.FolderName, 0700)
+
+		err = os.WriteFile(localPath, []byte(`{"quotes": []}`), 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		config.Messages = append(config.Messages, config.Green+"<< New Database Created! >>"+config.Reset)
+	}
 }

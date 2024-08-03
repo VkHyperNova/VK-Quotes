@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strconv"
@@ -29,89 +30,100 @@ type Quotes struct {
 	QUOTES []Quote `json:"quotes"` // Slice containing multiple Quote instances.
 }
 
+func (q *Quotes) UserInput(id int) bool {
+
+	config.UserInputs = []string{} // Clear previous user inputs
+
+	// Define question pairs with default values
+	type questionPairs struct {
+		Prompt  string
+		Default string
+	}
+	questions := []questionPairs{
+		{"Quote", ""},
+		{"Author", ""},
+		{"Language", "English"},
+	}
+
+	// If updating, populate questions with existing values
+	if id > 0 {
+		index := q.IndexOf(id)
+		if index == -1 {
+			return false
+		}
+		quote := q.QUOTES[index]
+		questions = []questionPairs{
+			{"Quote", quote.QUOTE},
+			{"Author", quote.AUTHOR},
+			{"Language", quote.LANGUAGE},
+		}
+	}
+
+	// Prompt user for input
+	for _, question := range questions {
+		if !q.PromptWithSuggestion(question.Prompt, question.Default) {
+			return false
+		}
+	}
+	return true
+}
+
 func (q *Quotes) AppendQuote(quote Quote) {
 	q.QUOTES = append(q.QUOTES, quote)
 }
 
-func (q *Quotes) ReadFromFile() error {
+func (q *Quotes) ReadFromFile() {
 
-	path := config.FilePathLinux
-	folder := config.FolderName
+	localPath := filepath.Join(".", config.FolderName, config.SaveFileName)
 
-	// Check if the file exists at the specified path.
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-
-		// If the file does not exist, create the "database" directory.
-		_ = os.Mkdir(folder, 0700)
-
-		// Create the JSON file with an initial empty quotes array.
-		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
-		if err != nil {
-			// Print any error that occurs during file creation.
-			config.Messages = append(config.Messages, err.Error())
-		}
-
-		// Print a message indicating that a new database file has been created.
-		config.Messages = append(config.Messages, "<< New Database Created! >>")
-	}
-
-	// Open the file for reading.
-	file, err := os.Open(path)
+	file, err := os.Open(localPath)
 	if err != nil {
-		// Return an error if the file could not be opened.
-		return err
+		panic(err)
 	}
-
-	// Ensure the file is closed after reading.
 
 	defer file.Close()
 
-	// Read the contents of the file into a byte slice.
-
 	byteValue, err := io.ReadAll(file)
-
 	if err != nil {
-
-		// Return an error if reading the file fails.
-
-		return err
+		panic(err)
 	}
-
-	// Unmarshal the JSON byte slice into the Quotes struct.
 
 	err = json.Unmarshal(byteValue, q)
 	if err != nil {
-
-		// Return an error if JSON unmarshalling fails.
-
-		return err
+		panic(err)
 	}
-
-	// Return nil to indicate that the operation was successful.
-
-	return nil
 }
 
-func (q *Quotes) SaveToFile() error {
+func (q *Quotes) SaveToFile() {
 
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	path := config.FilePathLinux
+	localPath := filepath.Join(".", config.FolderName, config.SaveFileName)
 
-	if runtime.GOOS == "windows" {
-		path = config.FilePathWindows
-	}
-
-	err = os.WriteFile(path, byteValue, 0644)
+	err = os.WriteFile(localPath, byteValue, 0644)
 	if err != nil {
-		config.Messages = append(config.Messages, "Copy to hdd error: "+err.Error())
-		return err
+		panic(err)
 	}
 
-	return nil
+	config.Messages = append(config.Messages, config.Yellow + "<< SAVED >>" + config.Reset)
+
+	// Backup
+
+	backupPath := config.CopyFilePathLinux + strconv.Itoa(q.Size()) + ".json"
+	if runtime.GOOS == "windows" {
+		backupPath = config.CopyFilePathWindows + strconv.Itoa(q.Size()) + ".json"
+	}
+
+	err = os.WriteFile(backupPath, byteValue, 0644)
+	if err != nil {
+		config.Messages = append(config.Messages, config.Red + "<< No Backup >>" + config.Reset)
+	}
+
+	config.Messages = append(config.Messages, config.Green + "<< Backup Done >>" + config.Reset)
+	
 }
 
 func (q *Quotes) Update(updatedQuote Quote) error {
@@ -129,9 +141,14 @@ func (q *Quotes) Remove(index int) {
 }
 
 func (q *Quotes) PrintAllQuotes() {
+
+	util.ClearScreen()
+
 	for _, quote := range q.QUOTES {
 		fmt.Print(q.FormatQuote(quote))
 	}
+
+	util.PressAnyKey()
 }
 
 func (q *Quotes) FormatQuote(quote Quote) string {
@@ -170,7 +187,7 @@ func (q *Quotes) Duplicates(searchQuote string) bool {
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
 			if quote.ID != config.MainQuoteID {
-				config.Messages = append(config.Messages, "<< there are dublicates in database. >>")
+				config.Messages = append(config.Messages, config.Red + "<< there are dublicates in database. >>" + config.Reset)
 				config.MainQuoteID = quote.ID
 				return true
 			}
@@ -273,7 +290,7 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 	}
 
 	if input == "q" {
-		config.Messages = append(config.Messages, "<< previous action aborted by user. >>")
+		config.Messages = append(config.Messages, config.Red + "<< previous action aborted by user. >>" + config.Reset)
 		return false
 	}
 
@@ -283,40 +300,6 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 
 	config.UserInputs = append(config.UserInputs, util.FillEmptyInput(input, "Unknown"))
 
-	return true
-}
-
-func (q *Quotes) UserInput(id int) bool {
-
-	// empty the old input before getting new values
-	if len(config.UserInputs) > 0 {
-		config.UserInputs = config.UserInputs[:0]
-	}
-
-	type questionPairs struct {
-		First  string
-		Second string
-	}
-
-	// pairs for adding
-	questions := [3]questionPairs{{"Quote", ""}, {"Author", ""}, {"Language", "English"}}
-
-	// pairs for updating
-	if id > 0 {
-		index := q.IndexOf(id)
-		if index == -1 {
-			return false
-		}
-		questions = [3]questionPairs{{"Quote", q.QUOTES[index].QUOTE}, {"Author", q.QUOTES[index].AUTHOR}, {"Language", q.QUOTES[index].LANGUAGE}}
-	}
-
-	// prompt all three questions
-	for _, question := range questions {
-		validation := q.PromptWithSuggestion(question.First, question.Second)
-		if !validation {
-			return false
-		}
-	}
 	return true
 }
 
@@ -347,7 +330,7 @@ func (q *Quotes) ResetIDs(quotes *Quotes) {
 
 	config.MainQuoteID = q.LastID()
 
-	config.Messages = append(config.Messages, "<< IDs Reset! >>")
+	config.Messages = append(config.Messages, config.Red + "<< IDs Reset! >>" + config.Reset)
 }
 
 func (q *Quotes) TopAuthors() string {

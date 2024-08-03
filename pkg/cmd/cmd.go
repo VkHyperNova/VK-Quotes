@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 	"vk-quotes/pkg/config"
 	db "vk-quotes/pkg/db"
@@ -15,78 +14,65 @@ import (
 	"github.com/peterh/liner"
 )
 
-// CommandLine is the main command processing function that handles various commands
-// entered by the user to manipulate quotes in the database.
 func CommandLine(quotes *db.Quotes) {
 
-	cli(quotes) // Initial display of the command line interface.
+	cli(quotes)
 
-	input, inputID := util.CommandPrompt("> ") // Retrieve the user's command input and corresponding ID if applicable.
-
-	input = strings.ToLower(input) // Convert command to lowercase for uniformity.
-
-	// Enter an infinite loop to continuously process user commands.
+	input, inputID := util.CommandPrompt("> ")
 
 	for {
 		switch input {
 
-		case "add", "a": // Add a new quote to the database.
-			validation := quotes.UserInput(inputID) // Validate the user input for the add command.
-			if validation {
-				add(quotes) // Call the add function if validation passes.
+		case "add", "a":
+			if quotes.UserInput(inputID) {
+				add(quotes)
 			}
-			CommandLine(quotes) // Restart command processing.
+			CommandLine(quotes)
 
-		case "update", "u": // Update a Quote in the database.
-			validation := quotes.UserInput(inputID) // Validate the user input for the update command.
-			if validation {
-				update(quotes, inputID) // Call the update function if validation passes.
+		case "update", "u":
+			if quotes.UserInput(inputID) {
+				update(quotes, inputID)
 			}
-			CommandLine(quotes) // Restart command processing.
+			CommandLine(quotes)
 
-		case "delete", "d": // Delete a Quote from the database.
-			delete(quotes, inputID) // Call the delete function.
-			CommandLine(quotes)     // Restart command processing.
+		case "delete", "d":
+			delete(quotes, inputID)
+			CommandLine(quotes)
 
-		case "showall", "s": // Print all Quotes from the database.
-			util.ClearScreen()      // Clear the screen in terminal.
-			quotes.PrintAllQuotes() // Display all quotes.
-			util.PressAnyKey()      // Wait for the user to press a key.
-			CommandLine(quotes)     // Restart command processing.
+		case "showall", "s":
+			quotes.PrintAllQuotes()
+			CommandLine(quotes)
 
-		case "stats": // Print Statistics for top Authors and top Languages.
-			util.ClearScreen()      // Clear the screen in terminal.
-			printStatistics(quotes) // Print statistics about the quotes.
-			util.PressAnyKey()      // Wait for the user to press a key.
-			CommandLine(quotes)     // Restart command processing.
+		case "stats":
+			printStatistics(quotes)
+			CommandLine(quotes)
 
-		case "resetids": // Reset all IDs in the database from 1 to n.
-			quotes.ResetIDs(quotes) // Reset the IDs of the quotes.
-			CommandLine(quotes)     // Restart command processing.
+		case "resetids":
+			quotes.ResetIDs(quotes)
+			CommandLine(quotes)
 
-		case "read", "r": // Read all Quotes in random order.
-			read(quotes)        // Call the read function.
-			CommandLine(quotes) // Restart command processing.
+		case "read", "r":
+			read(quotes)
+			CommandLine(quotes)
 
-		case "similarquotes", "sim": // Find similar Quotes in the database and save them to file.
-			db.RunTaskWithProgress(quotes) // Run a task to find similar quotes.
-			CommandLine(quotes)            // Restart command processing.
+		case "similarquotes", "sim":
+			db.FindSimilarQuotes(quotes)
+			CommandLine(quotes)
 
-		case "q", "quit": // Exit the program.
+		case "q", "quit":
 			util.ClearScreen()
 			os.Exit(0)
 
 		default:
 			if input != "" {
-				quotes.PrintQuote(input) // Search and Print a quote based on the command input.
+				quotes.PrintQuote(input)
 				util.PressAnyKey()
 			}
-			CommandLine(quotes) // Restart command processing.
+			CommandLine(quotes)
 		}
 	}
 }
 
-// cli initializes and displays the command-line interface (CLI) for the quotes application.
 func cli(quotes *db.Quotes) {
 
 	util.ClearScreen() // Clear the screen for a fresh display.
@@ -128,8 +114,6 @@ func add(quotes *db.Quotes) bool {
 
 	config.MainQuoteID = newID
 
-	config.Messages = append(config.Messages, fmt.Sprintf("<< %d Quote Added! >>", newID))
-
 	return true
 }
 
@@ -146,8 +130,6 @@ func update(quotes *db.Quotes, updateID int) bool {
 
 	config.MainQuoteID = updateID
 
-	config.Messages = append(config.Messages, fmt.Sprintf("<< %d Quote Updated! >>", updateID))
-
 	return true
 }
 
@@ -156,7 +138,7 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 	index := quotes.IndexOf(deleteID)
 
 	if index == -1 {
-		config.Messages = append(config.Messages, "Index Not Found!")
+		config.Messages = append(config.Messages, config.Red + "<< Index Not Found >>" + config.Reset)
 		return false
 	}
 
@@ -166,15 +148,10 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 
 	defer line.Close()
 
-	confirm, err := line.Prompt("(y/n)")
-
-	if err != nil {
-		config.Messages = append(config.Messages, err.Error())
-		return false
-	}
+	confirm, _ := line.Prompt("(y/n)")
 
 	if confirm != "y" {
-		config.Messages = append(config.Messages, "<< Delete Canceled! >>")
+		config.Messages = append(config.Messages, config.Red + "<< Delete Canceled >>" + config.Reset)
 		return false
 	}
 
@@ -183,8 +160,6 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 	quotes.SaveToFile()
 
 	config.MainQuoteID = quotes.LastID()
-
-	config.Messages = append(config.Messages, fmt.Sprintf("<< %d Quote Deleted! >>", deleteID))
 
 	return true
 }
@@ -237,7 +212,7 @@ func read(quotes *db.Quotes) {
 		// If the user inputs "q", exit the reading mode
 		if quit == "q" {
 			// Append a message indicating the reading mode is off
-			config.Messages = append(config.Messages, "<< Reading Mode Off >>")
+			config.Messages = append(config.Messages, config.Red + "<< Reading Mode Off >>" + config.Reset)
 
 			// Reset the read counter
 			config.ResetReadCounter()
@@ -256,13 +231,15 @@ func read(quotes *db.Quotes) {
 	}
 
 	// Append a message indicating 100% of readings are done
-	config.Messages = append(config.Messages, "<< Read 100% >>")
+	config.Messages = append(config.Messages, config.Green + "<< Read 100% >>" + config.Reset)
 
 	// Reset the read counter after finishing
 	config.ResetReadCounter()
 }
 
 func printStatistics(quotes *db.Quotes) {
+
+	util.ClearScreen()
 
 	format := "%s%s%s"
 
@@ -271,4 +248,6 @@ func printStatistics(quotes *db.Quotes) {
 	stats := fmt.Sprintf(format, name, quotes.TopAuthors(), quotes.TopLanguages())
 
 	fmt.Println(stats)
+
+	util.PressAnyKey()
 }
