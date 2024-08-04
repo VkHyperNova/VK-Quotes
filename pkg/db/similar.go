@@ -47,7 +47,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -82,9 +81,9 @@ func (s *SimilarQuotes) SaveToFile() {
 		panic(err)
 	}
 
-	localPath := filepath.Join(".", config.FolderName, config.SimilarFileName)
+	path := config.SimilarPath
 
-	err = os.WriteFile(localPath, byteValue, 0644)
+	err = os.WriteFile(path, byteValue, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -131,7 +130,7 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	similar.SaveToFile()
 
-	config.Messages = append(config.Messages, config.Green + "<< Find Similar Quotes Process Done! >>" + config.Reset)
+	config.Messages = append(config.Messages, config.Green+"<< Find Similar Quotes Process Done! >>"+config.Reset)
 }
 
 func calculateTFIDF(sentences []string) []map[string]float64 {

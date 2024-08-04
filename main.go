@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	
 	quotes := db.Quotes{}
 	util.CreateDirectory()
 	quotes.ReadFromFile()
 	cmd.CommandLine(&quotes)
 }
+

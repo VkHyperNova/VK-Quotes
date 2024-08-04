@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"runtime"
 	"sort"
 	"strconv"
@@ -74,9 +73,9 @@ func (q *Quotes) AppendQuote(quote Quote) {
 
 func (q *Quotes) ReadFromFile() {
 
-	localPath := filepath.Join(".", config.FolderName, config.SaveFileName)
+	path := config.LocalPath
 
-	file, err := os.Open(localPath)
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
@@ -101,29 +100,34 @@ func (q *Quotes) SaveToFile() {
 		panic(err)
 	}
 
-	localPath := filepath.Join(".", config.FolderName, config.SaveFileName)
+	path := config.LocalPath
 
-	err = os.WriteFile(localPath, byteValue, 0644)
+	err = os.WriteFile(path, byteValue, 0644)
 	if err != nil {
 		panic(err)
 	}
 
-	config.Messages = append(config.Messages, config.Yellow + "<< SAVED >>" + config.Reset)
+	config.Messages = append(config.Messages, config.Yellow+"<< SAVED >>"+config.Reset)
 
 	// Backup
+	q.Backup(byteValue)
+}
 
-	backupPath := config.CopyFilePathLinux + strconv.Itoa(q.Size()) + ".json"
+func (q *Quotes) Backup(byteValue []byte) {
+
+	backupPath := config.BackupPathLinux + strconv.Itoa(q.Size()) + ".json"
+
 	if runtime.GOOS == "windows" {
-		backupPath = config.CopyFilePathWindows + strconv.Itoa(q.Size()) + ".json"
+		backupPath = config.BackupPathWindows + strconv.Itoa(q.Size()) + ".json"
 	}
 
-	err = os.WriteFile(backupPath, byteValue, 0644)
+	err := os.WriteFile(backupPath, byteValue, 0644)
 	if err != nil {
-		config.Messages = append(config.Messages, config.Red + "<< No Backup >>" + config.Reset)
+		config.Messages = append(config.Messages, config.Red+"<< No Backup >>"+config.Reset)
+		config.Messages = append(config.Messages, err.Error())
 	}
 
-	config.Messages = append(config.Messages, config.Green + "<< Backup Done >>" + config.Reset)
-	
+	config.Messages = append(config.Messages, config.Green+"<< Backup Done >>"+config.Reset)
 }
 
 func (q *Quotes) Update(updatedQuote Quote) error {
@@ -187,7 +191,7 @@ func (q *Quotes) Duplicates(searchQuote string) bool {
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
 			if quote.ID != config.MainQuoteID {
-				config.Messages = append(config.Messages, config.Red + "<< there are dublicates in database. >>" + config.Reset)
+				config.Messages = append(config.Messages, config.Red+"<< there are dublicates in database. >>"+config.Reset)
 				config.MainQuoteID = quote.ID
 				return true
 			}
@@ -290,7 +294,7 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 	}
 
 	if input == "q" {
-		config.Messages = append(config.Messages, config.Red + "<< previous action aborted by user. >>" + config.Reset)
+		config.Messages = append(config.Messages, config.Red+"<< previous action aborted by user. >>"+config.Reset)
 		return false
 	}
 
@@ -330,7 +334,7 @@ func (q *Quotes) ResetIDs(quotes *Quotes) {
 
 	config.MainQuoteID = q.LastID()
 
-	config.Messages = append(config.Messages, config.Red + "<< IDs Reset! >>" + config.Reset)
+	config.Messages = append(config.Messages, config.Red+"<< IDs Reset! >>"+config.Reset)
 }
 
 func (q *Quotes) TopAuthors() string {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -136,17 +135,27 @@ func FormattedReadCounter(count int, size int) string {
 
 func CreateDirectory() {
 
-	localPath := filepath.Join(".", config.FolderName, config.SaveFileName)
+	path := config.LocalPath
 
-	if _, err := os.Stat(localPath); os.IsNotExist(err) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 
 		_ = os.Mkdir(config.FolderName, 0700)
 
-		err = os.WriteFile(localPath, []byte(`{"quotes": []}`), 0644)
+		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
 		if err != nil {
 			panic(err)
 		}
 
-		config.Messages = append(config.Messages, config.Green+"<< New Database Created! >>"+config.Reset)
+		config.Messages = append(config.Messages, config.Green+"<< Local Database Created! >>"+config.Reset)
 	}
+}
+
+func FormatMessages() string {
+
+	formattedString := ""
+	for _, m := range config.Messages {
+		formattedString += m + "\n"
+	}
+
+	return formattedString
 }

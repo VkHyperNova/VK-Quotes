@@ -75,13 +75,13 @@ func CommandLine(quotes *db.Quotes) {
 
 func cli(quotes *db.Quotes) {
 
-	util.ClearScreen() // Clear the screen for a fresh display.
+	util.ClearScreen() 
 
-	if config.MainQuoteID <= 0 { // Check if the main quote ID is not set (<= 0)
-		config.MainQuoteID = quotes.LastID() // If so, set it to the ID of the last quote.
+	if config.MainQuoteID <= 0 { 
+		config.MainQuoteID = quotes.LastID() 
 	}
 
-	stringFormat := `` + // Define the string format for displaying the CLI information.
+	stringFormat := `` + 
 		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n\n" +
 		"%s" +
 		config.Cyan + `%s` + config.Reset +
@@ -92,11 +92,11 @@ func cli(quotes *db.Quotes) {
 	quote := quotes.FindByID(config.MainQuoteID)
 	formattedQuote := quotes.FormatQuote(quote)
 
-	commands := "\nAdd Update Delete Read Showall Stats SimilarQuotes ResetIDs Quit\n" // Define the commands available to the user with color formatting.
+	commands := "\nAdd Update Delete Read Showall Stats SimilarQuotes ResetIDs Quit\n" 
 
-	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, config.FormatMessages(), config.ReadCounter, formattedQuote, commands) // Combine all the parts into the final CLI string.
+	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, util.FormatMessages(), config.ReadCounter, formattedQuote, commands) 
 
-	fmt.Print(cli) // Print the assembled CLI string.
+	fmt.Print(cli) 
 }
 
 func add(quotes *db.Quotes) bool {
@@ -138,7 +138,7 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 	index := quotes.IndexOf(deleteID)
 
 	if index == -1 {
-		config.Messages = append(config.Messages, config.Red + "<< Index Not Found >>" + config.Reset)
+		config.Messages = append(config.Messages, config.Red+"<< Index Not Found >>"+config.Reset)
 		return false
 	}
 
@@ -151,7 +151,7 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 	confirm, _ := line.Prompt("(y/n)")
 
 	if confirm != "y" {
-		config.Messages = append(config.Messages, config.Red + "<< Delete Canceled >>" + config.Reset)
+		config.Messages = append(config.Messages, config.Red+"<< Delete Canceled >>"+config.Reset)
 		return false
 	}
 
@@ -166,75 +166,40 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 
 func read(quotes *db.Quotes) {
 
-	// Append a set of random IDs to the quotes object
 	quotes.AppendRandomIDs()
 
-	// Loop until all random IDs are processed
 	for len(config.RandomIDs) != 0 {
 
-		// Increment the counter for each iteration
 		config.Counter += 1
 
-		// Create a new random source based on the current time in nanoseconds
 		source := rand.NewSource(time.Now().UnixNano())
-
-		// Initialize a new random number generator with the source
 		r := rand.New(source)
-
-		// Generate a random index based on the length of RandomIDs
 		randomIndex := r.Intn(len(config.RandomIDs))
 
-		// Select a random ID from RandomIDs using the random index
 		config.MainQuoteID = config.RandomIDs[randomIndex]
-
-		// Remove the selected ID from RandomIDs
 		config.RandomIDs = append(config.RandomIDs[:randomIndex], config.RandomIDs[randomIndex+1:]...)
 
-		// Get the current count of processed items
 		count := config.Counter
-
-		// Get the total size of the quotes
 		size := quotes.Size()
-
-		// Calculate the percentage of completed readings
 		percentage := float64(count) / float64(size) * 100
-
-		// Update the read counter message
 		config.ReadCounter = fmt.Sprintf("<< Reading [%d] %.0f%% >>", count, percentage)
 
-		// Call the CLI function to process/display the quotes
 		cli(quotes)
 
-		// Wait for user input to continue or quit
 		var quit string
 		fmt.Scanln(&quit)
 
-		// If the user inputs "q", exit the reading mode
 		if quit == "q" {
-			// Append a message indicating the reading mode is off
-			config.Messages = append(config.Messages, config.Red + "<< Reading Mode Off >>" + config.Reset)
-
-			// Reset the read counter
-			config.ResetReadCounter()
-
-			// Set the current ID to the last ID in quotes
-			config.MainQuoteID = quotes.LastID()
-
-			// Clear the remaining RandomIDs if there are any left
-			if len(config.RandomIDs) > 0 {
-				config.RandomIDs = config.RandomIDs[:0]
-			}
-
-			// Call the CMD function to process the command
-			CommandLine(quotes)
+			break
 		}
 	}
 
-	// Append a message indicating 100% of readings are done
-	config.Messages = append(config.Messages, config.Green + "<< Read 100% >>" + config.Reset)
-
-	// Reset the read counter after finishing
-	config.ResetReadCounter()
+	config.RandomIDs = config.RandomIDs[:0]
+	config.Messages = append(config.Messages, config.Yellow+"<< Reading Done! >>"+config.Reset)
+	config.MainQuoteID = quotes.LastID()
+	config.Counter = 0
+	config.ReadCounter = ""
+	CommandLine(quotes)
 }
 
 func printStatistics(quotes *db.Quotes) {
