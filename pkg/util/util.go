@@ -26,7 +26,7 @@ func CommandPrompt(prompt string) (string, int) {
 	}
 
 	// Initialize default values
-	input := userInput
+	input := strings.TrimSpace(userInput)
 	inputID := 0
 
 	// Split the input into parts based on whitespace
