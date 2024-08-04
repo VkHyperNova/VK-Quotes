@@ -8,8 +8,8 @@ const FolderName = "QUOTES"
 const LocalPath = "./QUOTES/quotes.json"
 const SimilarPath = "./QUOTES/similiar.json"
 
-var BackupPathLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/quotes"
-var BackupPathWindows = "D:\\DATABASES\\QUOTES\\quotes"
+var BackupPathLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/"
+var BackupPathWindows = "D:\\DATABASES\\QUOTES\\"
 
 var ReadCounter string
 var Counter int

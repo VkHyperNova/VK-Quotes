@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/util"
 
@@ -115,7 +116,10 @@ func (q *Quotes) SaveToFile() {
 
 func (q *Quotes) Backup(byteValue []byte) {
 
-	backupPath := config.BackupPathLinux + strconv.Itoa(q.Size()) + ".json"
+	currentTime := time.Now()
+	layout := "(02.01.2006_15-04-05)"
+
+	backupPath := config.BackupPathLinux + strconv.Itoa(q.Size()) + ". quotes " + currentTime.Format(layout) + ".json"
 
 	if runtime.GOOS == "windows" {
 		backupPath = config.BackupPathWindows + strconv.Itoa(q.Size()) + ".json"
@@ -125,6 +129,7 @@ func (q *Quotes) Backup(byteValue []byte) {
 	if err != nil {
 		config.Messages = append(config.Messages, config.Red+"<< No Backup >>"+config.Reset)
 		config.Messages = append(config.Messages, err.Error())
+		return
 	}
 
 	config.Messages = append(config.Messages, config.Green+"<< Backup Done >>"+config.Reset)
