@@ -130,7 +130,8 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	similar.SaveToFile()
 
-	config.Messages = append(config.Messages, config.Green+"<< Find Similar Quotes Process Done! >>"+config.Reset)
+	message := config.Green+"Find Similar Quotes Process Done"+config.Reset
+	config.AddMessage(message)
 }
 
 func calculateTFIDF(sentences []string) []map[string]float64 {

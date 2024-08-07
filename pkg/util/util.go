@@ -21,7 +21,7 @@ func CommandPrompt(prompt string) (string, int) {
 	// Prompt the user with the given prompt string and read userInput
 	userInput, err := line.Prompt(prompt)
 	if err != nil {
-		config.Messages = append(config.Messages, err.Error())
+		config.AddMessage(err.Error())
 		return "", 0
 	}
 
@@ -112,27 +112,6 @@ func ArrayContainsInt(numbers []int, number int) bool {
 	return false
 }
 
-func FillEmptyInput(a, b string) string {
-	if a == "" {
-		a = b
-	}
-
-	return a
-}
-
-func MoveBack(a string) bool {
-	return a == "b"
-}
-
-func FormattedReadCounter(count int, size int) string {
-
-	percentage := float64(count) / float64(size) * 100
-
-	readCounter := fmt.Sprintf("Reading: [%d] %.0f%%", count, percentage)
-
-	return readCounter
-}
-
 func CreateDirectory() {
 
 	path := config.LocalPath
@@ -146,16 +125,8 @@ func CreateDirectory() {
 			panic(err)
 		}
 
-		config.Messages = append(config.Messages, config.Green+"<< Local Database Created! >>"+config.Reset)
+		message := config.Green + "Local Database Created" + config.Reset
+		config.AddMessage(message)
 	}
 }
 
-func FormatMessages() string {
-
-	formattedString := ""
-	for _, m := range config.Messages {
-		formattedString += m + "\n"
-	}
-
-	return formattedString
-}

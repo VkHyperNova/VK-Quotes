@@ -1,5 +1,7 @@
 package config
 
+import "strconv"
+
 var ProgramVersion = "1.24"
 
 /* All Paths */
@@ -13,10 +15,9 @@ var BackupPathWindows = "D:\\DATABASES\\QUOTES\\"
 
 var ReadCounter string
 var Counter int
-var RandomIDs []int
 
 var MainQuoteID int
-var Messages []string
+
 var UserInputs []string
 
 const (
@@ -29,3 +30,29 @@ const (
 	Cyan   = "\033[36m"
 	Gray   = "\033[37m"
 )
+
+
+var Messages []string
+func AddMessage(message string) {
+	Messages = append(Messages, message)
+}
+
+func FormatMessages() string {
+
+	formattedString := ""
+
+	for nr, message := range Messages{
+		formattedString += strconv.Itoa(nr+1) + ". " + message + "\n"
+	}
+	
+	return formattedString
+}
+
+var RandomIDs []int
+func DeleteUsedID(index int) {
+	RandomIDs = append(RandomIDs[:index], RandomIDs[index+1:]...)
+}
+
+func DeleteAllRandomIDs() {
+	RandomIDs = RandomIDs[:0]
+}

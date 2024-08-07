@@ -75,13 +75,13 @@ func CommandLine(quotes *db.Quotes) {
 
 func cli(quotes *db.Quotes) {
 
-	util.ClearScreen() 
+	util.ClearScreen()
 
-	if config.MainQuoteID <= 0 { 
-		config.MainQuoteID = quotes.LastID() 
+	if config.MainQuoteID <= 0 {
+		config.MainQuoteID = quotes.LastID()
 	}
 
-	stringFormat := `` + 
+	stringFormat := `` +
 		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n\n" +
 		"%s" +
 		config.Cyan + `%s` + config.Reset +
@@ -92,11 +92,13 @@ func cli(quotes *db.Quotes) {
 	quote := quotes.FindByID(config.MainQuoteID)
 	formattedQuote := quotes.FormatQuote(quote)
 
-	commands := "\nAdd Update Delete Read Showall Stats SimilarQuotes ResetIDs Quit\n" 
+	messages := config.FormatMessages()
 
-	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, util.FormatMessages(), config.ReadCounter, formattedQuote, commands) 
+	commands := "\nAdd Update Delete Read Showall Stats SimilarQuotes ResetIDs Quit\n"
 
-	fmt.Print(cli) 
+	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, messages, config.ReadCounter, formattedQuote, commands)
+
+	fmt.Print(cli)
 }
 
 func add(quotes *db.Quotes) bool {
@@ -110,7 +112,9 @@ func add(quotes *db.Quotes) bool {
 		LANGUAGE: config.UserInputs[2],
 		DATE:     time.Now().Format("02.01.2006")})
 
-	quotes.SaveToFile()
+	message := config.Green + strconv.Itoa(newID) + " added" + config.Reset
+
+	quotes.SaveToFile(message)
 
 	config.MainQuoteID = newID
 
@@ -126,7 +130,9 @@ func update(quotes *db.Quotes, updateID int) bool {
 		LANGUAGE: config.UserInputs[2],
 		DATE:     time.Now().Format("02.01.2006")})
 
-	quotes.SaveToFile()
+	message := config.Yellow + strconv.Itoa(updateID) + " updated" + config.Reset
+
+	quotes.SaveToFile(message)
 
 	config.MainQuoteID = updateID
 
@@ -136,9 +142,11 @@ func update(quotes *db.Quotes, updateID int) bool {
 func delete(quotes *db.Quotes, deleteID int) bool {
 
 	index := quotes.IndexOf(deleteID)
+	
 
 	if index == -1 {
-		config.Messages = append(config.Messages, config.Red+"<< Index Not Found >>"+config.Reset)
+		message := config.Red + "Index Not Found" + config.Reset
+		config.AddMessage(message)
 		return false
 	}
 
@@ -151,13 +159,16 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 	confirm, _ := line.Prompt("(y/n)")
 
 	if confirm != "y" {
-		config.Messages = append(config.Messages, config.Red+"<< Delete Canceled >>"+config.Reset)
+		message := config.Red + "Delete Canceled" + config.Reset
+		config.AddMessage(message)
 		return false
 	}
 
 	quotes.Remove(index)
 
-	quotes.SaveToFile()
+	message := config.Red + strconv.Itoa(deleteID) + " deleted" + config.Reset
+
+	quotes.SaveToFile(message)
 
 	config.MainQuoteID = quotes.LastID()
 
@@ -177,7 +188,7 @@ func read(quotes *db.Quotes) {
 		randomIndex := r.Intn(len(config.RandomIDs))
 
 		config.MainQuoteID = config.RandomIDs[randomIndex]
-		config.RandomIDs = append(config.RandomIDs[:randomIndex], config.RandomIDs[randomIndex+1:]...)
+		config.DeleteUsedID(randomIndex)
 
 		count := config.Counter
 		size := quotes.Size()
@@ -194,11 +205,14 @@ func read(quotes *db.Quotes) {
 		}
 	}
 
-	config.RandomIDs = config.RandomIDs[:0]
-	config.Messages = append(config.Messages, config.Yellow+"<< Reading Done! >>"+config.Reset)
+	message := config.Yellow + "Reading Done" + config.Reset
+	config.AddMessage(message)
+
+	config.DeleteAllRandomIDs()
 	config.MainQuoteID = quotes.LastID()
 	config.Counter = 0
 	config.ReadCounter = ""
+
 	CommandLine(quotes)
 }
 

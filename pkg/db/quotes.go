@@ -94,7 +94,7 @@ func (q *Quotes) ReadFromFile() {
 	}
 }
 
-func (q *Quotes) SaveToFile() {
+func (q *Quotes) SaveToFile(message string) {
 
 	byteValue, err := json.MarshalIndent(q, "", "  ")
 	if err != nil {
@@ -108,10 +108,9 @@ func (q *Quotes) SaveToFile() {
 		panic(err)
 	}
 
-	config.Messages = append(config.Messages, config.Yellow+"<< SAVED >>"+config.Reset)
-
-	// Backup
-	q.Backup(byteValue)
+	config.AddMessage(message)
+	
+	q.Backup(byteValue) // Backup
 }
 
 func (q *Quotes) Backup(byteValue []byte) {
@@ -127,12 +126,13 @@ func (q *Quotes) Backup(byteValue []byte) {
 
 	err := os.WriteFile(backupPath, byteValue, 0644)
 	if err != nil {
-		config.Messages = append(config.Messages, config.Red+"<< No Backup >>"+config.Reset)
-		config.Messages = append(config.Messages, err.Error())
+		message := config.Red+"<< No Backup >>"+config.Reset
+		config.AddMessage(message)
+		config.AddMessage(err.Error())
 		return
 	}
-
-	config.Messages = append(config.Messages, config.Green+"<< Backup Done >>"+config.Reset)
+	message := config.Green+"Backup Done"+config.Reset
+	config.AddMessage(message)
 }
 
 func (q *Quotes) Update(updatedQuote Quote) error {
@@ -196,7 +196,8 @@ func (q *Quotes) Duplicates(searchQuote string) bool {
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
 			if quote.ID != config.MainQuoteID {
-				config.Messages = append(config.Messages, config.Red+"<< there are dublicates in database. >>"+config.Reset)
+				message := config.Red+"There are dublicates in database"+config.Reset
+				config.AddMessage(message)
 				config.MainQuoteID = quote.ID
 				return true
 			}
@@ -239,18 +240,16 @@ func (q *Quotes) PrintQuote(command string) {
 		isID, _ := strconv.Atoi(command)
 		if quote.ID == isID {
 			fmt.Println(q.FormatQuote(quote))
-			break
+			return
 		}
 
 		normalizedAuthor := strings.ToLower(quote.AUTHOR)
-		if strings.Contains(normalizedAuthor, command) {
+		normalizedQuote := strings.ToLower(quote.QUOTE)
+
+		if strings.Contains(normalizedAuthor, command) || strings.Contains(normalizedQuote, command) {
 			fmt.Println(q.FormatQuote(quote))
 		}
 
-		normalizedQuote := strings.ToLower(quote.QUOTE)
-		if strings.Contains(normalizedQuote, command) {
-			fmt.Println(q.FormatQuote(quote))
-		}
 	}
 }
 
@@ -299,7 +298,8 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 	}
 
 	if input == "q" {
-		config.Messages = append(config.Messages, config.Red+"<< previous action aborted by user. >>"+config.Reset)
+		message := config.Red+"Previous action aborted by user"+config.Reset
+		config.AddMessage(message)
 		return false
 	}
 
@@ -307,7 +307,11 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 		return false
 	}
 
-	config.UserInputs = append(config.UserInputs, util.FillEmptyInput(input, "Unknown"))
+	if input == "" {
+		input = "Unknown"
+	}
+
+	config.UserInputs = append(config.UserInputs, input)
 
 	return true
 }
@@ -335,11 +339,9 @@ func (q *Quotes) ResetIDs(quotes *Quotes) {
 		q.QUOTES[key].ID = key + 1
 	}
 
-	q.SaveToFile()
+	q.SaveToFile("<< All ID's Reset >>")
 
 	config.MainQuoteID = q.LastID()
-
-	config.Messages = append(config.Messages, config.Red+"<< IDs Reset! >>"+config.Reset)
 }
 
 func (q *Quotes) TopAuthors() string {
