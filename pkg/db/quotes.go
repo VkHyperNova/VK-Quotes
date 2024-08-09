@@ -109,7 +109,7 @@ func (q *Quotes) SaveToFile(message string) {
 	}
 
 	config.AddMessage(message)
-	
+
 	q.Backup(byteValue) // Backup
 }
 
@@ -118,21 +118,19 @@ func (q *Quotes) Backup(byteValue []byte) {
 	currentTime := time.Now()
 	layout := "(02.01.2006_15-04-05)"
 
-	backupPath := config.BackupPathLinux + strconv.Itoa(q.Size()) + ". quotes " + currentTime.Format(layout) + ".json"
+	backupPath := "/media/veikko/VK DATA/DATABASES/QUOTES/" + strconv.Itoa(q.Size()) + ". quotes " + currentTime.Format(layout) + ".json"
 
 	if runtime.GOOS == "windows" {
-		backupPath = config.BackupPathWindows + strconv.Itoa(q.Size()) + ".json"
+		backupPath = "D:\\DATABASES\\QUOTES\\" + strconv.Itoa(q.Size()) + ".json"
 	}
 
 	err := os.WriteFile(backupPath, byteValue, 0644)
 	if err != nil {
-		message := config.Red+"<< No Backup >>"+config.Reset
+		message := config.Red + "<< No Backup >>" + config.Reset
 		config.AddMessage(message)
 		config.AddMessage(err.Error())
 		return
 	}
-	message := config.Green+"Backup Done"+config.Reset
-	config.AddMessage(message)
 }
 
 func (q *Quotes) Update(updatedQuote Quote) error {
@@ -196,7 +194,7 @@ func (q *Quotes) Duplicates(searchQuote string) bool {
 	for _, quote := range q.QUOTES {
 		if quote.QUOTE == searchQuote {
 			if quote.ID != config.MainQuoteID {
-				message := config.Red+"There are dublicates in database"+config.Reset
+				message := config.Red + "There are dublicates in database" + config.Reset
 				config.AddMessage(message)
 				config.MainQuoteID = quote.ID
 				return true
@@ -298,7 +296,7 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 	}
 
 	if input == "q" {
-		message := config.Red+"Previous action aborted by user"+config.Reset
+		message := config.Red + "Previous action aborted by user" + config.Reset
 		config.AddMessage(message)
 		return false
 	}

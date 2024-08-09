@@ -118,7 +118,7 @@ func CreateDirectory() {
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 
-		_ = os.Mkdir(config.FolderName, 0700)
+		_ = os.Mkdir("QUOTES", 0700)
 
 		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
 		if err != nil {

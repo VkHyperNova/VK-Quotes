@@ -6,18 +6,10 @@ var ProgramVersion = "1.24"
 
 /* All Paths */
 
-const FolderName = "QUOTES"
 const LocalPath = "./QUOTES/quotes.json"
-const SimilarPath = "./QUOTES/similiar.json"
-
-var BackupPathLinux = "/media/veikko/VK DATA/DATABASES/QUOTES/"
-var BackupPathWindows = "D:\\DATABASES\\QUOTES\\"
-
 var ReadCounter string
 var Counter int
-
 var MainQuoteID int
-
 var UserInputs []string
 
 const (

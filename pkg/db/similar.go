@@ -81,7 +81,7 @@ func (s *SimilarQuotes) SaveToFile() {
 		panic(err)
 	}
 
-	path := config.SimilarPath
+	path := "./QUOTES/similiar.json"
 
 	err = os.WriteFile(path, byteValue, 0644)
 	if err != nil {
