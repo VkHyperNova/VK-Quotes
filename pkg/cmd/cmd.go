@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 	"vk-quotes/pkg/config"
-	db "vk-quotes/pkg/db"
+	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 
 	"math/rand"

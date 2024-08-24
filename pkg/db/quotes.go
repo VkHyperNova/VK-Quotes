@@ -19,11 +19,11 @@ import (
 )
 
 type Quote struct {
-	ID       int    `json:"id"`       // Unique identifier for the quote.
-	QUOTE    string `json:"quote"`    // The text of the quote.
-	AUTHOR   string `json:"author"`   // The author of the quote.
-	LANGUAGE string `json:"language"` // The language in which the quote is written.
-	DATE     string `json:"date"`     // The date when the quote was made or published.
+	ID       int    `json:"id"`
+	QUOTE    string `json:"quote"`
+	AUTHOR   string `json:"author"`
+	LANGUAGE string `json:"language"`
+	DATE     string `json:"date"`
 }
 
 type Quotes struct {
@@ -109,8 +109,9 @@ func (q *Quotes) SaveToFile(message string) {
 	}
 
 	config.AddMessage(message)
-
-	q.Backup(byteValue) // Backup
+	
+	// Backup
+	q.Backup(byteValue)
 }
 
 func (q *Quotes) Backup(byteValue []byte) {
@@ -305,8 +306,12 @@ func (q *Quotes) PromptWithSuggestion(name string, edit string) bool {
 		return false
 	}
 
-	if input == "" {
+	if name == "Author" && input == "" {
 		input = "Unknown"
+	}
+
+	if name == "Language" && input == "" {
+		input = "Russian"
 	}
 
 	config.UserInputs = append(config.UserInputs, input)
