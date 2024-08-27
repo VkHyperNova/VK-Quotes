@@ -24,13 +24,17 @@ func CommandLine(quotes *db.Quotes) {
 		switch input {
 
 		case "add", "a":
-			if quotes.UserInput(inputID) {
+			emptyQuote := db.Quote{}
+
+			if quotes.UserInput(emptyQuote) {
 				add(quotes)
 			}
 			CommandLine(quotes)
 
 		case "update", "u":
-			if quotes.UserInput(inputID) {
+			UpdateQuote := quotes.FindQuoteByID(inputID)
+
+			if quotes.UserInput(UpdateQuote) {
 				update(quotes, inputID)
 			}
 			CommandLine(quotes)
@@ -78,7 +82,7 @@ func cli(quotes *db.Quotes) {
 	util.ClearScreen()
 
 	if config.MainQuoteID <= 0 {
-		config.MainQuoteID = quotes.LastID()
+		config.MainQuoteID = quotes.LastQuote()
 	}
 
 	stringFormat := `` +
@@ -89,7 +93,7 @@ func cli(quotes *db.Quotes) {
 		config.Yellow + `%s` + config.Reset +
 		``
 
-	quote := quotes.FindByID(config.MainQuoteID)
+	quote := quotes.FindQuoteByID(config.MainQuoteID)
 	formattedQuote := quotes.FormatQuote(quote)
 
 	messages := config.FormatMessages()
@@ -103,9 +107,17 @@ func cli(quotes *db.Quotes) {
 
 func add(quotes *db.Quotes) bool {
 
-	newID := quotes.CreateId()
+	maxID := 0
 
-	quotes.AppendQuote(db.Quote{
+	for _, quote := range quotes.QUOTES {
+		if quote.ID > maxID {
+			maxID = quote.ID
+		}
+	}
+
+	newID := maxID + 1
+
+	quotes.AddQuote(db.Quote{
 		ID:       newID,
 		QUOTE:    config.UserInputs[0],
 		AUTHOR:   config.UserInputs[1],
@@ -123,7 +135,7 @@ func add(quotes *db.Quotes) bool {
 
 func update(quotes *db.Quotes, updateID int) bool {
 
-	quotes.Update(db.Quote{
+	quotes.UpdateQuote(db.Quote{
 		ID:       updateID,
 		QUOTE:    config.UserInputs[0],
 		AUTHOR:   config.UserInputs[1],
@@ -141,8 +153,12 @@ func update(quotes *db.Quotes, updateID int) bool {
 
 func delete(quotes *db.Quotes, deleteID int) bool {
 
-	index := quotes.IndexOf(deleteID)
-	
+	index := -1
+	for i, quote := range quotes.QUOTES {
+		if quote.ID == deleteID {
+			index = i
+		}
+	}
 
 	if index == -1 {
 		message := config.Red + "Index Not Found" + config.Reset
@@ -164,20 +180,25 @@ func delete(quotes *db.Quotes, deleteID int) bool {
 		return false
 	}
 
-	quotes.Remove(index)
+	quotes.DeleteQuote(index)
 
 	message := config.Red + strconv.Itoa(deleteID) + " deleted" + config.Reset
 
 	quotes.SaveToFile(message)
 
-	config.MainQuoteID = quotes.LastID()
+	config.MainQuoteID = quotes.LastQuote()
 
 	return true
 }
 
 func read(quotes *db.Quotes) {
 
-	quotes.AppendRandomIDs()
+	// Append All Quotes IDs
+	for _, quote := range quotes.QUOTES {
+		if !util.ArrayContainsInt(config.RandomIDs, quote.ID) {
+			config.RandomIDs = append(config.RandomIDs, quote.ID)
+		}
+	}
 
 	for len(config.RandomIDs) != 0 {
 
@@ -191,7 +212,7 @@ func read(quotes *db.Quotes) {
 		config.DeleteUsedID(randomIndex)
 
 		count := config.Counter
-		size := quotes.Size()
+		size := len(quotes.QUOTES)
 		percentage := float64(count) / float64(size) * 100
 		config.ReadCounter = fmt.Sprintf("<< Reading [%d] %.0f%% >>", count, percentage)
 
@@ -209,7 +230,7 @@ func read(quotes *db.Quotes) {
 	config.AddMessage(message)
 
 	config.DeleteAllRandomIDs()
-	config.MainQuoteID = quotes.LastID()
+	config.MainQuoteID = quotes.LastQuote()
 	config.Counter = 0
 	config.ReadCounter = ""
 

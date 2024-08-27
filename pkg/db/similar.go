@@ -103,7 +103,10 @@ func waitGroupDone(wg *sync.WaitGroup) <-chan struct{} {
 
 func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
-	sentences := quotes.GetAllQuotes()
+	var sentences []string
+	for _, value := range quotes.QUOTES {
+		sentences = append(sentences, value.QUOTE)
+	}
 
 	tfidfVectors := calculateTFIDF(sentences)
 
@@ -112,17 +115,16 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	for _, pair := range similarSentences {
 
-		firstID, firstQuote, FirstAuthor := quotes.DetailsOf(pair[0])
-
-		secondID, secondQuote, secondAuthor := quotes.DetailsOf(pair[1])
+		firstQuote := quotes.FindQuoteByQuote(pair[0])
+		secondQuote := quotes.FindQuoteByQuote(pair[1])
 
 		SimilarQuotePairs := SimilarQuotePairs{
-			FirstID:      firstID,
-			FirstQuote:   firstQuote,
-			FirstAuthor:  FirstAuthor,
-			SecondID:     secondID,
-			SecondQuote:  secondQuote,
-			SecondAuthor: secondAuthor,
+			FirstID:      firstQuote.ID,
+			FirstQuote:   firstQuote.QUOTE,
+			FirstAuthor:  firstQuote.AUTHOR,
+			SecondID:     secondQuote.ID,
+			SecondQuote:  secondQuote.QUOTE,
+			SecondAuthor: secondQuote.AUTHOR,
 		}
 
 		similar.Add(SimilarQuotePairs)
@@ -130,7 +132,7 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	similar.SaveToFile()
 
-	message := config.Green+"Find Similar Quotes Process Done"+config.Reset
+	message := config.Green + "Find Similar Quotes Process Done" + config.Reset
 	config.AddMessage(message)
 }
 

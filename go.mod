@@ -39,6 +39,7 @@ require (
 )
 
 require (
+	github.com/abadojack/whatlanggo v1.0.1
 	github.com/bas24/googletranslatefree v0.0.0-20231117033553-f5859fe54d30
 	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/jdkato/prose/v2 v2.0.0

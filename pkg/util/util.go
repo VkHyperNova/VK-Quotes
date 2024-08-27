@@ -3,14 +3,13 @@ package util
 import (
 	"bufio"
 	"fmt"
+	"github.com/peterh/liner"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
 	"vk-quotes/pkg/config"
-
-	"github.com/peterh/liner"
 )
 
 func CommandPrompt(prompt string) (string, int) {
@@ -130,3 +129,12 @@ func CreateDirectory() {
 	}
 }
 
+func Quit(input string) bool {
+	if input == "q" {
+		message := config.Red + "Previous action aborted by user" + config.Reset
+		config.AddMessage(message)
+		return false
+	}
+
+	return true
+}
