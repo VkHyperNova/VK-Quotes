@@ -49,7 +49,7 @@ func (q *Quotes) SaveToFile(message string) {
 	config.AddMessage(message)
 
 	// Backup
-	// q.Backup(byteValue)
+	q.Backup(byteValue)
 }
 
 func (q *Quotes) Backup(byteValue []byte) {
