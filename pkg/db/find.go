@@ -2,11 +2,11 @@ package db
 
 import "vk-quotes/pkg/config"
 
-func (q *Quotes) LastQuote() int {
+func (q *Quotes) ResetMainQuote() {
 
 	index := len(q.QUOTES) - 1
 
-	return q.QUOTES[index].ID
+	config.MainQuoteID = q.QUOTES[index].ID
 }
 
 func (q *Quotes) FindQuoteByQuote(searchQuote string) Quote {

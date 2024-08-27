@@ -9,6 +9,34 @@ import (
 	"vk-quotes/pkg/util"
 )
 
+func (q *Quotes) PrintCLI() {
+
+	util.ClearScreen()
+
+	if config.MainQuoteID <= 0 {
+		q.ResetMainQuote()
+	}
+
+	stringFormat := `` +
+		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n\n" +
+		"%s" +
+		config.Cyan + `%s` + config.Reset +
+		"%s" +
+		config.Yellow + `%s` + config.Reset +
+		``
+
+	quote := q.FindQuoteByID(config.MainQuoteID)
+	formattedQuote := q.FormatQuote(quote)
+
+	messages := config.FormatMessages()
+
+	commands := "\nAdd Update Delete Read Showall Stats SimilarQuotes ResetIDs Quit\n"
+
+	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, messages, config.ReadCounter, formattedQuote, commands)
+
+	fmt.Print(cli)
+}
+
 func (q *Quotes) PrintQuote(command string) {
 
 	for _, quote := range q.QUOTES {

@@ -1,11 +1,27 @@
 package db
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/util"
 )
+
+func (q *Quotes) PrintStatistics() {
+
+	util.ClearScreen()
+
+	format := "%s%s%s"
+
+	name := config.Cyan + "Statistics: " + config.Reset
+
+	stats := fmt.Sprintf(format, name, q.TopAuthors(), q.TopLanguages())
+
+	fmt.Println(stats)
+
+	util.PressAnyKey()
+}
 
 func (q *Quotes) TopAuthors() string {
 
