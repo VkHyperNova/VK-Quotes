@@ -14,7 +14,7 @@ func (q *Quotes) PrintCLI() {
 	util.ClearScreen()
 
 	if config.MainQuoteID <= 0 {
-		q.ResetMainQuote()
+		q.SetToDefaultQuote()
 	}
 
 	stringFormat := `` +

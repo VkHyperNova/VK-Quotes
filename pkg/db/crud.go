@@ -102,7 +102,7 @@ func (q *Quotes) Delete(deleteID int) bool {
 
 	q.SaveToFile(message)
 
-	q.ResetMainQuote()
+	q.SetToDefaultQuote()
 
 	return true
 }
@@ -146,7 +146,7 @@ func (q *Quotes) Read() {
 	config.AddMessage(message)
 
 	config.DeleteAllRandomIDs()
-	q.ResetMainQuote()
+	q.SetToDefaultQuote()
 	config.Counter = 0
 	config.ReadCounter = ""
 }

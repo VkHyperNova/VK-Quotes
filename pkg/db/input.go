@@ -4,7 +4,6 @@ import (
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/util"
 
-	"github.com/abadojack/whatlanggo"
 	"github.com/peterh/liner"
 )
 
@@ -29,7 +28,7 @@ func (q *Quotes) UserInput(quote Quote) bool {
 	}
 
 	// Get Quote Language
-	lang := whatlanggo.Detect(config.UserInputs[0]).Lang.String()
+	lang := util.DetectLanguage(config.UserInputs[0])
 
 	config.UserInputs = append(config.UserInputs, lang)
 

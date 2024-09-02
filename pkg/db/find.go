@@ -2,7 +2,7 @@ package db
 
 import "vk-quotes/pkg/config"
 
-func (q *Quotes) ResetMainQuote() {
+func (q *Quotes) SetToDefaultQuote() {
 
 	index := len(q.QUOTES) - 1
 

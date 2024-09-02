@@ -3,13 +3,15 @@ package util
 import (
 	"bufio"
 	"fmt"
-	"github.com/peterh/liner"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
+	"unicode"
 	"vk-quotes/pkg/config"
+
+	"github.com/peterh/liner"
 )
 
 func CommandPrompt(prompt string) (string, int) {
@@ -137,4 +139,27 @@ func Quit(input string) bool {
 	}
 
 	return true
+}
+
+func DetectLanguage(quote string) string {
+	var englishCount, russianCount int
+
+	for _, char := range quote {
+		// Check if the rune belongs to the Latin script
+		if unicode.In(char, unicode.Latin) {
+			englishCount++
+		}
+		// Check if the rune belongs to the Cyrillic script
+		if unicode.In(char, unicode.Cyrillic) {
+			russianCount++
+		}
+	}
+
+	if russianCount > englishCount {
+		return "Russian"
+	} else if englishCount > russianCount {
+		return "English"
+	} else {
+		return "Unknown" // When it's a tie or when neither script dominates
+	}
 }

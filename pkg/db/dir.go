@@ -80,5 +80,5 @@ func (q *Quotes) ResetIDs(quotes *Quotes) {
 
 	q.SaveToFile("<< All ID's Reset >>")
 
-	q.ResetMainQuote()
+	q.SetToDefaultQuote()
 }
