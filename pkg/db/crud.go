@@ -145,7 +145,7 @@ func (q *Quotes) Read() {
 	message := config.Yellow + "Reading Done" + config.Reset
 	config.AddMessage(message)
 
-	config.DeleteAllRandomIDs()
+	config.RandomIDs = config.RandomIDs[:0]
 	q.SetToDefaultQuote()
 	config.Counter = 0
 	config.ReadCounter = ""

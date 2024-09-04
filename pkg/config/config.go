@@ -45,6 +45,4 @@ func DeleteUsedID(index int) {
 	RandomIDs = append(RandomIDs[:index], RandomIDs[index+1:]...)
 }
 
-func DeleteAllRandomIDs() {
-	RandomIDs = RandomIDs[:0]
-}
+
