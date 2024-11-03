@@ -26,8 +26,7 @@ func (q *Quotes) UserInput(quote Quote) bool {
 	if !q.GetQuote(quote) || !q.GetAuthor(quote) {
 		return false
 	}
-
-	// Get Quote Language
+	
 	lang := util.AutoDetectLanguage(config.UserInputs[0])
 
 	config.UserInputs = append(config.UserInputs, lang)
@@ -46,6 +45,10 @@ func (q *Quotes) GetQuote(quote Quote) bool {
 	if q.FindDuplicates(input) {
 		return false
 	}
+
+	input = util.CapitalizeFirstLetter(input)
+
+	input = util.EnsureSentenceEnd(input)
 
 	config.UserInputs = append(config.UserInputs, input)
 

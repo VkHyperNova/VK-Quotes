@@ -6,10 +6,21 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"unicode"
 	"vk-quotes/pkg/config"
-
 )
+
+func EnsureSentenceEnd(s string) string {
+	if strings.HasSuffix(s, ".") || strings.HasSuffix(s, "!") || strings.HasSuffix(s, "?") {
+		return s
+	}
+	return s + "."
+}
+
+func CapitalizeFirstLetter(s string) string {
+	return strings.ToUpper(string(s[0])) + s[1:]
+}
 
 func ClearScreen() {
 
