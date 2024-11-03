@@ -22,9 +22,9 @@ func CapitalizeFirstLetter(s string) string {
 	if len(s) == 0 {
 		return s
 	}
-	runes := []rune(s)
-	runes[0] = unicode.ToUpper(runes[0])
-	return string(runes)
+	firstChar := string([]rune(s)[0]) // Get the first character as a string
+	capitalizedFirst := strings.ToUpper(firstChar) // Capitalize the first character
+	return capitalizedFirst + s[len(firstChar):] // Concatenate with the rest of the string
 }
 
 func ClearScreen() {
