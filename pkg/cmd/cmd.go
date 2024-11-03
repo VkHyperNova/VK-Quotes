@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
@@ -64,6 +65,8 @@ func CommandLine(quotes *db.Quotes) {
 			if input != "" {
 				quotes.PrintQuote(input)
 				util.PressAnyKey()
+			} else {
+				config.AddMessage("Not Found!")
 			}
 			CommandLine(quotes)
 		}
