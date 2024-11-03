@@ -19,7 +19,12 @@ func EnsureSentenceEnd(s string) string {
 }
 
 func CapitalizeFirstLetter(s string) string {
-	return strings.ToUpper(string(s[0])) + s[1:]
+	if len(s) == 0 {
+		return s
+	}
+	runes := []rune(s)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }
 
 func ClearScreen() {
