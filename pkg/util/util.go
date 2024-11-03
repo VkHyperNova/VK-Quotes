@@ -6,54 +6,10 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
-	"strings"
 	"unicode"
 	"vk-quotes/pkg/config"
 
-	"github.com/peterh/liner"
 )
-
-func CommandPrompt(prompt string) (string, int) {
-
-	line := liner.NewLiner()
-	defer line.Close()
-
-	// Prompt the user with the given prompt string and read userInput
-	userInput, err := line.Prompt(prompt)
-	if err != nil {
-		config.AddMessage(err.Error())
-		return "", 0
-	}
-
-	// Initialize default values
-	input := strings.TrimSpace(userInput)
-	inputID := 0
-
-	// Split the input into parts based on whitespace
-	parts := strings.Fields(userInput)
-
-	// Check if the input contains exactly two parts
-	if len(parts) == 2 {
-
-		// Assume the first part is the command
-		isCommand := parts[0]
-
-		// Try to convert the second part to an integer
-		isID, err := strconv.Atoi(parts[1])
-
-		// If the conversion is successful, update the command and commandID
-		if err == nil {
-			input = isCommand
-			inputID = isID
-		}
-	}
-
-	// Convert the input to lowercase
-	input = strings.ToLower(input)
-
-	return input, inputID
-}
 
 func ClearScreen() {
 
@@ -119,8 +75,10 @@ func CreateDirectory() {
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 
+		// Create dir 
 		_ = os.Mkdir("QUOTES", 0700)
 
+		// Create file
 		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
 		if err != nil {
 			panic(err)
@@ -141,7 +99,8 @@ func Quit(input string) bool {
 	return true
 }
 
-func DetectLanguage(quote string) string {
+func AutoDetectLanguage(quote string) string {
+
 	for _, char := range quote {
 		if unicode.In(char, unicode.Cyrillic) {
 			return "Russian"
@@ -150,3 +109,5 @@ func DetectLanguage(quote string) string {
 
 	return "English"
 }
+
+

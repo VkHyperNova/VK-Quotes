@@ -28,7 +28,7 @@ func (q *Quotes) UserInput(quote Quote) bool {
 	}
 
 	// Get Quote Language
-	lang := util.DetectLanguage(config.UserInputs[0])
+	lang := util.AutoDetectLanguage(config.UserInputs[0])
 
 	config.UserInputs = append(config.UserInputs, lang)
 

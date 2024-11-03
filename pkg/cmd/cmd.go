@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
@@ -10,22 +11,22 @@ func CommandLine(quotes *db.Quotes) {
 
 	quotes.PrintCLI()
 
-	input, inputID := util.CommandPrompt("> ")
+	var input string = ""
+	var inputID int = 0
+
+	fmt.Scanln(&input, &inputID)
 
 	for {
 		switch input {
 
 		case "add", "a":
 			emptyQuote := db.Quote{}
-
 			if quotes.UserInput(emptyQuote) {
 				quotes.Add()
 			}
 			CommandLine(quotes)
-
 		case "update", "u":
 			UpdateQuote := quotes.FindQuoteByID(inputID)
-
 			if quotes.UserInput(UpdateQuote) {
 				quotes.Update(inputID)
 			}

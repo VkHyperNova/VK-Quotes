@@ -127,7 +127,8 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 			SecondAuthor: secondQuote.AUTHOR,
 		}
 
-		similar.Add(SimilarQuotePairs)
+		// similar.Add(SimilarQuotePairs)
+		similar.SimilarQuotes = append(similar.SimilarQuotes, SimilarQuotePairs)
 	}
 
 	similar.SaveToFile()
