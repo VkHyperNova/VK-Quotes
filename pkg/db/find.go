@@ -1,12 +1,31 @@
 package db
 
-import "vk-quotes/pkg/config"
+import (
+	"fmt"
+	"vk-quotes/pkg/config"
+	"vk-quotes/pkg/util"
+)
 
 func (q *Quotes) SetToDefaultQuote() {
 
 	index := len(q.QUOTES) - 1
 
-	config.MainQuoteID = q.QUOTES[index].ID
+	if index > 0 {
+		config.MainQuoteID = q.QUOTES[index].ID
+	}
+
+}
+
+func (q *Quotes) Find() {
+
+	fmt.Print("Search: ")
+
+	var searchQuote string
+	fmt.Scanln(&searchQuote)
+
+	q.PrintQuote(searchQuote)
+
+	util.PressAnyKey()
 }
 
 func (q *Quotes) FindQuoteByQuote(searchQuote string) Quote {

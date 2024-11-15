@@ -12,4 +12,3 @@ func main() {
 	quotes.ReadFromFile()
 	cmd.CommandLine(&quotes)
 }
-

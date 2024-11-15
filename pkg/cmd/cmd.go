@@ -15,6 +15,8 @@ func CommandLine(quotes *db.Quotes) {
 	var input string = ""
 	var inputID int = 0
 
+	fmt.Print("=> ")
+
 	fmt.Scanln(&input, &inputID)
 
 	for {
@@ -37,6 +39,10 @@ func CommandLine(quotes *db.Quotes) {
 			quotes.Delete(inputID)
 			CommandLine(quotes)
 
+		case "find", "f":
+			quotes.Find()
+			CommandLine(quotes)
+			
 		case "showall", "s":
 			quotes.PrintAllQuotes()
 			CommandLine(quotes)
@@ -62,12 +68,7 @@ func CommandLine(quotes *db.Quotes) {
 			os.Exit(0)
 
 		default:
-			if input != "" {
-				quotes.PrintQuote(input)
-				util.PressAnyKey()
-			} else {
-				config.AddMessage("Not Found!")
-			}
+			config.AddMessage("Enter pressed!")
 			CommandLine(quotes)
 		}
 	}
