@@ -51,20 +51,26 @@ func PressAnyKey() {
 
 	fmt.Println("\nPress any key to continue...")
 
-	// Create a new scanner to read from standard input
 	scanner := bufio.NewScanner(os.Stdin)
 
-	// Scan the next token (line) from standard input
 	if scanner.Scan() {
-		// Successfully read input; can handle further actions here if needed
 		return
 	}
 
-	// Check for scanning errors
 	if err := scanner.Err(); err != nil {
-		// Print the error message to standard error
 		fmt.Fprintln(os.Stderr, "Error reading input:", err)
 	}
+}
+
+
+func WaitForInput() bool {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Press Enter to continue or 'q' to quit: ")
+
+	input, _ := reader.ReadString('\n') 
+	input = strings.TrimSpace(input)   
+
+	return strings.ToLower(input) != "q" 
 }
 
 func ArrayContainsString(arr []string, name string) bool {

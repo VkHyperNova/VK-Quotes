@@ -39,6 +39,8 @@ func (q *Quotes) PrintCLI() {
 
 func (q *Quotes) PrintQuote(command string) {
 
+	var foundQuotes []Quote
+
 	for _, quote := range q.QUOTES {
 
 		isID, _ := strconv.Atoi(command)
@@ -51,9 +53,20 @@ func (q *Quotes) PrintQuote(command string) {
 		normalizedQuote := strings.ToLower(quote.QUOTE)
 
 		if strings.Contains(normalizedAuthor, command) || strings.Contains(normalizedQuote, command) {
-			fmt.Println(q.FormatQuote(quote))
+			foundQuotes = append(foundQuotes, quote)
 		}
 
+	}
+
+	size := len(foundQuotes)
+	
+	for _, value := range foundQuotes {
+		fmt.Println(config.Yellow, "Found: ", size, config.Reset)
+		fmt.Println(q.FormatQuote(value))
+		if !util.WaitForInput() {
+			break
+		}
+		size--
 	}
 }
 

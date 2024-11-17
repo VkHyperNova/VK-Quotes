@@ -3,7 +3,6 @@ package db
 import (
 	"fmt"
 	"vk-quotes/pkg/config"
-	"vk-quotes/pkg/util"
 )
 
 func (q *Quotes) SetToDefaultQuote() {
@@ -18,14 +17,12 @@ func (q *Quotes) SetToDefaultQuote() {
 
 func (q *Quotes) Find() {
 
-	fmt.Print("Search: ")
+	fmt.Print("Find: ")
 
 	var searchQuote string
 	fmt.Scanln(&searchQuote)
 
 	q.PrintQuote(searchQuote)
-
-	util.PressAnyKey()
 }
 
 func (q *Quotes) FindQuoteByQuote(searchQuote string) Quote {
