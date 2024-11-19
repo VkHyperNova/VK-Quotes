@@ -22,9 +22,9 @@ func CapitalizeFirstLetter(s string) string {
 	if len(s) == 0 {
 		return s
 	}
-	firstChar := string([]rune(s)[0]) // Get the first character as a string
+	firstChar := string([]rune(s)[0])              // Get the first character as a string
 	capitalizedFirst := strings.ToUpper(firstChar) // Capitalize the first character
-	return capitalizedFirst + s[len(firstChar):] // Concatenate with the rest of the string
+	return capitalizedFirst + s[len(firstChar):]   // Concatenate with the rest of the string
 }
 
 func ClearScreen() {
@@ -48,30 +48,16 @@ func ClearScreen() {
 }
 
 func PressAnyKey() {
+    fmt.Println("\nPress Enter to continue...")
 
-	fmt.Println("\nPress any key to continue...")
-
-	scanner := bufio.NewScanner(os.Stdin)
-
-	if scanner.Scan() {
-		return
-	}
-
-	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "Error reading input:", err)
-	}
+    reader := bufio.NewReader(os.Stdin)
+    _, err := reader.ReadString('\n') // Waits for the user to press Enter
+    if err != nil {
+        fmt.Fprintln(os.Stderr, "Error reading input:", err)
+    }
 }
 
 
-func WaitForInput() bool {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Press Enter to continue or 'q' to quit: ")
-
-	input, _ := reader.ReadString('\n') 
-	input = strings.TrimSpace(input)   
-
-	return strings.ToLower(input) != "q" 
-}
 
 func ArrayContainsString(arr []string, name string) bool {
 	for _, n := range arr {
@@ -97,7 +83,7 @@ func CreateDirectory() {
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 
-		// Create dir 
+		// Create dir
 		_ = os.Mkdir("QUOTES", 0700)
 
 		// Create file
@@ -131,5 +117,3 @@ func AutoDetectLanguage(quote string) string {
 
 	return "English"
 }
-
-

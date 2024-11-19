@@ -1,7 +1,10 @@
 package db
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 	"vk-quotes/pkg/config"
 )
 
@@ -16,14 +19,28 @@ func (q *Quotes) SetToDefaultQuote() {
 }
 
 func (q *Quotes) Find() {
+    fmt.Print("Find: ")
 
-	fmt.Print("Find: ")
+    // Use bufio.Reader for more flexible input
+    reader := bufio.NewReader(os.Stdin)
+    searchQuote, err := reader.ReadString('\n')
+    if err != nil {
+        fmt.Fprintln(os.Stderr, "Error reading input:", err)
+        return
+    }
 
-	var searchQuote string
-	fmt.Scanln(&searchQuote)
+    // Trim whitespace from the input
+    searchQuote = strings.TrimSpace(searchQuote)
 
-	q.PrintQuote(searchQuote)
+    if searchQuote == "" {
+        fmt.Println("No input provided. Please try again.")
+        return
+    }
+
+    // Call the PrintQuote method with the user's input
+    q.PrintQuote(searchQuote)
 }
+
 
 func (q *Quotes) FindQuoteByQuote(searchQuote string) Quote {
 

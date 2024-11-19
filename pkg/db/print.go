@@ -1,8 +1,10 @@
 package db
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"vk-quotes/pkg/config"
@@ -39,34 +41,39 @@ func (q *Quotes) PrintCLI() {
 
 func (q *Quotes) PrintQuote(command string) {
 
-	var foundQuotes []Quote
-
+	reader := bufio.NewReader(os.Stdin)
+	
 	for _, quote := range q.QUOTES {
 
+		// Find by ID
 		isID, _ := strconv.Atoi(command)
 		if quote.ID == isID {
 			fmt.Println(q.FormatQuote(quote))
 			return
 		}
 
-		normalizedAuthor := strings.ToLower(quote.AUTHOR)
-		normalizedQuote := strings.ToLower(quote.QUOTE)
+		// Find by Quote or Author
+		Author := strings.ToLower(quote.AUTHOR)
+		Quote := strings.ToLower(quote.QUOTE)
 
-		if strings.Contains(normalizedAuthor, command) || strings.Contains(normalizedQuote, command) {
-			foundQuotes = append(foundQuotes, quote)
+		findAuthor := strings.Contains(Author, command)
+		findQuote := strings.Contains(Quote, command)
+
+		
+		if findAuthor || findQuote {
+			fmt.Println(q.FormatQuote(quote))
+
+			fmt.Print("Press Enter to continue or type 'q' to quit: ")
+
+			input, _ := reader.ReadString('\n') 
+
+			input = strings.TrimSpace(input)    
+
+			if strings.ToLower(input) == "q" { 
+				fmt.Println("Exiting...")
+				break
+			}
 		}
-
-	}
-
-	size := len(foundQuotes)
-	
-	for _, value := range foundQuotes {
-		fmt.Println(config.Yellow, "Found: ", size, config.Reset)
-		fmt.Println(q.FormatQuote(value))
-		if !util.WaitForInput() {
-			break
-		}
-		size--
 	}
 }
 
