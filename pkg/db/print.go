@@ -72,7 +72,11 @@ func (q *Quotes) PrintQuote(command string) {
 			if strings.ToLower(input) == "q" { 
 				fmt.Println("Exiting...")
 				break
-			}
+			} 
+		} else {
+			fmt.Println("Not found!")
+			util.PressAnyKey()
+			break
 		}
 	}
 }
