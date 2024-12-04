@@ -42,7 +42,7 @@ func CommandLine(quotes *db.Quotes) {
 		case "find", "f":
 			quotes.Find()
 			CommandLine(quotes)
-			
+
 		case "showall", "s":
 			quotes.PrintAllQuotes()
 			CommandLine(quotes)
@@ -64,6 +64,8 @@ func CommandLine(quotes *db.Quotes) {
 			CommandLine(quotes)
 
 		case "q", "quit":
+			// Backup
+			quotes.Backup()
 			util.ClearScreen()
 			os.Exit(0)
 

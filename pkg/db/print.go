@@ -32,7 +32,7 @@ func (q *Quotes) PrintCLI() {
 
 	messages := config.FormatMessages()
 
-	commands := "\nAdd Update Delete Search Read Showall Stats SimilarQuotes ResetIDs Quit\n"
+	commands := "\nAdd Update Delete Find Read Showall Stats SimilarQuotes ResetIDs Quit\n"
 
 	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, messages, config.ReadCounter, formattedQuote, commands)
 

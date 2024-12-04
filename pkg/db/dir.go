@@ -47,12 +47,14 @@ func (q *Quotes) SaveToFile(message string) {
 	}
 
 	config.AddMessage(message)
-
-	// Backup
-	q.Backup(byteValue)
 }
 
-func (q *Quotes) Backup(byteValue []byte) {
+func (q *Quotes) Backup() {
+
+	byteValue, err := json.MarshalIndent(q, "", "  ")
+	if err != nil {
+		panic(err)
+	}
 
 	currentTime := time.Now()
 	layout := "(02.01.2006_15-04-05)"
@@ -63,7 +65,7 @@ func (q *Quotes) Backup(byteValue []byte) {
 		backupPath = "D:\\DATABASES\\QUOTES\\" + strconv.Itoa(len(q.QUOTES)) + ".json"
 	}
 
-	err := os.WriteFile(backupPath, byteValue, 0644)
+	err = os.WriteFile(backupPath, byteValue, 0644)
 	if err != nil {
 		message := config.Red + "<< No Backup >>" + config.Reset
 		config.AddMessage(message)

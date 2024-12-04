@@ -1,44 +1,4 @@
-/*
-Package db provides functionality for handling and processing a database of quotes. It includes the ability to
-identify similar quotes using TF-IDF vectors and cosine similarity, save the results to a file, and display progress
-while running long-running tasks.
 
-The package includes the following main types and functions:
-
-Types:
-  - SimilarQuotePairs: Represents a pair of similar quotes with their respective details, including IDs, quotes, and authors.
-  - SimilarQuotes: Holds a collection of SimilarQuotePairs and provides methods for adding pairs and saving to a file.
-
-Functions:
-  - (s *SimilarQuotes) Add(quote SimilarQuotePairs): Appends a new SimilarQuotePairs instance to the SimilarQuotes slice.
-  - (q *SimilarQuotes) SaveToFile() error: Marshals the SimilarQuotes instance to JSON format and saves it to a file.
-  - waitGroupDone(wg *sync.WaitGroup) <-chan struct{}: Returns a channel that is closed when the provided WaitGroup is done.
-  - processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes): Finds and processes similar quotes, adding the pairs to SimilarQuotes and saving the results.
-  - calculateTFIDF(sentences []string) []map[string]float64: Calculates the TF-IDF vectors for a given set of sentences.
-  - cosineSimilarity(vec1, vec2 map[string]float64) float64: Calculates the cosine similarity between two TF-IDF vectors.
-  - findSimilarSentences(sentences []string, tfidfVectors []map[string]float64, threshold float64) [][2]string: Identifies pairs of sentences that are similar based on their TF-IDF vectors.
-  - RunTaskWithProgress(quotes *Quotes): Runs a long-running task with a progress bar to indicate progress, processing quotes and updating the progress bar until the task is complete.
-
-Example Usage:
-
-To use this package, you would typically follow these steps:
-
-1. Load your quotes into a Quotes instance.
-2. Call the RunTaskWithProgress function to process similar quotes with a progress bar.
-
-	// Create an instance of Quotes and load quotes from a file.
-	quotes := &Quotes{}
-	err := quotes.ReadFromFile("path/to/quotes.json")
-	if err != nil {
-	  log.Fatalf("Failed to read quotes: %v", err)
-	}
-
-	// Run the long-running task with a progress bar.
-	RunTaskWithProgress(quotes)
-
-The package handles reading quotes, processing them to find similar pairs based on TF-IDF and cosine similarity,
-and saving the results to a file. It also provides a progress bar to give feedback on the task's progress.
-*/
 package db
 
 import (
@@ -67,11 +27,6 @@ type SimilarQuotePairs struct {
 
 type SimilarQuotes struct {
 	SimilarQuotes []SimilarQuotePairs `json:"similarquotes"`
-}
-
-func (s *SimilarQuotes) Add(quote SimilarQuotePairs) {
-	// Append the provided quote to the SimilarQuotes slice.
-	s.SimilarQuotes = append(s.SimilarQuotes, quote)
 }
 
 func (s *SimilarQuotes) SaveToFile() {
@@ -127,7 +82,6 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 			SecondAuthor: secondQuote.AUTHOR,
 		}
 
-		// similar.Add(SimilarQuotePairs)
 		similar.SimilarQuotes = append(similar.SimilarQuotes, SimilarQuotePairs)
 	}
 
@@ -254,3 +208,4 @@ func FindSimilarQuotes(quotes *Quotes) {
 
 	wg.Wait()
 }
+
