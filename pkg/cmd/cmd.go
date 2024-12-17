@@ -10,10 +10,9 @@ import (
 )
 
 func CommandLine(quotes *db.Quotes) {
-
-	quotes.PrintCLI()
-
 	for {
+		quotes.PrintCLI()
+
 		var input string = ""
 		var inputID int = 0
 
