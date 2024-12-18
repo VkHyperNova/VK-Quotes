@@ -57,7 +57,7 @@ func (q *Quotes) Backup() {
 	}
 
 	currentTime := time.Now()
-	layout := "(02.01.2006_15-04-05)"
+	layout := "(02.01.2006)"
 
 	backupPath := "/media/veikko/VK DATA/DATABASES/QUOTES/" + strconv.Itoa(len(q.QUOTES)) + ". quotes " + currentTime.Format(layout) + ".json"
 
