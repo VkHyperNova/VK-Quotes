@@ -83,7 +83,11 @@ func (q *Quotes) Delete(deleteID int) bool {
 		return false
 	}
 
-	q.PrintQuote(strconv.Itoa(deleteID))
+	for _, quote := range q.QUOTES {
+		if quote.ID == deleteID {
+			fmt.Println(q.FormatQuote(quote))
+		}
+	}
 
 	line := liner.NewLiner()
 

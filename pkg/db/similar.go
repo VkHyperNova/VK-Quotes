@@ -70,8 +70,8 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	for _, pair := range similarSentences {
 
-		firstQuote := quotes.FindQuoteByQuote(pair[0])
-		secondQuote := quotes.FindQuoteByQuote(pair[1])
+		firstQuote, _ := quotes.FindQuoteByQuote(pair[0])
+		secondQuote, _ := quotes.FindQuoteByQuote(pair[1])
 
 		SimilarQuotePairs := SimilarQuotePairs{
 			FirstID:      firstQuote.ID,

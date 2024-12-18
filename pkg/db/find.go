@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"vk-quotes/pkg/config"
+	"vk-quotes/pkg/util"
 )
 
 func (q *Quotes) SetToDefaultQuote() {
@@ -19,39 +20,41 @@ func (q *Quotes) SetToDefaultQuote() {
 }
 
 func (q *Quotes) Find() {
-    fmt.Print("Find: ")
+	fmt.Print("Find: ")
 
-    // Use bufio.Reader for more flexible input
-    reader := bufio.NewReader(os.Stdin)
-    searchQuote, err := reader.ReadString('\n')
-    if err != nil {
-        fmt.Fprintln(os.Stderr, "Error reading input:", err)
-        return
-    }
+	// Read user input
+	reader := bufio.NewReader(os.Stdin)
+	searchQuote, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Error reading input:", err)
+		util.PressAnyKey()
+		return
+	}
 
-    // Trim whitespace from the input
-    searchQuote = strings.TrimSpace(searchQuote)
+	// Clean and process the input
+	searchQuote = strings.TrimSpace(searchQuote)
+	searchQuote = util.EnsureSentenceEnd(searchQuote)
 
-    if searchQuote == "" {
-        fmt.Println("No input provided. Please try again.")
-        return
-    }
+	// Search for the quote
+	foundQuote, found := q.FindQuoteByQuote(searchQuote)
+	if !found {
+		fmt.Println("Quote not found.")
+		util.PressAnyKey()
+		return
+	}
 
-    // Call the PrintQuote method with the user's input
-    q.PrintQuote(searchQuote)
+	// Print the found quote
+	fmt.Println(q.FormatQuote(foundQuote))
+	util.PressAnyKey()
 }
 
-
-func (q *Quotes) FindQuoteByQuote(searchQuote string) Quote {
-
-	var foundQuote Quote
-
+func (q *Quotes) FindQuoteByQuote(searchQuote string) (Quote, bool) {
 	for _, quote := range q.QUOTES {
-		if quote.QUOTE == searchQuote {
-			foundQuote = quote
+		if strings.EqualFold(quote.QUOTE, searchQuote) {
+			return quote, true
 		}
 	}
-	return foundQuote
+	return Quote{}, false
 }
 
 func (q *Quotes) FindQuoteByID(id int) Quote {

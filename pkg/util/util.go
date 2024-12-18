@@ -31,17 +31,14 @@ func ClearScreen() {
 
 	var cmd *exec.Cmd
 
-	// Determine the command to clear the screen based on the OS
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("cmd", "/c", "cls")
 	} else {
 		cmd = exec.Command("clear")
 	}
 
-	// Set the command output to the standard output
 	cmd.Stdout = os.Stdout
 
-	// Run the command and handle any errors
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "Error clearing screen:", err)
 	}
