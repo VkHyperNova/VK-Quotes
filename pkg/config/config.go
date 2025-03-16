@@ -1,7 +1,5 @@
 package config
 
-import "strconv"
-
 var ProgramVersion = "1.24"
 
 /* All Paths */
@@ -33,8 +31,8 @@ func FormatMessages() string {
 
 	formattedString := ""
 
-	for nr, message := range Messages{
-		formattedString += strconv.Itoa(nr+1) + ". " + message + "\n"
+	for _, message := range Messages{
+		formattedString += message + "\n"
 	}
 	
 	return formattedString

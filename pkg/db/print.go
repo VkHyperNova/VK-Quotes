@@ -24,14 +24,15 @@ func (q *Quotes) PrintCLI() {
 		config.Yellow + `%s` + config.Reset +
 		``
 
-	quote := q.FindQuoteByID(config.MainQuoteID)
-	formattedQuote := q.FormatQuote(quote)
+
+	lastQuote := q.FindQuoteByID(config.MainQuoteID)
+	formattedLastQuote := q.FormatQuote(lastQuote)
 
 	messages := config.FormatMessages()
 
 	commands := "\nAdd Update Delete Find Read Showall Stats SimilarQuotes ResetIDs Quit\n"
 
-	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, messages, config.ReadCounter, formattedQuote, commands)
+	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, messages, config.ReadCounter, formattedLastQuote, commands)
 
 	fmt.Print(cli)
 }

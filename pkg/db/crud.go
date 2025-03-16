@@ -33,7 +33,7 @@ func (q *Quotes) Add() bool {
 
 	q.QUOTES = append(q.QUOTES, quote)
 
-	message := config.Green + strconv.Itoa(newID) + " added" + config.Reset
+	message := config.Green + strconv.Itoa(quote.ID) + ". " + quote.QUOTE + "\n\t" + quote.AUTHOR + " (" + quote.LANGUAGE + " " + quote.DATE+ ")" + config.Reset
 
 	q.SaveToFile(message)
 

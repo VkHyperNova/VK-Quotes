@@ -34,22 +34,16 @@ func CommandLine(quotes *db.Quotes) {
 			if quotes.UserInput(UpdateQuote) {
 				quotes.Update(inputID)
 			}
-
 		case "delete", "d":
 			quotes.Delete(inputID)
-
 		case "find", "f":
 			quotes.Find()
-
 		case "showall", "s":
 			quotes.PrintAllQuotes()
-
 		case "stats":
 			quotes.PrintStatistics()
-
 		case "resetids":
 			quotes.ResetIDs(quotes)
-
 		case "read", "r":
 			quotes.Read()
 		case "similarquotes", "sim":
