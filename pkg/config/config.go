@@ -32,7 +32,7 @@ func FormatMessages() string {
 	formattedString := ""
 
 	for _, message := range Messages{
-		formattedString += message + "\n"
+		formattedString += message + "\n------------------------------\n"
 	}
 	
 	return formattedString
