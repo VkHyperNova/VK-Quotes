@@ -42,7 +42,7 @@ func (q *Quotes) GetQuote(quote Quote) bool {
 		return false
 	}
 
-	if q.FindDuplicates(input) {
+	if q.FindDuplicates(input, quote.ID) {
 		return false
 	}
 
