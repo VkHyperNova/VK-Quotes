@@ -49,7 +49,7 @@ func CommandLine(quotes *db.Quotes) {
 		case "similarquotes", "sim":
 			db.FindSimilarQuotes(quotes)
 		case "q", "quit":
-			quotes.Backup()
+			//quotes.Backup()
 			util.ClearScreen()
 			os.Exit(0)
 

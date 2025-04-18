@@ -75,15 +75,25 @@ func (q *Quotes) FindDuplicates(searchQuote string, excludeID int) bool {
 		return false
 	}
 
+	// for _, quote := range q.QUOTES {
+	// 	if  searchQuote == quote.QUOTE {
+	// 		if excludeID != quote.ID {
+	// 			message := config.Red + "There are dublicates in database" + config.Reset
+	// 			config.AddMessage(message)
+	// 			config.MainQuoteID = quote.ID
+	// 			return true
+	// 		}
+	// 	}
+	// }
+
 	for _, quote := range q.QUOTES {
-		if quote.QUOTE == searchQuote {
-			if quote.ID != excludeID {
-				message := config.Red + "There are dublicates in database" + config.Reset
-				config.AddMessage(message)
-				config.MainQuoteID = quote.ID
-				return true
-			}
+		if searchQuote == quote.QUOTE {
+			message := config.Red + "There are dublicates in database" + config.Reset
+			config.AddMessage(message)
+			config.MainQuoteID = quote.ID
+			return true
 		}
 	}
+
 	return false
 }

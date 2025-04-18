@@ -42,13 +42,14 @@ func (q *Quotes) GetQuote(quote Quote) bool {
 		return false
 	}
 
-	if q.FindDuplicates(input, quote.ID) {
-		return false
-	}
-
 	input = util.CapitalizeFirstLetter(input)
 
 	input = util.EnsureSentenceEnd(input)
+
+
+	if q.FindDuplicates(input, quote.ID) {
+		return false
+	}
 
 	config.UserInputs = append(config.UserInputs, input)
 
