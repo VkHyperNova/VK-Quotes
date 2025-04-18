@@ -25,15 +25,9 @@ func CommandLine(quotes *db.Quotes) {
 		switch input {
 
 		case "add", "a":
-			emptyQuote := db.Quote{}
-			if quotes.UserInput(emptyQuote) {
-				quotes.Add()
-			}
+			quotes.Add()
 		case "update", "u":
-			UpdateQuote := quotes.FindQuoteByID(inputID)
-			if quotes.UserInput(UpdateQuote) {
-				quotes.Update(inputID)
-			}
+			quotes.Update(inputID)
 		case "delete", "d":
 			quotes.Delete(inputID)
 		case "find", "f":

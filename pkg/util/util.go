@@ -9,6 +9,8 @@ import (
 	"strings"
 	"unicode"
 	"vk-quotes/pkg/config"
+
+	"github.com/peterh/liner"
 )
 
 func EnsureSentenceEnd(s string) string {
@@ -113,4 +115,17 @@ func AutoDetectLanguage(quote string) string {
 	}
 
 	return "English"
+}
+
+func PromptWithSuggestion(name string, edit string) string {
+
+	line := liner.NewLiner()
+	defer line.Close()
+
+	input, err := line.PromptWithSuggestion("   "+name+": ", edit, -1)
+	if err != nil {
+		panic(err)
+	}
+
+	return input
 }

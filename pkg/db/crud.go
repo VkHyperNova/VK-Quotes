@@ -12,49 +12,59 @@ import (
 	"github.com/peterh/liner"
 )
 
+type Quote struct {
+	ID       int    `json:"id"`
+	QUOTE    string `json:"quote"`
+	AUTHOR   string `json:"author"`
+	LANGUAGE string `json:"language"`
+	DATE     string `json:"date"`
+}
+
+type Quotes struct {
+	QUOTES []Quote `json:"quotes"` // Slice containing multiple Quote instances.
+}
+
 func (q *Quotes) Add() bool {
 
-	maxID := 0
+	newQuote := Quote{}
+	newQuote.ID = q.UniqueID()
 
-	for _, quote := range q.QUOTES {
-		if quote.ID > maxID {
-			maxID = quote.ID
-		}
+	newQuote.QUOTE = util.PromptWithSuggestion("Quote", "")
+	if !util.Quit(newQuote.QUOTE) {
+		return false
 	}
 
-	newID := maxID + 1
+	newQuote.QUOTE = util.CapitalizeFirstLetter(newQuote.QUOTE)
+	newQuote.QUOTE = util.EnsureSentenceEnd(newQuote.QUOTE)
+	if q.FindDuplicates(newQuote.QUOTE, newQuote.ID) {
+		return false
+	}
 
-	quote := Quote{
-		ID:       newID,
-		QUOTE:    config.UserInputs[0],
-		AUTHOR:   config.UserInputs[1],
-		LANGUAGE: config.UserInputs[2],
-		DATE:     time.Now().Format("02.01.2006")}
+	newQuote.AUTHOR = util.PromptWithSuggestion("Author", "")
+	newQuote.LANGUAGE = util.AutoDetectLanguage(newQuote.QUOTE)
+	newQuote.DATE = time.Now().Format("02.01.2006")
 
-	q.QUOTES = append(q.QUOTES, quote)
+	q.QUOTES = append(q.QUOTES, newQuote)
 
-	message := config.Green + strconv.Itoa(quote.ID) + ". " + quote.QUOTE + "\n\t" + quote.AUTHOR + " (" + quote.LANGUAGE + " " + quote.DATE+ ")" + config.Reset
+	message := config.Green + strconv.Itoa(newQuote.ID) + ". " + newQuote.QUOTE + "\n\t" + newQuote.AUTHOR + " (" + newQuote.LANGUAGE + " " + newQuote.DATE+ ")" + config.Reset
 
 	q.SaveToFile(message)
 
-	config.MainQuoteID = newID
+	config.MainQuoteID = newQuote.ID
 
 	return true
 }
 
 func (q *Quotes) Update(updateID int) bool {
 
-	updatedQuote := Quote{
-		ID:       updateID,
-		QUOTE:    config.UserInputs[0],
-		AUTHOR:   config.UserInputs[1],
-		LANGUAGE: config.UserInputs[2],
-		DATE:     time.Now().Format("02.01.2006"),
-	}
+	updateQuote := q.FindQuoteByID(updateID)
+
+	updateQuote.QUOTE = util.PromptWithSuggestion("Quote", updateQuote.QUOTE)
+	updateQuote.AUTHOR = util.PromptWithSuggestion("Author", updateQuote.AUTHOR)
 
 	for i, quote := range q.QUOTES {
 		if quote.ID == updateID {
-			q.QUOTES[i] = updatedQuote
+			q.QUOTES[i] = updateQuote
 
 		}
 	}
@@ -85,7 +95,7 @@ func (q *Quotes) Delete(deleteID int) bool {
 
 	for _, quote := range q.QUOTES {
 		if quote.ID == deleteID {
-			fmt.Println(q.FormatQuote(quote))
+			fmt.Println(FormatQuote(quote))
 		}
 	}
 
@@ -154,4 +164,17 @@ func (q *Quotes) Read() {
 	q.SetToDefaultQuote()
 	config.Counter = 0
 	config.ReadCounter = ""
+}
+
+func (q *Quotes) UniqueID() int {
+
+	maxID := 0
+
+	for _, quote := range q.QUOTES {
+		if quote.ID > maxID {
+			maxID = quote.ID
+		}
+	}
+
+	return maxID + 1
 }

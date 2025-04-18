@@ -26,7 +26,7 @@ func (q *Quotes) PrintCLI() {
 
 
 	lastQuote := q.FindQuoteByID(config.MainQuoteID)
-	formattedLastQuote := q.FormatQuote(lastQuote)
+	formattedLastQuote := FormatQuote(lastQuote)
 
 	messages := config.FormatMessages()
 
@@ -42,13 +42,13 @@ func (q *Quotes) PrintAllQuotes() {
 	util.ClearScreen()
 
 	for _, quote := range q.QUOTES {
-		fmt.Print(q.FormatQuote(quote))
+		fmt.Print(FormatQuote(quote))
 	}
 
 	util.PressAnyKey()
 }
 
-func (q *Quotes) FormatQuote(quote Quote) string {
+func FormatQuote(quote Quote) string {
 
 	var (
 		quoteBuffer    bytes.Buffer
