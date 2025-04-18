@@ -44,7 +44,7 @@ func (q *Quotes) Find() {
 	}
 
 	// Print the found quote
-	fmt.Println(q.FormatQuote(foundQuote))
+	fmt.Println(FormatQuote(foundQuote))
 	util.PressAnyKey()
 }
 
