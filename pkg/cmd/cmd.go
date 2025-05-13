@@ -46,7 +46,6 @@ func CommandLine(quotes *db.Quotes) {
 			quotes.Backup()
 			util.ClearScreen()
 			os.Exit(0)
-
 		default:
 			config.AddMessage("Enter pressed!")
 		}

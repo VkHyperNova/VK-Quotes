@@ -27,7 +27,7 @@ type Quotes struct {
 func (q *Quotes) Add() bool {
 
 	newQuote := Quote{}
-	newQuote.ID = q.UniqueID()
+	newQuote.ID = q.GenerateUniqueID()
 
 	newQuote.QUOTE = util.PromptWithSuggestion("Quote", "")
 	if !util.Quit(newQuote.QUOTE) {
@@ -40,7 +40,7 @@ func (q *Quotes) Add() bool {
 		return false
 	}
 
-	newQuote.AUTHOR = util.PromptWithSuggestion("Author", "")
+	newQuote.AUTHOR = util.PromptWithSuggestion("Author", "Unknown")
 	newQuote.LANGUAGE = util.AutoDetectLanguage(newQuote.QUOTE)
 	newQuote.DATE = time.Now().Format("02.01.2006")
 
@@ -166,7 +166,7 @@ func (q *Quotes) Read() {
 	config.ReadCounter = ""
 }
 
-func (q *Quotes) UniqueID() int {
+func (q *Quotes) GenerateUniqueID() int {
 
 	maxID := 0
 

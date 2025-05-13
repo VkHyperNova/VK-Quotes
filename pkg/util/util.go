@@ -56,8 +56,6 @@ func PressAnyKey() {
     }
 }
 
-
-
 func ArrayContainsString(arr []string, name string) bool {
 	for _, n := range arr {
 		if n == name {
