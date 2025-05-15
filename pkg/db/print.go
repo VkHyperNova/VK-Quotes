@@ -16,12 +16,15 @@ func (q *Quotes) PrintCLI() {
 		q.SetToDefaultQuote()
 	}
 
+	nowPlaying := "Now playing: Gustavo Bravetti - Babel.mp3"
+
 	stringFormat := `` +
-		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n\n" +
-		"%s" +
-		config.Cyan + `%s` + config.Reset +
-		"%s" +
-		config.Yellow + `%s` + config.Reset +
+		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n" + // Program Name
+		config.Purple + "%s" + config.Reset + "\n" + // Now Playing
+		"%s" + // Messages
+		config.Cyan + `%s` + config.Reset + // Read Counter
+		"%s" + // Last Quote
+		config.Yellow + `%s` + config.Reset + // Commands
 		``
 
 
@@ -32,7 +35,7 @@ func (q *Quotes) PrintCLI() {
 
 	commands := "\nAdd Update Delete Find Read Showall Stats SimilarQuotes ResetIDs Quit\n"
 
-	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, messages, config.ReadCounter, formattedLastQuote, commands)
+	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
 
 	fmt.Print(cli)
 }

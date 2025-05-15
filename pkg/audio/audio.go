@@ -10,12 +10,12 @@ import (
 	"github.com/faiface/beep/speaker"
 )
 
-//go:embed babel.mp3
+//go:embed "Gustavo Bravetti - Babel.mp3"
 var babelMP3 embed.FS
 
 func PlayMP3() error {
 	// Open the embedded file
-	file, err := babelMP3.Open("babel.mp3")
+	file, err := babelMP3.Open("Gustavo Bravetti - Babel.mp3")
 	if err != nil {
 		return fmt.Errorf("failed to open embedded MP3: %w", err)
 	}
@@ -37,11 +37,8 @@ func PlayMP3() error {
 	// Loop the streamer infinitely
 	looped := beep.Loop(-1, streamer)
 
-	// Play the music
+	// Start playback
 	speaker.Play(looped)
 
-	// Block forever
-	select {}
+	return nil // Don't block here; let main continue
 }
-
-

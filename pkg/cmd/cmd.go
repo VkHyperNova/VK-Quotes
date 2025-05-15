@@ -2,14 +2,24 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
+	"vk-quotes/pkg/audio"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
 
 func CommandLine(quotes *db.Quotes) {
+
+	go func() {
+		err := audio.PlayMP3()
+		if err != nil {
+			log.Printf("MP3 Playback Error: %v", err)
+		}
+	}()
+	
 	for {
 		quotes.PrintCLI()
 
