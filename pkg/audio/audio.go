@@ -10,12 +10,12 @@ import (
 	"github.com/faiface/beep/speaker"
 )
 
-//go:embed "Gustavo Bravetti - Babel.mp3"
+//go:embed "Otnicka - BABEL.mp3"
 var babelMP3 embed.FS
 
 func PlayMP3() error {
 	// Open the embedded file
-	file, err := babelMP3.Open("Gustavo Bravetti - Babel.mp3")
+	file, err := babelMP3.Open("Otnicka - BABEL.mp3")
 	if err != nil {
 		return fmt.Errorf("failed to open embedded MP3: %w", err)
 	}
