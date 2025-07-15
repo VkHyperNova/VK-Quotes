@@ -13,6 +13,8 @@ import (
 //go:embed "Otnicka - BABEL.mp3"
 var babelMP3 embed.FS
 
+var ctrl *beep.Ctrl
+
 func PlayMP3() error {
 	// Open the embedded file
 	file, err := babelMP3.Open("Otnicka - BABEL.mp3")
@@ -27,18 +29,27 @@ func PlayMP3() error {
 		return fmt.Errorf("failed to decode MP3: %w", err)
 	}
 
-	err = speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-	if err != nil {
-		streamer.Close()
-		file.Close()
-		return fmt.Errorf("failed to initialize speaker: %w", err)
-	}
 
-	// Loop the streamer infinitely
-	looped := beep.Loop(-1, streamer)
-
-	// Start playback
-	speaker.Play(looped)
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	ctrl = &beep.Ctrl{Streamer: streamer, Paused: false}
+	speaker.Play(ctrl)
 
 	return nil // Don't block here; let main continue
+}
+
+
+func PauseMP3() {
+	if ctrl != nil {
+		speaker.Lock()
+		ctrl.Paused = true
+		speaker.Unlock()
+	}
+}
+
+func ResumeMP3() {
+	if ctrl != nil {
+		speaker.Lock()
+		ctrl.Paused = false
+		speaker.Unlock()
+	}
 }

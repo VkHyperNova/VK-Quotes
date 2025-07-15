@@ -19,7 +19,7 @@ func CommandLine(quotes *db.Quotes) {
 			log.Printf("MP3 Playback Error: %v", err)
 		}
 	}()
-	
+
 	for {
 		quotes.PrintCLI()
 
@@ -48,10 +48,14 @@ func CommandLine(quotes *db.Quotes) {
 			quotes.PrintStatistics()
 		case "resetids":
 			quotes.ResetIDs(quotes)
-		case "read", "r":
+		case "read":
 			quotes.Read()
 		case "similarquotes", "sim":
 			db.FindSimilarQuotes(quotes)
+		case "pause", "p":
+			audio.PauseMP3()
+		case "resume", "r":
+			audio.ResumeMP3()
 		case "q", "quit":
 			quotes.Backup()
 			util.ClearScreen()
