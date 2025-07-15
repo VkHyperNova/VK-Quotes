@@ -57,16 +57,13 @@ func (q *Quotes) FindQuoteByQuote(searchQuote string) (Quote, bool) {
 	return Quote{}, false
 }
 
-func (q *Quotes) FindQuoteByID(id int) Quote {
-
-	var foundQuote Quote
-
+func (q *Quotes) FindQuoteByID(id int) (Quote, bool) {
 	for _, quote := range q.QUOTES {
 		if quote.ID == id {
-			foundQuote = quote
+			return quote, true // found
 		}
 	}
-	return foundQuote
+	return Quote{}, false // not found
 }
 
 func (q *Quotes) FindDuplicates(searchQuote string, excludeID int) bool {

@@ -57,7 +57,12 @@ func (q *Quotes) Add() bool {
 
 func (q *Quotes) Update(updateID int) bool {
 
-	updateQuote := q.FindQuoteByID(updateID)
+	updateQuote, exists := q.FindQuoteByID(updateID)
+
+	if !exists {
+		config.AddMessage(config.Red + "Quote ID out of range! Range from 1 to " + strconv.Itoa(len(q.QUOTES)) + config.Reset)
+		return false
+	}
 
 	updateQuote.QUOTE = util.PromptWithSuggestion("Quote", updateQuote.QUOTE)
 	updateQuote.AUTHOR = util.PromptWithSuggestion("Author", updateQuote.AUTHOR)

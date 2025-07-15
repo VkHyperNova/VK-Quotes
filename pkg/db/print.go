@@ -28,7 +28,7 @@ func (q *Quotes) PrintCLI() {
 		``
 
 
-	lastQuote := q.FindQuoteByID(config.MainQuoteID)
+	lastQuote, _ := q.FindQuoteByID(config.MainQuoteID)
 	formattedLastQuote := FormatQuote(lastQuote)
 
 	messages := config.FormatMessages()
