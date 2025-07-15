@@ -9,6 +9,7 @@ var ReadCounter string
 var Counter int
 var MainQuoteID int
 var UserInputs []string
+//test
 
 const (
 	Reset  = "\033[0m"
