@@ -4,20 +4,21 @@ import (
 	"embed"
 	"fmt"
 	"time"
+	"vk-quotes/pkg/config"
 
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
 )
 
-//go:embed "Otnicka - BABEL.mp3"
-var babelMP3 embed.FS
+//go:embed "Flute.mp3"
+var FluteMP3 embed.FS
 
 var ctrl *beep.Ctrl
 
 func PlayMP3() error {
 	// Open the embedded file
-	file, err := babelMP3.Open("Otnicka - BABEL.mp3")
+	file, err := FluteMP3.Open("Flute.mp3")
 	if err != nil {
 		return fmt.Errorf("failed to open embedded MP3: %w", err)
 	}
@@ -44,6 +45,7 @@ func PauseMP3() {
 		ctrl.Paused = true
 		speaker.Unlock()
 	}
+	config.AddMessage(config.Yellow + "Music Paused!" + config.Reset)
 }
 
 func ResumeMP3() {
@@ -52,4 +54,5 @@ func ResumeMP3() {
 		ctrl.Paused = false
 		speaker.Unlock()
 	}
+	config.AddMessage(config.Green + "Music Resumed!" + config.Reset)
 }
