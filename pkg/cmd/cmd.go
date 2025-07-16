@@ -26,7 +26,7 @@ func CommandLine(quotes *db.Quotes) {
 		var input string = ""
 		var inputID int = 0
 
-		fmt.Print("=> ")
+		fmt.Printf("[%d]=> ", len(quotes.QUOTES))
 
 		fmt.Scanln(&input, &inputID)
 

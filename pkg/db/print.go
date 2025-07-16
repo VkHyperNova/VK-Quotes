@@ -12,6 +12,8 @@ func (q *Quotes) PrintCLI() {
 
 	util.ClearScreen()
 
+	util.IsVKDataMounted()
+	
 	if config.MainQuoteID <= 0 {
 		q.SetToDefaultQuote()
 	}
@@ -26,7 +28,6 @@ func (q *Quotes) PrintCLI() {
 		"%s" + // Last Quote
 		config.Yellow + `%s` + config.Reset + // Commands
 		``
-
 
 	lastQuote, _ := q.FindQuoteByID(config.MainQuoteID)
 	formattedLastQuote := FormatQuote(lastQuote)
@@ -73,3 +74,5 @@ func FormatQuote(quote Quote) string {
 
 	return quoteBuffer.String()
 }
+
+
