@@ -19,7 +19,7 @@ func (q *Quotes) SetToDefaultQuote() {
 
 }
 
-func (q *Quotes) Find() {
+func (q *Quotes) Find() bool {
 	fmt.Print("Find: ")
 
 	// Read user input
@@ -28,7 +28,7 @@ func (q *Quotes) Find() {
 	if err != nil {
 		fmt.Println("Error reading input:", err)
 		util.PressAnyKey()
-		return
+		return false
 	}
 
 	// Clean and process the input
@@ -38,14 +38,13 @@ func (q *Quotes) Find() {
 	// Search for the quote
 	foundQuote, found := q.FindQuoteByQuote(searchQuote)
 	if !found {
-		fmt.Println("Quote not found.")
-		util.PressAnyKey()
-		return
+		config.AddMessage(config.Red + "Quote not found." + config.Reset)
+		return false
 	}
 
 	// Print the found quote
-	fmt.Println(FormatQuote(foundQuote))
-	util.PressAnyKey()
+	config.MainQuoteID = foundQuote.ID
+	return true
 }
 
 func (q *Quotes) FindQuoteByQuote(searchQuote string) (Quote, bool) {

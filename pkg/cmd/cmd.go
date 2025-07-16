@@ -35,13 +35,25 @@ func CommandLine(quotes *db.Quotes) {
 		switch input {
 
 		case "add", "a":
-			quotes.Add()
+			added := quotes.Add()
+			if !added {
+				audio.PlayErrorSound()
+			}
 		case "update", "u":
-			quotes.Update(inputID)
+			updated := quotes.Update(inputID)
+			if !updated {
+				audio.PlayErrorSound()
+			}
 		case "delete", "d":
-			quotes.Delete(inputID)
+			deleted := quotes.Delete(inputID)
+			if !deleted {
+				audio.PlayErrorSound()
+			}
 		case "find", "f":
-			quotes.Find()
+			found := quotes.Find()
+			if !found {
+				audio.PlayErrorSound()
+			}
 		case "showall", "s":
 			quotes.PrintAllQuotes()
 		case "stats":

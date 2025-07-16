@@ -16,7 +16,7 @@ func (q *Quotes) PrintCLI() {
 		q.SetToDefaultQuote()
 	}
 
-	nowPlaying := "Now playing: Otnicka - BABEL.mp3"
+	nowPlaying := "Now playing: Flute.mp3"
 
 	stringFormat := `` +
 		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n" + // Program Name

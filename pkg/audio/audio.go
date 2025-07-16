@@ -38,7 +38,6 @@ func PlayMP3() error {
 	return nil // Don't block here; let main continue
 }
 
-
 func PauseMP3() {
 	if ctrl != nil {
 		speaker.Lock()
@@ -56,3 +55,4 @@ func ResumeMP3() {
 	}
 	config.AddMessage(config.Green + "Music Resumed!" + config.Reset)
 }
+
