@@ -3,6 +3,7 @@ package audio
 import (
 	"embed"
 	"fmt"
+	"sync"
 	"time"
 	"vk-quotes/pkg/config"
 
@@ -16,26 +17,37 @@ var FluteMP3 embed.FS
 
 var ctrl *beep.Ctrl
 
+var speakerOnce sync.Once
+
+func InitSpeaker(sampleRate beep.SampleRate) error {
+	var err error
+	speakerOnce.Do(func() {
+		err = speaker.Init(sampleRate, sampleRate.N(time.Second/10))
+	})
+	return err
+}
+
 func PlayMP3() error {
-	// Open the embedded file
 	file, err := FluteMP3.Open("Flute.mp3")
 	if err != nil {
 		return fmt.Errorf("failed to open embedded MP3: %w", err)
 	}
 
-	// Decode the MP3
 	streamer, format, err := mp3.Decode(file)
 	if err != nil {
 		file.Close()
 		return fmt.Errorf("failed to decode MP3: %w", err)
 	}
 
+	err = InitSpeaker(format.SampleRate)
+	if err != nil {
+		return fmt.Errorf("failed to initialize speaker: %w", err)
+	}
 
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	ctrl = &beep.Ctrl{Streamer: streamer, Paused: false}
 	speaker.Play(ctrl)
 
-	return nil // Don't block here; let main continue
+	return nil
 }
 
 func PauseMP3() {
@@ -55,4 +67,34 @@ func ResumeMP3() {
 	}
 	config.AddMessage(config.Green + "Music Resumed!" + config.Reset)
 }
+
+//go:embed "error.mp3"
+var ErrorSound embed.FS
+
+func PlayErrorSound() error {
+	file, err := ErrorSound.Open("error.mp3")
+	if err != nil {
+		return fmt.Errorf("failed to open embedded MP3: %w", err)
+	}
+
+	streamer, format, err := mp3.Decode(file)
+	if err != nil {
+		file.Close()
+		return fmt.Errorf("failed to decode MP3: %w", err)
+	}
+
+	err = InitSpeaker(format.SampleRate)
+	if err != nil {
+		return fmt.Errorf("failed to initialize speaker: %w", err)
+	}
+
+	s := streamer
+	speaker.Play(beep.Seq(s, beep.Callback(func() {
+		s.Close()
+		file.Close()
+	})))
+
+	return nil
+}
+
 
