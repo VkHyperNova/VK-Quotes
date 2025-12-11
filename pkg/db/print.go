@@ -31,6 +31,7 @@ func (q *Quotes) PrintCLI() {
 		``
 
 	lastQuote, _ := q.FindQuoteByID(config.MainQuoteID)
+
 	formattedLastQuote := FormatQuote(lastQuote)
 
 	messages := config.FormatMessages()
@@ -56,23 +57,15 @@ func (q *Quotes) PrintAllQuotes() {
 func (q *Quotes) PrintDaylyTen() {
 	util.ClearScreen()
 
-	maxNumber := len(q.QUOTES)
-
-	numbers := make([]int, 10)
-	for i := 0; i < 10; i++ {
-		numbers[i] = rand.Intn(maxNumber) + 1 // random number 1–5000
-	}
-
-	fmt.Println(numbers)
-
-	for id, quote := range q.QUOTES {
-		if util.Contains(numbers, id) {
-			fmt.Print(FormatQuote(quote))
-		}
+	for i := 1; i < 11; i++ {
+		fmt.Print("Number ", i)
+		quote, _ := q.FindQuoteByID(rand.Intn(len(q.QUOTES)))
+		fmt.Print(FormatQuote(quote))
 	}
 
 	util.PressAnyKey()
 }
+
 
 func FormatQuote(quote Quote) string {
 
