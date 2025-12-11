@@ -67,8 +67,7 @@ func (q *Quotes) Backup() {
 
 	err = os.WriteFile(backupPath, byteValue, 0644)
 	if err != nil {
-		message := config.Red + "<< No Backup >>" + config.Reset
-		config.AddMessage(message)
+		config.AddMessage(config.Red + "<< No Backup >>" + config.Reset)
 		config.AddMessage(err.Error())
 		return
 	}

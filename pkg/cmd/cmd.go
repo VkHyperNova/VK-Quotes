@@ -68,6 +68,8 @@ func CommandLine(quotes *db.Quotes) {
 			audio.PauseMP3()
 		case "resume", "r":
 			audio.ResumeMP3()
+		case "dayly":
+			quotes.PrintDaylyTen()
 		case "q", "quit":
 			quotes.Backup()
 			util.ClearScreen()

@@ -3,6 +3,7 @@ package db
 import (
 	"bytes"
 	"fmt"
+	"math/rand"
 	"strings"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/util"
@@ -34,7 +35,7 @@ func (q *Quotes) PrintCLI() {
 
 	messages := config.FormatMessages()
 
-	commands := "\nAdd Update Delete Find Read Showall Stats SimilarQuotes ResetIDs Quit\n"
+	commands := "\ndayly Add Update Delete Find Read Showall Stats SimilarQuotes ResetIDs Quit\n"
 
 	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
 
@@ -47,6 +48,27 @@ func (q *Quotes) PrintAllQuotes() {
 
 	for _, quote := range q.QUOTES {
 		fmt.Print(FormatQuote(quote))
+	}
+
+	util.PressAnyKey()
+}
+
+func (q *Quotes) PrintDaylyTen() {
+	util.ClearScreen()
+
+	maxNumber := len(q.QUOTES)
+
+	numbers := make([]int, 10)
+	for i := 0; i < 10; i++ {
+		numbers[i] = rand.Intn(maxNumber) + 1 // random number 1–5000
+	}
+
+	fmt.Println(numbers)
+
+	for id, quote := range q.QUOTES {
+		if util.Contains(numbers, id) {
+			fmt.Print(FormatQuote(quote))
+		}
 	}
 
 	util.PressAnyKey()
