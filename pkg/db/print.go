@@ -14,7 +14,7 @@ func (q *Quotes) PrintCLI() {
 	util.ClearScreen()
 
 	util.IsVKDataMounted()
-	
+
 	if config.MainQuoteID <= 0 {
 		q.SetToDefaultQuote()
 	}
@@ -36,7 +36,7 @@ func (q *Quotes) PrintCLI() {
 
 	messages := config.FormatMessages()
 
-	commands := "\ndayly Add Update Delete Find Read Showall Stats SimilarQuotes ResetIDs Quit\n"
+	commands := "\nRandom Add Update Delete Find Read Showall Stats SimilarQuotes ResetIDs Quit\n"
 
 	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
 
@@ -53,19 +53,6 @@ func (q *Quotes) PrintAllQuotes() {
 
 	util.PressAnyKey()
 }
-
-func (q *Quotes) PrintDaylyTen() {
-	util.ClearScreen()
-
-	for i := 1; i < 11; i++ {
-		fmt.Print("Number ", i)
-		quote, _ := q.FindQuoteByID(rand.Intn(len(q.QUOTES)))
-		fmt.Print(FormatQuote(quote))
-	}
-
-	util.PressAnyKey()
-}
-
 
 func FormatQuote(quote Quote) string {
 
@@ -90,4 +77,28 @@ func FormatQuote(quote Quote) string {
 	return quoteBuffer.String()
 }
 
+const DefaultQuoteAmount = 10
 
+func (q *Quotes) PrintRandomQuotes(amount int) {
+
+	util.ClearScreen()
+
+	if amount <= 0 {
+		amount = DefaultQuoteAmount
+	}
+
+	if len(q.QUOTES) == 0 {
+		fmt.Print(FormatQuote(DefaultQuote))
+		util.PressAnyKey()
+		return
+	}
+
+	for i := 0; i < amount; i++ {
+		fmt.Printf("Number %d\n", i+1)
+		idx := rand.Intn(len(q.QUOTES))
+		quote := q.QUOTES[idx] 
+		fmt.Print(FormatQuote(quote))
+	}
+
+	util.PressAnyKey()
+}

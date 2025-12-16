@@ -54,7 +54,7 @@ func CommandLine(quotes *db.Quotes) {
 			if !found {
 				audio.PlayErrorSound()
 			}
-		case "showall", "s":
+		case "showall":
 			quotes.PrintAllQuotes()
 		case "stats":
 			quotes.PrintStatistics()
@@ -62,14 +62,14 @@ func CommandLine(quotes *db.Quotes) {
 			quotes.ResetIDs(quotes)
 		case "read":
 			quotes.Read()
-		case "similarquotes", "sim":
+		case "similarquotes":
 			db.FindSimilarQuotes(quotes)
-		case "pause", "p":
+		case "pause":
 			audio.PauseMP3()
-		case "resume", "r":
+		case "resume":
 			audio.ResumeMP3()
-		case "dayly":
-			quotes.PrintDaylyTen()
+		case "random", "r":
+			quotes.PrintRandomQuotes(inputID)
 		case "q", "quit":
 			quotes.Backup()
 			util.ClearScreen()

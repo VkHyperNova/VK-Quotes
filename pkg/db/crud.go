@@ -24,6 +24,14 @@ type Quotes struct {
 	QUOTES []Quote `json:"quotes"` // Slice containing multiple Quote instances.
 }
 
+var DefaultQuote = Quote{
+	QUOTE:    "Nothing Smart to Say",
+	AUTHOR:   "Unknown",
+	ID:       0,
+	LANGUAGE: "Golang",
+	DATE:     "00.00.00",
+}
+
 func (q *Quotes) Add() bool {
 
 	newQuote := Quote{}
@@ -46,7 +54,7 @@ func (q *Quotes) Add() bool {
 
 	q.QUOTES = append(q.QUOTES, newQuote)
 
-	message := config.Green + strconv.Itoa(newQuote.ID) + ". " + newQuote.QUOTE + "\n\t" + newQuote.AUTHOR + " (" + newQuote.LANGUAGE + " " + newQuote.DATE+ ")" + config.Reset
+	message := config.Green + strconv.Itoa(newQuote.ID) + ". " + newQuote.QUOTE + "\n\t" + newQuote.AUTHOR + " (" + newQuote.LANGUAGE + " " + newQuote.DATE + ")" + config.Reset
 
 	q.SaveToFile(message)
 
@@ -81,6 +89,7 @@ func (q *Quotes) Update(updateID int) bool {
 	config.MainQuoteID = updateID
 
 	return true
+
 }
 
 func (q *Quotes) Delete(deleteID int) bool {
