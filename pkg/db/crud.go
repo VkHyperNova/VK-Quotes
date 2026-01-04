@@ -63,32 +63,25 @@ func (q *Quotes) Add() bool {
 	return true
 }
 
-func (q *Quotes) Update(updateID int) bool {
+func (q *Quotes) Update(id int) error {
 
-	updateQuote, exists := q.FindQuoteByID(updateID)
-
-	if !exists {
-		config.AddMessage(config.Red + "Quote ID out of range! Range from 1 to " + strconv.Itoa(len(q.QUOTES)) + config.Reset)
-		return false
+	if id <= 0 || id > len(q.QUOTES) {
+		return fmt.Errorf("quote ID out of range (1–%d)", len(q.QUOTES))
 	}
 
-	updateQuote.QUOTE = util.PromptWithSuggestion("Quote", updateQuote.QUOTE)
-	updateQuote.AUTHOR = util.PromptWithSuggestion("Author", updateQuote.AUTHOR)
+	index := id - 1
+	quote := &q.QUOTES[index]
 
-	for i, quote := range q.QUOTES {
-		if quote.ID == updateID {
-			q.QUOTES[i] = updateQuote
+	quote.QUOTE = util.PromptWithSuggestion("Quote", quote.QUOTE)
+	quote.AUTHOR = util.PromptWithSuggestion("Author", quote.AUTHOR)
 
-		}
-	}
-
-	message := config.Yellow + strconv.Itoa(updateID) + " updated" + config.Reset
+	message := config.Yellow + strconv.Itoa(id) + " updated" + config.Reset
 
 	q.SaveToFile(message)
 
-	config.MainQuoteID = updateID
+	config.MainQuoteID = id
 
-	return true
+	return nil
 
 }
 
@@ -183,6 +176,8 @@ func (q *Quotes) Read() {
 func (q *Quotes) GenerateUniqueID() int {
 
 	maxID := 0
+
+	// maxID := q.QUOTES[len(q.QUOTES) - 1].ID
 
 	for _, quote := range q.QUOTES {
 		if quote.ID > maxID {

@@ -40,15 +40,19 @@ func CommandLine(quotes *db.Quotes) {
 				audio.PlayErrorSound()
 			}
 		case "update", "u":
-			updated := quotes.Update(inputID)
-			if !updated {
+			err := quotes.Update(inputID)
+			if  err != nil {
+				fmt.Println(config.Red, err, config.Reset)
 				audio.PlayErrorSound()
+				util.PressAnyKey()
 			}
 		case "delete", "d":
 			deleted := quotes.Delete(inputID)
 			if !deleted {
 				audio.PlayErrorSound()
 			}
+
+			quotes.ResetIDs(quotes) // Reset all IDs in database
 		case "find", "f":
 			found := quotes.Find()
 			if !found {
