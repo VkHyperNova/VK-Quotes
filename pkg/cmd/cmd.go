@@ -11,6 +11,7 @@ import (
 	"vk-quotes/pkg/util"
 )
 
+// Test
 func CommandLine(quotes *db.Quotes) {
 
 	go func() {
