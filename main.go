@@ -1,23 +1,27 @@
 package main
 
 import (
+	"fmt"
+	"log"
+	"os"
 	"vk-quotes/pkg/cmd"
+	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
 
-// main is the entry point of the application.
 func main() {
+	if err := util.CreateFilesAndFolders(); err != nil {
+		fmt.Println("Error creating files/folders:", err)
+		os.Exit(1)
+	}
 
-	// It initializes a Quotes database
 	quotes := db.Quotes{}
 
-	// Ensures the necessary directory structure exists
-	util.CreateDirectory()
+	err := quotes.ReadFromFile(config.LocalFile)
+	if err != nil {
+		log.Fatalf("Fatal error: failed to load walkings database: %v", err)
+	}
 
-	// Loads quotes from a file
-	quotes.ReadFromFile()
-
-	// and starts the command-line interface for user interaction.
 	cmd.CommandLine(&quotes)
 }

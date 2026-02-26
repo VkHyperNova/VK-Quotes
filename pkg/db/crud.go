@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 
 	"vk-quotes/pkg/util"
@@ -54,7 +55,7 @@ func (q *Quotes) Add() bool {
 
 	q.QUOTES = append(q.QUOTES, newQuote)
 
-	message := config.Green + strconv.Itoa(newQuote.ID) + ". " + newQuote.QUOTE + "\n\t" + newQuote.AUTHOR + " (" + newQuote.LANGUAGE + " " + newQuote.DATE + ")" + config.Reset
+	message := color.Green + strconv.Itoa(newQuote.ID) + ". " + newQuote.QUOTE + "\n\t" + newQuote.AUTHOR + " (" + newQuote.LANGUAGE + " " + newQuote.DATE + ")" + color.Reset
 
 	q.SaveToFile(message)
 
@@ -75,7 +76,7 @@ func (q *Quotes) Update(id int) error {
 	quote.QUOTE = util.PromptWithSuggestion("Quote", quote.QUOTE)
 	quote.AUTHOR = util.PromptWithSuggestion("Author", quote.AUTHOR)
 
-	message := config.Yellow + strconv.Itoa(id) + " updated" + config.Reset
+	message := color.Yellow + strconv.Itoa(id) + " updated" + color.Reset
 
 	q.SaveToFile(message)
 
@@ -95,7 +96,7 @@ func (q *Quotes) Delete(deleteID int) bool {
 	}
 
 	if index == -1 {
-		message := config.Red + "Index Not Found" + config.Reset
+		message := color.Red + "Index Not Found" + color.Reset
 		config.AddMessage(message)
 		return false
 	}
@@ -113,14 +114,14 @@ func (q *Quotes) Delete(deleteID int) bool {
 	confirm, _ := line.Prompt("(y/n)")
 
 	if confirm != "y" {
-		message := config.Red + "Delete Canceled" + config.Reset
+		message := color.Red + "Delete Canceled" + color.Reset
 		config.AddMessage(message)
 		return false
 	}
 
 	q.QUOTES = append(q.QUOTES[:index], q.QUOTES[index+1:]...)
 
-	message := config.Red + strconv.Itoa(deleteID) + " deleted" + config.Reset
+	message := color.Red + strconv.Itoa(deleteID) + " deleted" + color.Reset
 
 	q.SaveToFile(message)
 
@@ -164,7 +165,7 @@ func (q *Quotes) Read() {
 		}
 	}
 
-	message := config.Yellow + "Reading Done" + config.Reset
+	message := color.Yellow + "Reading Done" + color.Reset
 	config.AddMessage(message)
 
 	config.RandomIDs = config.RandomIDs[:0]

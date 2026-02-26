@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-	"vk-quotes/pkg/config"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/util"
 )
 
@@ -14,7 +14,7 @@ func (q *Quotes) PrintStatistics() {
 
 	format := "%s%s%s"
 
-	name := config.Cyan + "Statistics: " + config.Reset
+	name := color.Cyan + "Statistics: " + color.Reset
 
 	stats := fmt.Sprintf(format, name, q.TopAuthors(), q.TopLanguages())
 
@@ -62,7 +62,7 @@ func (q *Quotes) TopAuthors() string {
 	// Make a string
 	authorsString := ""
 	for i := 0; i < len(pairs) && i < 10; i++ {
-		authorsString += "\n" + strconv.Itoa(pairs[i].count) + " " + config.Cyan + pairs[i].name + config.Reset
+		authorsString += "\n" + strconv.Itoa(pairs[i].count) + " " + color.Cyan + pairs[i].name + color.Reset
 	}
 
 	return authorsString
@@ -85,7 +85,7 @@ func (q *Quotes) TopLanguages() string {
 	// Make a string
 	languagesString := ""
 	for name, num := range languagesMap {
-		languagesString += "\n" + strconv.Itoa(num) + " " + config.Yellow + name + config.Reset
+		languagesString += "\n" + strconv.Itoa(num) + " " + color.Yellow + name + color.Reset
 	}
 	return languagesString
 }

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"unicode"
-	"vk-quotes/pkg/audio"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 
 	"github.com/peterh/liner"
@@ -75,29 +76,9 @@ func ArrayContainsInt(numbers []int, number int) bool {
 	return false
 }
 
-func CreateDirectory() {
-
-	path := config.LocalPath
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-
-		// Create dir
-		_ = os.Mkdir("QUOTES", 0700)
-
-		// Create file
-		err = os.WriteFile(path, []byte(`{"quotes": []}`), 0644)
-		if err != nil {
-			panic(err)
-		}
-
-		message := config.Green + "Local Database Created" + config.Reset
-		config.AddMessage(message)
-	}
-}
-
 func Quit(input string) bool {
 	if input == "q" {
-		message := config.Red + "Previous action aborted by user" + config.Reset
+		message := color.Red + "Previous action aborted by user" + color.Reset
 		config.AddMessage(message)
 		return false
 	}
@@ -129,48 +110,6 @@ func PromptWithSuggestion(name string, edit string) string {
 	return input
 }
 
-func isMounted(mountPoint string) (bool, error) {
-    file, err := os.Open("/proc/mounts")
-    if err != nil {
-        return false, err
-    }
-    defer file.Close()
-
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        line := scanner.Text()
-        fields := strings.Fields(line)
-        if len(fields) >= 2 && fields[1] == mountPoint {
-            return true, nil
-        }
-    }
-
-    return false, scanner.Err()
-}
-
-func IsVKDataMounted() {
-
-	if runtime.GOOS != "linux" {
-        fmt.Println("This program only works on Linux.")
-        return
-    }
-
-	mountPoint := "/media/veikko/VK\\040DATA" // change to your actual mount path
-
-    mounted, err := isMounted(mountPoint)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return
-    }
-
-    if mounted {
-        fmt.Println(config.Green + "VK DATA is mounted" + config.Reset)
-    } else {
-        fmt.Println(config.Red + "VK DATA is NOT mounted" + config.Reset)
-		audio.PlayErrorSound()
-    }
-}
-
 func Contains(slice []int, value int) bool {
 	for _, v := range slice {
 		if v == value {
@@ -178,4 +117,84 @@ func Contains(slice []int, value int) bool {
 		}
 	}
 	return false
+}
+
+func ensureFile(path string, content string) error {
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("error creating directory for %s: %w", path, err)
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			return fmt.Errorf("error creating file %s: %w", path, err)
+		}
+	}
+
+	return nil
+}
+
+func CreateFilesAndFolders() error {
+
+	if err := ensureFile(config.LocalFile, config.DefaultContent); err != nil {
+		return err
+	}
+
+	if !HardDriveMountCheck() {
+		input := Input("Do you want to continue? (y/n) ")
+		if strings.ToLower(strings.TrimSpace(input)) != "y" {
+			fmt.Println("Exiting program.")
+			os.Exit(0)
+		}
+	} else {
+		if err := ensureFile(config.BackupFile, config.DefaultContent); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func HardDriveMountCheck() bool {
+	if runtime.GOOS != "linux" {
+		fmt.Println("This program only works on Linux.")
+		return false
+	}
+
+	mountPoint := "/media/veikko/VK\\040DATA" // match /proc/mounts format
+
+	file, err := os.Open("/proc/mounts")
+	if err != nil {
+		fmt.Println("Cannot open /proc/mounts:", err)
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) >= 2 && fields[1] == mountPoint {
+			return true
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error scanning /proc/mounts:", err)
+		return false
+	}
+
+	fmt.Println(color.Red + "\nVK DATA is NOT mounted" + color.Reset)
+	return false
+}
+
+func Input(prompt string) string {
+
+	line := liner.NewLiner()
+	defer line.Close()
+
+	userInput, err := line.Prompt(prompt)
+	if err != nil {
+		panic(err)
+	}
+	return userInput
 }

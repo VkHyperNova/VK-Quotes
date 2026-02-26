@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"vk-quotes/pkg/audio"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
@@ -42,7 +43,7 @@ func CommandLine(quotes *db.Quotes) {
 		case "update", "u":
 			err := quotes.Update(inputID)
 			if  err != nil {
-				fmt.Println(config.Red, err, config.Reset)
+				fmt.Println(color.Red, err, color.Reset)
 				audio.PlayErrorSound()
 				util.PressAnyKey()
 			}
@@ -75,7 +76,6 @@ func CommandLine(quotes *db.Quotes) {
 		case "random", "r":
 			quotes.PrintRandomQuotes(inputID)
 		case "q", "quit":
-			quotes.Backup()
 			util.ClearScreen()
 			os.Exit(0)
 		default:

@@ -1,4 +1,3 @@
-
 package db
 
 import (
@@ -10,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 
 	"github.com/cheggaaa/pb/v3"
@@ -87,7 +87,7 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	similar.SaveToFile()
 
-	message := config.Green + "Find Similar Quotes Process Done" + config.Reset
+	message := color.Green + "Find Similar Quotes Process Done" + color.Reset
 	config.AddMessage(message)
 }
 

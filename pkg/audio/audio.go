@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 
 	"github.com/faiface/beep"
@@ -56,7 +57,7 @@ func PauseMP3() {
 		ctrl.Paused = true
 		speaker.Unlock()
 	}
-	config.AddMessage(config.Yellow + "Music Paused!" + config.Reset)
+	config.AddMessage(color.Yellow + "Music Paused!" + color.Reset)
 }
 
 func ResumeMP3() {
@@ -65,7 +66,7 @@ func ResumeMP3() {
 		ctrl.Paused = false
 		speaker.Unlock()
 	}
-	config.AddMessage(config.Green + "Music Resumed!" + config.Reset)
+	config.AddMessage(color.Green + "Music Resumed!" + color.Reset)
 }
 
 //go:embed "error.mp3"

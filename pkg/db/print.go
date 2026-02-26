@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/util"
 )
@@ -13,8 +14,6 @@ func (q *Quotes) PrintCLI() {
 
 	util.ClearScreen()
 
-	util.IsVKDataMounted()
-
 	if config.MainQuoteID <= 0 {
 		q.SetToDefaultQuote()
 	}
@@ -22,12 +21,12 @@ func (q *Quotes) PrintCLI() {
 	nowPlaying := "Now playing: Flute.mp3"
 
 	stringFormat := `` +
-		config.Cyan + "VK-Quotes" + config.Reset + " %s" + "\n" + // Program Name
-		config.Purple + "%s" + config.Reset + "\n" + // Now Playing
+		color.Cyan + "VK-Quotes" + color.Reset + " %s" + "\n" + // Program Name
+		color.Purple + "%s" + color.Reset + "\n" + // Now Playing
 		"%s" + // Messages
-		config.Cyan + `%s` + config.Reset + // Read Counter
+		color.Cyan + `%s` + color.Reset + // Read Counter
 		"%s" + // Last Quote
-		config.Yellow + `%s` + config.Reset + // Commands
+		color.Yellow + `%s` + color.Reset + // Commands
 		``
 
 	lastQuote, _ := q.FindQuoteByID(config.MainQuoteID)
@@ -61,8 +60,8 @@ func FormatQuote(quote Quote) string {
 		formattedQuote string
 	)
 
-	stringFormat := `` + "\n" + config.Cyan + `%d. ` + "\"" + config.Reset + `%s` + `` + config.Cyan + "\"" +
-		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + config.Reset + "\n" + ``
+	stringFormat := `` + "\n" + color.Cyan + `%d. ` + "\"" + color.Reset + `%s` + `` + color.Cyan + "\"" +
+		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + color.Reset + "\n" + ``
 
 	formattedQuote = fmt.Sprintf(
 		stringFormat,

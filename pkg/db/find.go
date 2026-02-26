@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/util"
 )
@@ -38,7 +39,7 @@ func (q *Quotes) Find() bool {
 	// Search for the quote
 	foundQuote, found := q.FindQuoteByQuote(searchQuote)
 	if !found {
-		config.AddMessage(config.Red + "Quote not found." + config.Reset)
+		config.AddMessage(color.Red + "Quote not found." + color.Reset)
 		return false
 	}
 
@@ -74,7 +75,7 @@ func (q *Quotes) FindDuplicates(searchQuote string, excludeID int) bool {
 	for _, quote := range q.QUOTES {
 		if  searchQuote == quote.QUOTE {
 			if excludeID != quote.ID {
-				message := config.Red + "There are dublicates in database" + config.Reset
+				message := color.Red + "There are dublicates in database" + color.Reset
 				config.AddMessage(message)
 				config.MainQuoteID = quote.ID
 				return true
