@@ -40,6 +40,36 @@ type Quotes struct {
 
 /* Main */
 
+func (q *Quotes) PrintCLI() {
+
+	util.ClearScreen()
+
+	if config.MainQuoteID <= 0 {
+		q.SetToDefaultQuote()
+	}
+
+	nowPlaying := "Now playing: Flute.mp3"
+
+	stringFormat := `` +
+		color.Cyan + "VK-Quotes" + color.Reset + " %s" + "\n" + // Program Name
+		color.Purple + "%s" + color.Reset + "\n" + // Now Playing
+		"%s" + // Messages
+		color.Cyan + `%s` + color.Reset + // Read Counter
+		"%s" + // Last Quote
+		color.Yellow + `%s` + color.Reset + // Commands
+		``
+
+	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES) - 1])
+
+	messages := config.FormatMessages()
+
+	commands := "\n< add, update, delete, random, find, read, history, unmount, export, import, stats, findsimilar, quit\n"
+
+	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
+
+	fmt.Print(cli)
+}
+
 func (q *Quotes) Add() error {
 
 	newQuote, err := q.promptEntry(Quote{})
@@ -412,35 +442,7 @@ func (q *Quotes) FindDuplicates(searchQuote string, excludeID int) bool {
 
 /* Print */
 
-func (q *Quotes) PrintCLI() {
 
-	util.ClearScreen()
-
-	if config.MainQuoteID <= 0 {
-		q.SetToDefaultQuote()
-	}
-
-	nowPlaying := "Now playing: Flute.mp3"
-
-	stringFormat := `` +
-		color.Cyan + "VK-Quotes" + color.Reset + " %s" + "\n" + // Program Name
-		color.Purple + "%s" + color.Reset + "\n" + // Now Playing
-		"%s" + // Messages
-		color.Cyan + `%s` + color.Reset + // Read Counter
-		"%s" + // Last Quote
-		color.Yellow + `%s` + color.Reset + // Commands
-		``
-
-	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES) - 1])
-
-	messages := config.FormatMessages()
-
-	commands := "\n< add, update, delete, random, find, read, history, stats, findsimilar, quit\n"
-
-	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
-
-	fmt.Print(cli)
-}
 
 func (q *Quotes) History() {
 
