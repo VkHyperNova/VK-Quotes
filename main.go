@@ -11,17 +11,17 @@ import (
 )
 
 func main() {
-	if err := util.CreateFilesAndFolders(); err != nil {
+	if err := util.InitLocalStorage(); err != nil {
 		fmt.Println("Error creating files/folders:", err)
 		os.Exit(1)
 	}
 
-	quotes := db.Quotes{}
+	q := db.Quotes{}
 
-	err := quotes.ReadFromFile(config.LocalFile)
+	err := q.LoadFromFile(config.LocalFile)
 	if err != nil {
 		log.Fatalf("Fatal error: failed to load walkings database: %v", err)
 	}
 
-	cmd.CommandLine(&quotes)
+	cmd.CommandLine(&q)
 }

@@ -6,13 +6,12 @@ import (
 	"os"
 	"strings"
 	"vk-quotes/pkg/audio"
-	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
 
-func CommandLine(quotes *db.Quotes) {
+func CommandLine(q *db.Quotes) {
 
 	go func() {
 		err := audio.PlayMP3()
@@ -22,12 +21,12 @@ func CommandLine(quotes *db.Quotes) {
 	}()
 
 	for {
-		quotes.PrintCLI()
+		q.PrintCLI()
 
 		var input string = ""
 		var inputID int = 0
 
-		fmt.Printf("[%d]=> ", len(quotes.QUOTES))
+		fmt.Printf("[%d]=> ", len(q.QUOTES))
 
 		fmt.Scanln(&input, &inputID)
 
@@ -36,45 +35,57 @@ func CommandLine(quotes *db.Quotes) {
 		switch input {
 
 		case "add", "a":
-			added := quotes.Add()
-			if !added {
+			if err := q.Add(); err != nil {
 				audio.PlayErrorSound()
+				fmt.Println(err)
+				util.PressAnyKey()
 			}
 		case "update", "u":
-			err := quotes.Update(inputID)
-			if  err != nil {
-				fmt.Println(color.Red, err, color.Reset)
+			if err := q.Update(inputID); err != nil {
 				audio.PlayErrorSound()
+				fmt.Println(err)
 				util.PressAnyKey()
 			}
 		case "delete", "d":
-			deleted := quotes.Delete(inputID)
-			if !deleted {
+			if err := q.Delete(inputID); err != nil {
 				audio.PlayErrorSound()
+				fmt.Println(err)
+				util.PressAnyKey()
 			}
-
-			quotes.ResetIDs(quotes) // Reset all IDs in database
 		case "find", "f":
-			found := quotes.Find()
+			found := q.Find()
 			if !found {
 				audio.PlayErrorSound()
 			}
-		case "showall":
-			quotes.PrintAllQuotes()
+		case "import", "i":
+			if err := q.Import(); err != nil {
+				fmt.Println(err)
+			}
+			util.PressAnyKey()
+		case "export", "e":
+			if err := q.Export(); err != nil {
+				fmt.Println(err)
+			}
+			util.PressAnyKey()
+		case "unmount":
+			if err := util.UnmountDrive(); err != nil {
+				fmt.Println(err)
+			}
+			util.PressAnyKey()
+		case "history", "h":
+			q.History()
 		case "stats":
-			quotes.PrintStatistics()
-		case "resetids":
-			quotes.ResetIDs(quotes)
+			q.PrintStatistics()
 		case "read":
-			quotes.Read()
-		case "similarquotes":
-			db.FindSimilarQuotes(quotes)
+			q.Read()
+		case "findsimilar":
+			db.FindSimilarQuotes(q)
 		case "pause":
 			audio.PauseMP3()
 		case "resume":
 			audio.ResumeMP3()
 		case "random", "r":
-			quotes.PrintRandomQuotes(inputID)
+			q.PrintRandomQuotes(inputID)
 		case "q", "quit":
 			util.ClearScreen()
 			os.Exit(0)
