@@ -40,36 +40,6 @@ type Quotes struct {
 
 /* Main */
 
-func (q *Quotes) PrintCLI() {
-
-	util.ClearScreen()
-
-	if config.MainQuoteID <= 0 {
-		q.SetToDefaultQuote()
-	}
-
-	nowPlaying := "Now playing: Flute.mp3"
-
-	stringFormat := `` +
-		color.Cyan + "VK-Quotes" + color.Reset + " %s" + "\n" + // Program Name
-		color.Purple + "%s" + color.Reset + "\n" + // Now Playing
-		"%s" + // Messages
-		color.Cyan + `%s` + color.Reset + // Read Counter
-		"%s" + // Last Quote
-		color.Yellow + `%s` + color.Reset + // Commands
-		``
-
-	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES) - 1])
-
-	messages := config.FormatMessages()
-
-	commands := "\n< add, update, delete, random, find, read, history, unmount, export, import, stats, findsimilar, quit\n"
-
-	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
-
-	fmt.Print(cli)
-}
-
 func (q *Quotes) Add() error {
 
 	newQuote, err := q.promptEntry(Quote{})
@@ -281,6 +251,72 @@ func (q *Quotes) LoadFromFile(path string) error {
 	return nil
 }
 
+/* Print */
+
+func (q *Quotes) PrintCLI() {
+
+	util.ClearScreen()
+
+	if config.MainQuoteID <= 0 {
+		q.SetToDefaultQuote()
+	}
+
+	nowPlaying := "Now playing: Flute.mp3"
+
+	stringFormat := `` +
+		color.Cyan + "VK-Quotes" + color.Reset + " %s" + "\n" + // Program Name
+		color.Purple + "%s" + color.Reset + "\n" + // Now Playing
+		"%s" + // Messages
+		color.Cyan + `%s` + color.Reset + // Read Counter
+		"%s" + // Last Quote
+		color.Yellow + `%s` + color.Reset + // Commands
+		``
+
+	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES) - 1])
+
+	messages := config.FormatMessages()
+
+	commands := "\n< add, update, delete, random, find, read, history, unmount, export, import, stats, findsimilar, quit\n"
+
+	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
+
+	fmt.Print(cli)
+}
+
+func (q *Quotes) History() {
+
+	util.ClearScreen()
+
+	for _, quote := range q.QUOTES {
+		fmt.Print(FormatQuote(quote))
+	}
+
+	util.PressAnyKey()
+}
+
+func FormatQuote(quote Quote) string {
+
+	var (
+		quoteBuffer    bytes.Buffer
+		formattedQuote string
+	)
+
+	stringFormat := `` + "\n" + color.Cyan + `%d. ` + "\"" + color.Reset + `%s` + `` + color.Cyan + "\"" +
+		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + color.Reset + "\n" + ``
+
+	formattedQuote = fmt.Sprintf(
+		stringFormat,
+		quote.ID,
+		quote.QUOTE,
+		quote.AUTHOR,
+		quote.DATE,
+		quote.LANGUAGE)
+
+	quoteBuffer.WriteString(formattedQuote)
+
+	return quoteBuffer.String()
+}
+
 /* Stats */
 
 func (q *Quotes) PrintStatistics() {
@@ -440,52 +476,12 @@ func (q *Quotes) FindDuplicates(searchQuote string, excludeID int) bool {
 	return false
 }
 
-/* Print */
-
-
-
-func (q *Quotes) History() {
-
-	util.ClearScreen()
-
-	for _, quote := range q.QUOTES {
-		fmt.Print(FormatQuote(quote))
-	}
-
-	util.PressAnyKey()
-}
-
-func FormatQuote(quote Quote) string {
-
-	var (
-		quoteBuffer    bytes.Buffer
-		formattedQuote string
-	)
-
-	stringFormat := `` + "\n" + color.Cyan + `%d. ` + "\"" + color.Reset + `%s` + `` + color.Cyan + "\"" +
-		"\n" + strings.Repeat(" ", 50) + `By %s (%s %s)` + color.Reset + "\n" + ``
-
-	formattedQuote = fmt.Sprintf(
-		stringFormat,
-		quote.ID,
-		quote.QUOTE,
-		quote.AUTHOR,
-		quote.DATE,
-		quote.LANGUAGE)
-
-	quoteBuffer.WriteString(formattedQuote)
-
-	return quoteBuffer.String()
-}
-
-const DefaultQuoteAmount = 10
-
 func (q *Quotes) PrintRandomQuotes(amount int) {
 
 	util.ClearScreen()
 
 	if amount <= 0 {
-		amount = DefaultQuoteAmount
+		amount = 10
 	}
 
 	var DefaultQuote = Quote{
@@ -779,6 +775,14 @@ func (q *Quotes) promptEntry(suggestions Quote) (Quote, error) {
 		}
 
 		*p.target = input
+	}
+
+	if suggestions.QUOTE == "" {
+		suggestions.QUOTE = "Unknown"
+	}
+
+	if suggestions.AUTHOR == "" {
+		suggestions.AUTHOR = "Unknown"
 	}
 
 	suggestions.QUOTE = util.CapitalizeFirstLetter(suggestions.QUOTE)
