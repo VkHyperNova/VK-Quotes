@@ -4,18 +4,14 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"vk-quotes/pkg/audio"
-	"vk-quotes/pkg/config"
 	"vk-quotes/pkg/db"
 	"vk-quotes/pkg/util"
 )
 
 func CommandLine(q *db.Quotes) {
-
 	go func() {
-		err := audio.PlayMP3()
-		if err != nil {
+		if err := audio.PlayMP3(); err != nil {
 			log.Printf("MP3 Playback Error: %v", err)
 		}
 	}()
@@ -23,17 +19,12 @@ func CommandLine(q *db.Quotes) {
 	for {
 		q.PrintCLI()
 
-		var input string = ""
-		var inputID int = 0
+		input := util.ReadInput()
+		if input.Raw == "" {
+			continue
+		}
 
-		fmt.Printf("[%d]=> ", len(q.QUOTES))
-
-		fmt.Scanln(&input, &inputID)
-
-		input = strings.ToLower(input)
-
-		switch input {
-
+		switch input.Command {
 		case "add", "a":
 			if err := q.Add(); err != nil {
 				audio.PlayErrorSound()
@@ -41,21 +32,16 @@ func CommandLine(q *db.Quotes) {
 				util.PressAnyKey()
 			}
 		case "update", "u":
-			if err := q.Update(inputID); err != nil {
+			if err := q.Update(input.ID); err != nil {
 				audio.PlayErrorSound()
 				fmt.Println(err)
 				util.PressAnyKey()
 			}
 		case "delete", "d":
-			if err := q.Delete(inputID); err != nil {
+			if err := q.Delete(input.ID); err != nil {
 				audio.PlayErrorSound()
 				fmt.Println(err)
 				util.PressAnyKey()
-			}
-		case "find", "f":
-			found := q.Find()
-			if !found {
-				audio.PlayErrorSound()
 			}
 		case "import", "i":
 			if err := q.Import(); err != nil {
@@ -85,12 +71,12 @@ func CommandLine(q *db.Quotes) {
 		case "resume":
 			audio.ResumeMP3()
 		case "random", "r":
-			q.PrintRandomQuotes(inputID)
+			q.PrintRandomQuotes(input.ID)
 		case "q", "quit":
 			util.ClearScreen()
 			os.Exit(0)
 		default:
-			config.AddMessage("Enter pressed!")
+			q.Search(input.Raw)
 		}
 	}
 }

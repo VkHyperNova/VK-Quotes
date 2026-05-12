@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"unicode"
 	"vk-quotes/pkg/config"
@@ -257,23 +258,34 @@ func PromptWithSuggestion(name string, edit string) (string, error) {
 	return input, nil
 }
 
-func Contains(slice []int, value int) bool {
-	for _, v := range slice {
-		if v == value {
-			return true
+type Input struct {
+	Command string
+	ID      int
+	Raw     string
+}
+
+var scanner = bufio.NewScanner(os.Stdin)
+
+func ReadInput() Input {
+	scanner.Scan()
+	line := strings.TrimSpace(scanner.Text())
+
+	parts := strings.SplitN(line, " ", 2)
+	command := parts[0]
+
+	id := 0
+	if len(parts) > 1 {
+		if n, err := strconv.Atoi(parts[1]); err == nil {
+			id = n
 		}
 	}
-	return false
-}
 
-func Input(prompt string) string {
-
-	line := liner.NewLiner()
-	defer line.Close()
-
-	userInput, err := line.Prompt(prompt)
-	if err != nil {
-		panic(err)
+	return Input{
+		Command: command,
+		ID:      id,
+		Raw:     line,
 	}
-	return userInput
 }
+
+
+

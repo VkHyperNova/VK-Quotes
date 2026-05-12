@@ -1,7 +1,6 @@
 package db
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -17,6 +16,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"vk-quotes/pkg/audio"
 	"vk-quotes/pkg/color"
 	"vk-quotes/pkg/config"
 
@@ -42,7 +42,7 @@ type Quotes struct {
 
 func (q *Quotes) Add() error {
 
-	newQuote, err := q.promptEntry(Quote{})
+	newQuote, err := q.promptEntry(Quote{}, true)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (q *Quotes) Update(id int) error {
 		return err
 	}
 
-	updated, err := q.promptEntry((q.QUOTES)[index])
+	updated, err := q.promptEntry((q.QUOTES)[index], false)
 	if err != nil {
 		return err
 	}
@@ -102,47 +102,31 @@ func (q *Quotes) Delete(id int) error {
 }
 
 func (q *Quotes) Read() {
-
-	// Append All Quotes IDs
-	for _, quote := range q.QUOTES {
-		if !util.ArrayContainsInt(config.RandomIDs, quote.ID) {
-			config.RandomIDs = append(config.RandomIDs, quote.ID)
-		}
+	if len(q.QUOTES) == 0 {
+		fmt.Println("No quotes available.")
+		util.PressAnyKey()
+		return
 	}
 
-	for len(config.RandomIDs) != 0 {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	remaining := make([]Quote, len(q.QUOTES))
+	copy(remaining, q.QUOTES)
+	r.Shuffle(len(remaining), func(i, j int) {
+		remaining[i], remaining[j] = remaining[j], remaining[i]
+	})
 
-		config.Counter += 1
+	for i, quote := range remaining {
+		util.ClearScreen()
+		counter := i + 1
+		percentage := float64(counter) / float64(len(remaining)) * 100
+		fmt.Printf("<< Reading [%d/%d] %.0f%% >>\n\n%s\n", counter, len(remaining), percentage, FormatQuote(quote))
+		fmt.Printf("[%d]=> ", len(q.QUOTES))
 
-		source := rand.NewSource(time.Now().UnixNano())
-		r := rand.New(source)
-		randomIndex := r.Intn(len(config.RandomIDs))
-
-		config.MainQuoteID = config.RandomIDs[randomIndex]
-		config.DeleteUsedID(randomIndex)
-
-		count := config.Counter
-		size := len(q.QUOTES)
-		percentage := float64(count) / float64(size) * 100
-		config.ReadCounter = fmt.Sprintf("<< Reading [%d] %.0f%% >>", count, percentage)
-
-		q.PrintCLI()
-
-		var quit string
-		fmt.Scanln(&quit)
-
-		if quit == "q" {
+		input := util.ReadInput()
+		if input.Raw == "q" {
 			break
 		}
 	}
-
-	message := color.Yellow + "Reading Done" + color.Reset
-	config.AddMessage(message)
-
-	config.RandomIDs = config.RandomIDs[:0]
-	q.SetToDefaultQuote()
-	config.Counter = 0
-	config.ReadCounter = ""
 }
 
 func (q *Quotes) Export() error {
@@ -257,30 +241,26 @@ func (q *Quotes) PrintCLI() {
 
 	util.ClearScreen()
 
-	if config.MainQuoteID <= 0 {
-		q.SetToDefaultQuote()
-	}
+	var ProgramVersion = "1.24"
 
 	nowPlaying := "Now playing: Flute.mp3"
 
 	stringFormat := `` +
 		color.Cyan + "VK-Quotes" + color.Reset + " %s" + "\n" + // Program Name
 		color.Purple + "%s" + color.Reset + "\n" + // Now Playing
-		"%s" + // Messages
-		color.Cyan + `%s` + color.Reset + // Read Counter
 		"%s" + // Last Quote
 		color.Yellow + `%s` + color.Reset + // Commands
 		``
 
-	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES) - 1])
-
-	messages := config.FormatMessages()
+	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES)-1])
 
 	commands := "\n< add, update, delete, random, find, read, history, unmount, export, import, stats, findsimilar, quit\n"
 
-	cli := fmt.Sprintf(stringFormat, config.ProgramVersion, nowPlaying, messages, config.ReadCounter, formattedLastQuote, commands)
+	cli := fmt.Sprintf(stringFormat, ProgramVersion, nowPlaying, formattedLastQuote, commands)
 
 	fmt.Print(cli)
+
+	fmt.Printf("[%d]=> ", len(q.QUOTES))
 }
 
 func (q *Quotes) History() {
@@ -403,47 +383,32 @@ func (q *Quotes) TopLanguages() string {
 
 /* Find */
 
-func (q *Quotes) SetToDefaultQuote() {
+func (q *Quotes) Search(searchQuote string) {
+	var foundQuotes []Quote
 
-	index := len(q.QUOTES) - 1
-
-	if index > 0 {
-		config.MainQuoteID = q.QUOTES[index].ID
+	for _, quote := range q.QUOTES {
+		if strings.Contains(strings.ToLower(quote.QUOTE), strings.ToLower(searchQuote)) {
+			foundQuotes = append(foundQuotes, quote)
+		}
 	}
 
-}
-
-func (q *Quotes) Find() bool {
-	fmt.Print("Find: ")
-
-	// Read user input
-	reader := bufio.NewReader(os.Stdin)
-	searchQuote, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println("Error reading input:", err)
+	if len(foundQuotes) == 0 {
+		audio.PlayErrorSound()
+		fmt.Println("Quote not found!")
 		util.PressAnyKey()
-		return false
+		return
 	}
 
-	// Clean and process the input
-	searchQuote = strings.TrimSpace(searchQuote)
-	searchQuote = util.EnsureSentenceEnd(searchQuote)
-
-	// Search for the quote
-	foundQuote, found := q.FindQuoteByQuote(searchQuote)
-	if !found {
-		config.AddMessage(color.Red + "Quote not found." + color.Reset)
-		return false
+	for _, quote := range foundQuotes {
+		fmt.Println(FormatQuote(quote))
 	}
 
-	// Print the found quote
-	config.MainQuoteID = foundQuote.ID
-	return true
+	util.PressAnyKey()
 }
 
 func (q *Quotes) FindQuoteByQuote(searchQuote string) (Quote, bool) {
 	for _, quote := range q.QUOTES {
-		if strings.EqualFold(quote.QUOTE, searchQuote) {
+		if strings.Contains(strings.ToLower(quote.QUOTE), strings.ToLower(searchQuote)) {
 			return quote, true
 		}
 	}
@@ -460,19 +425,18 @@ func (q *Quotes) FindQuoteByID(id int) (Quote, bool) {
 }
 
 func (q *Quotes) FindDuplicates(searchQuote string, excludeID int) bool {
-
 	if searchQuote == "" || searchQuote == "Unknown" {
 		return false
 	}
-
 	for _, quote := range q.QUOTES {
-		if searchQuote == quote.QUOTE {
-			if excludeID != quote.ID {
-				return true
-			}
+		if quote.ID == excludeID {
+			continue // skip the record we're comparing against
+		}
+		if strings.EqualFold(quote.QUOTE, searchQuote) {
+			fmt.Println(quote.ID)
+			return true
 		}
 	}
-
 	return false
 }
 
@@ -581,8 +545,8 @@ func processSimilarQuotes(quotes *Quotes, similar *SimilarQuotes) {
 
 	similar.SaveToFile()
 
-	message := color.Green + "Find Similar Quotes Process Done" + color.Reset
-	config.AddMessage(message)
+	fmt.Println("Find Similar Quotes Process Done")
+	util.PressAnyKey()
 }
 
 func calculateTFIDF(sentences []string) []map[string]float64 {
@@ -747,7 +711,7 @@ func (q *Quotes) save() error {
 	return nil
 }
 
-func (q *Quotes) promptEntry(suggestions Quote) (Quote, error) {
+func (q *Quotes) promptEntry(suggestions Quote, isNew bool) (Quote, error) {
 	prompts := []struct {
 		label  string
 		target *string
@@ -756,25 +720,30 @@ func (q *Quotes) promptEntry(suggestions Quote) (Quote, error) {
 		{"Author: ", &suggestions.AUTHOR},
 	}
 
-	suggestions.ID = q.newID()
+	if isNew {
+		suggestions.ID = q.newID()
+	}
 
 	for _, p := range prompts {
-		input, err := util.PromptWithSuggestion(p.label, *p.target)
+		inputQuote, err := util.PromptWithSuggestion(p.label, *p.target)
 		if err != nil {
 			return Quote{}, err
 		}
 
-		if input == "q" {
+		if inputQuote == "q" {
 			return Quote{}, errors.New("Aborted")
 		}
 
+		inputQuote = util.CapitalizeFirstLetter(inputQuote)
+		inputQuote = util.EnsureSentenceEnd(inputQuote)
+
 		if p.label == "Quote: " {
-			if q.FindDuplicates(input, suggestions.ID) {
+			if q.FindDuplicates(inputQuote, suggestions.ID) {
 				return Quote{}, errors.New("Dublicates found")
 			}
 		}
 
-		*p.target = input
+		*p.target = inputQuote
 	}
 
 	if suggestions.QUOTE == "" {
@@ -785,8 +754,6 @@ func (q *Quotes) promptEntry(suggestions Quote) (Quote, error) {
 		suggestions.AUTHOR = "Unknown"
 	}
 
-	suggestions.QUOTE = util.CapitalizeFirstLetter(suggestions.QUOTE)
-	suggestions.QUOTE = util.EnsureSentenceEnd(suggestions.QUOTE)
 	suggestions.LANGUAGE = util.AutoDetectLanguage(suggestions.QUOTE)
 	suggestions.DATE = time.Now().Format("15:04 (02.01.2006)")
 
