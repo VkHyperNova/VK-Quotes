@@ -174,10 +174,13 @@ func UnmountDrive() error {
 /* Other */
 
 func EnsureSentenceEnd(s string) string {
-	if strings.HasSuffix(s, ".") || strings.HasSuffix(s, "!") || strings.HasSuffix(s, "?") {
-		return s
-	}
-	return s + "."
+    if s == "" {
+        return s
+    }
+    if strings.HasSuffix(s, ".") || strings.HasSuffix(s, "!") || strings.HasSuffix(s, "?") {
+        return s
+    }
+    return s + "."
 }
 
 func CapitalizeFirstLetter(s string) string {
