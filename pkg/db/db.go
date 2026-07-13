@@ -254,7 +254,7 @@ func (q *Quotes) PrintCLI() {
 
 	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES)-1])
 
-	commands := "\n< add, update, delete, random, find, read, history, unmount, export, import, stats, findsimilar, quit\n"
+	commands := "\n< add, update, delete, random, find, read, history, unmount, export, import, stats, findsimilar, quit >\n"
 
 	cli := fmt.Sprintf(stringFormat, ProgramVersion, nowPlaying, formattedLastQuote, commands)
 
