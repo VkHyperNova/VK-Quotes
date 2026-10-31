@@ -121,11 +121,6 @@ func (q *Quotes) Delete() error {
 
 	q.QUOTES = append(q.QUOTES[:index], q.QUOTES[index+1:]...)
 
-	// Reset IDs
-	for key := range q.QUOTES {
-		q.QUOTES[key].ID = key + 1
-	}
-
 	return q.Save()
 }
 
@@ -187,6 +182,7 @@ func (q *Quotes) Read() error {
 	}
 
 	for {
+		clearScreen()
 		quote := q.QUOTES[i]
 
 		fmt.Printf("\n%s#%d (%d/%d)%s\n", Gray, quote.ID, i+1, len(q.QUOTES), Reset)
@@ -240,6 +236,8 @@ func (q *Quotes) Duplicates() error {
 		threshold = t
 	}
 
+	fmt.Println(Gray + "Scanning..." + Reset)
+
 	norm := make([]string, len(q.QUOTES))
 	for i, quote := range q.QUOTES {
 		norm[i] = normalize(quote.QUOTE)
@@ -261,21 +259,54 @@ func (q *Quotes) Duplicates() error {
 
 	sort.Slice(pairs, func(x, y int) bool { return pairs[x].score > pairs[y].score })
 
-	for _, p := range pairs {
+	// Show one pair per screen.
+	for i := 0; ; {
+		p := pairs[i]
+
 		label := fmt.Sprintf("%.0f%% similar", p.score*100)
 		if p.score >= 1 {
 			label = "exact duplicate"
 		}
-		fmt.Printf("\n%s%s%s\n", Gray, label, Reset)
-		for _, quote := range []Quote{p.a, p.b} {
-			fmt.Printf("  %s#%d%s %s%s%s - %s\n",
-				Gray, quote.ID, Reset, Yellow, quote.QUOTE, Reset, quote.AUTHOR)
+
+		clearScreen()
+		fmt.Printf("%sPair %d/%d - %s%s\n", Cyan, i+1, len(pairs), label, Reset)
+		fmt.Print(FormatQuote(p.a))
+		fmt.Print(FormatQuote(p.b))
+		fmt.Printf("\n%sUse 'delete <id>' to remove one of them.%s\n\n", Gray, Reset)
+
+		answer, err := prompt("[Enter] next, [p] prev, [q] quit:", "")
+		if errors.Is(err, errCancelled) {
+			return nil // Ctrl+C / Ctrl+D is a normal way to stop
+		}
+		if err != nil {
+			return err
+		}
+
+		switch strings.ToLower(answer) {
+		case "q", "quit", "exit":
+			return nil
+		case "p", "prev":
+			if i > 0 {
+				i--
+			}
+		default: // Enter or anything else: next
+			if i < len(pairs)-1 {
+				i++
+			} else {
+				fmt.Println(Gray + "   That was the last pair." + Reset)
+				return nil
+			}
 		}
 	}
+}
 
-	fmt.Printf("\n%s%d pair(s) found. Use 'delete <id>' to remove one.%s\n",
-		Gray, len(pairs), Reset)
-	return nil
+func (q *Quotes) ResetIDs() error {
+	// Reset IDs
+	for key := range q.QUOTES {
+		q.QUOTES[key].ID = key + 1
+	}
+
+	return q.Save()
 }
 
 /* Helper Functions */

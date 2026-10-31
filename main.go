@@ -99,6 +99,8 @@ func main() {
 		case "dublicates", "dub":
 			err = q.Duplicates()
 			showReport = false
+		case "reset", "resetids":
+			err = q.ResetIDs()
 		default:
 			closePrompt()
 			fmt.Printf("%serror: unknown command: %s%s\n\n", Red, os.Args[1], Reset)

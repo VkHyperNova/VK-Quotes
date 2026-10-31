@@ -26,7 +26,7 @@ func (q *Quotes) Report() {
 
 	formattedLastQuote := FormatQuote(q.QUOTES[len(q.QUOTES)-1])
 
-	commands := "\n< add, update, delete, read, search, dublicates >\n"
+	commands := "\n< add, update, delete, read, search, dublicates, reset >\n"
 
 	cli := fmt.Sprintf(stringFormat, ProgramVersion, nowPlaying, formattedLastQuote, commands)
 
