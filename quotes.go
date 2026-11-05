@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"os"
 	"sort"
@@ -16,11 +17,12 @@ import (
 )
 
 type Quote struct {
-	ID       int    `json:"id"`
-	QUOTE    string `json:"quote"`
-	AUTHOR   string `json:"author"`
-	LANGUAGE string `json:"language"`
-	DATE     string `json:"date"`
+	ID               int    `json:"id"`
+	QUOTE            string `json:"quote"`
+	AUTHOR           string `json:"author"`
+	LANGUAGE         string `json:"language"`
+	DATE             string `json:"date"`
+	WRITTEN_ON_PAPER bool   `json:"written_on_paper"`
 }
 
 type Quotes struct {
@@ -30,6 +32,12 @@ type Quotes struct {
 /* Main */
 
 func (q *Quotes) Add() error {
+
+	go func() {
+		if err := PlayMP3(); err != nil {
+			log.Printf("MP3 Playback Error: %v", err)
+		}
+	}()
 
 	newQuote, err := q.promptEntry(Quote{}, true)
 	if err != nil {
@@ -91,7 +99,6 @@ func (q *Quotes) Update() error {
 }
 
 func (q *Quotes) Delete() error {
-
 	if len(os.Args) < 3 {
 		return fmt.Errorf("usage: delete <id>")
 	}
@@ -101,27 +108,8 @@ func (q *Quotes) Delete() error {
 		return err
 	}
 
-	index, err := q.indexOf(id)
-	if err != nil {
-		return err
-	}
-
-	quote := q.QUOTES[index]
-	fmt.Printf("\nDelete %s#%d%s %s%s%s - %s?\n",
-		Gray, quote.ID, Reset, Yellow, quote.QUOTE, Reset, quote.AUTHOR)
-
-	answer, err := prompt("(y/N):", "")
-	if err != nil {
-		return err
-	}
-	if a := strings.ToLower(answer); a != "y" && a != "yes" {
-		fmt.Println(Gray + "Not deleted." + Reset)
-		return nil
-	}
-
-	q.QUOTES = append(q.QUOTES[:index], q.QUOTES[index+1:]...)
-
-	return q.Save()
+	_, err = q.deleteByID(id)
+	return err
 }
 
 func (q *Quotes) Search() error {
@@ -168,29 +156,78 @@ func (q *Quotes) Read() error {
 		return nil
 	}
 
-	i := 0
+	onlyUnwritten := false
+	startIdx := 0
 
-	// Optional start position: read <id>
-	if len(os.Args) >= 3 {
-		id, err := parseID(os.Args[2])
-		if err != nil {
-			return err
-		}
-		if i, err = q.indexOf(id); err != nil {
-			return err
+	// Optional args: read [id] [unwritten]
+	if len(os.Args) > 2 {
+		for _, arg := range os.Args[2:] {
+			switch strings.ToLower(arg) {
+			case "u", "unwritten":
+				onlyUnwritten = true
+			default:
+				id, err := parseID(arg)
+				if err != nil {
+					return fmt.Errorf("usage: read [id] [unwritten]")
+				}
+				if startIdx, err = q.indexOf(id); err != nil {
+					return err
+				}
+			}
 		}
 	}
 
+	// view holds indexes into q.QUOTES that are currently being read.
+	buildView := func() []int {
+		var v []int
+		for idx, quote := range q.QUOTES {
+			if !onlyUnwritten || !quote.WRITTEN_ON_PAPER {
+				v = append(v, idx)
+			}
+		}
+		return v
+	}
+
+	// firstAtOrAfter returns the position in view of the first quote whose
+	// index is >= idx (or the last position if there is none).
+	firstAtOrAfter := func(view []int, idx int) int {
+		for pos, v := range view {
+			if v >= idx {
+				return pos
+			}
+		}
+		return len(view) - 1
+	}
+
+	view := buildView()
+	if len(view) == 0 {
+		fmt.Println(Gray + "All quotes are already written on paper." + Reset)
+		return nil
+	}
+	i := firstAtOrAfter(view, startIdx)
+
+	msg := "" // one-shot message, shown after the screen is redrawn
 	for {
 		clearScreen()
-		quote := q.QUOTES[i]
+		quote := q.QUOTES[view[i]]
 
-		fmt.Printf("\n%s#%d (%d/%d)%s\n", Gray, quote.ID, i+1, len(q.QUOTES), Reset)
+		mode := ""
+		if onlyUnwritten {
+			mode = " - unwritten only"
+		}
+		fmt.Printf("\n%s#%d (%d/%d%s)%s\n", Gray, quote.ID, i+1, len(view), mode, Reset)
 		fmt.Printf("%s%s%s\n", Yellow, quote.QUOTE, Reset)
-		fmt.Printf("- %s %s(%s, %s)%s\n\n",
-			quote.AUTHOR, Gray, quote.LANGUAGE, quote.DATE, Reset)
+		fmt.Printf("- %s %s(%s, %s)%s\n", quote.AUTHOR, Gray, quote.LANGUAGE, quote.DATE, Reset)
+		if quote.WRITTEN_ON_PAPER {
+			fmt.Printf("%s[written on paper]%s\n", Cyan, Reset)
+		}
+		fmt.Println()
+		if msg != "" {
+			fmt.Println(msg)
+			msg = ""
+		}
 
-		answer, err := prompt("[Enter] next, [p] prev, [r] random, [q] quit:", "")
+		answer, err := prompt("[Enter] next, [p] prev, [r] random, [w] written on paper, [f] filter, [q] quit:", "")
 		if errors.Is(err, errCancelled) {
 			return nil // Ctrl+C / Ctrl+D is a normal way to stop reading
 		}
@@ -201,16 +238,53 @@ func (q *Quotes) Read() error {
 		switch strings.ToLower(answer) {
 		case "q", "quit", "exit":
 			return nil
+
 		case "p", "prev":
 			if i > 0 {
 				i--
 			} else {
-				fmt.Println(Gray + "   This is the first quote." + Reset)
+				msg = Gray + "   This is the first quote." + Reset
 			}
+
 		case "r", "random":
-			i = rand.Intn(len(q.QUOTES))
+			i = rand.Intn(len(view))
+
+		case "w":
+			// Toggle written_on_paper and save.
+			idx := view[i]
+			q.QUOTES[idx].WRITTEN_ON_PAPER = !q.QUOTES[idx].WRITTEN_ON_PAPER
+			if err := q.Save(); err != nil {
+				return err
+			}
+
+			if onlyUnwritten {
+				// The quote just left the list, so rebuild it.
+				view = buildView()
+				if len(view) == 0 {
+					fmt.Println(Gray + "All quotes are written on paper." + Reset)
+					return nil
+				}
+				if i >= len(view) {
+					i = len(view) - 1
+				}
+				// otherwise i now points at the next unwritten quote
+			}
+
+		case "f", "filter":
+			cur := view[i]
+			onlyUnwritten = !onlyUnwritten
+
+			newView := buildView()
+			if len(newView) == 0 {
+				onlyUnwritten = false // nothing to show, stay in the full list
+				msg = Gray + "   All quotes are already written on paper." + Reset
+				continue
+			}
+			view = newView
+			i = firstAtOrAfter(view, cur)
+
 		default: // Enter or anything else: next
-			if i < len(q.QUOTES)-1 {
+			if i < len(view)-1 {
 				i++
 			} else {
 				fmt.Println(Gray + "   That was the last quote." + Reset)
@@ -260,6 +334,7 @@ func (q *Quotes) Duplicates() error {
 	sort.Slice(pairs, func(x, y int) bool { return pairs[x].score > pairs[y].score })
 
 	// Show one pair per screen.
+	msg := "" // one-shot message, shown after the screen is redrawn
 	for i := 0; ; {
 		p := pairs[i]
 
@@ -272,9 +347,14 @@ func (q *Quotes) Duplicates() error {
 		fmt.Printf("%sPair %d/%d - %s%s\n", Cyan, i+1, len(pairs), label, Reset)
 		fmt.Print(FormatQuote(p.a))
 		fmt.Print(FormatQuote(p.b))
-		fmt.Printf("\n%sUse 'delete <id>' to remove one of them.%s\n\n", Gray, Reset)
+		fmt.Printf("\n%sUse 'd <id>' to delete one of them.%s\n", Gray, Reset)
+		if msg != "" {
+			fmt.Println(msg)
+			msg = ""
+		}
+		fmt.Println()
 
-		answer, err := prompt("[Enter] next, [p] prev, [q] quit:", "")
+		answer, err := prompt("[Enter] next, [p] prev, [d <id>] delete, [q] quit:", "")
 		if errors.Is(err, errCancelled) {
 			return nil // Ctrl+C / Ctrl+D is a normal way to stop
 		}
@@ -282,13 +362,66 @@ func (q *Quotes) Duplicates() error {
 			return err
 		}
 
-		switch strings.ToLower(answer) {
+		fields := strings.Fields(strings.ToLower(answer))
+		cmd := ""
+		if len(fields) > 0 {
+			cmd = fields[0]
+		}
+
+		switch cmd {
 		case "q", "quit", "exit":
 			return nil
+
 		case "p", "prev":
 			if i > 0 {
 				i--
 			}
+
+		case "d", "delete":
+			if len(fields) < 2 {
+				msg = Yellow + "usage: d <id>" + Reset
+				continue
+			}
+			id, err := parseID(fields[1])
+			if err != nil {
+				msg = Yellow + err.Error() + Reset
+				continue
+			}
+			if id != p.a.ID && id != p.b.ID {
+				msg = Yellow + "That ID is not in this pair." + Reset
+				continue
+			}
+
+			deleted, err := q.deleteByID(id)
+			if errors.Is(err, errCancelled) {
+				return nil
+			}
+			if err != nil {
+				msg = Yellow + err.Error() + Reset
+				continue
+			}
+			if !deleted {
+				continue
+			}
+
+			// Drop every pair that contained the deleted quote.
+			kept := pairs[:0]
+			for _, pr := range pairs {
+				if pr.a.ID != id && pr.b.ID != id {
+					kept = append(kept, pr)
+				}
+			}
+			pairs = kept
+
+			if len(pairs) == 0 {
+				fmt.Println(Gray + "No more duplicates." + Reset)
+				return nil
+			}
+			if i >= len(pairs) {
+				i = len(pairs) - 1
+			}
+			// otherwise i now points at the next pair, which shifted into place
+
 		default: // Enter or anything else: next
 			if i < len(pairs)-1 {
 				i++
@@ -311,6 +444,29 @@ func (q *Quotes) ResetIDs() error {
 
 /* Helper Functions */
 
+func (q *Quotes) deleteByID(id int) (bool, error) {
+	index, err := q.indexOf(id)
+	if err != nil {
+		return false, err
+	}
+
+	quote := q.QUOTES[index]
+	fmt.Printf("\nDelete %s#%d%s %s%s%s - %s?\n",
+		Gray, quote.ID, Reset, Yellow, quote.QUOTE, Reset, quote.AUTHOR)
+
+	answer, err := prompt("(y/N):", "")
+	if err != nil {
+		return false, err
+	}
+	if a := strings.ToLower(answer); a != "y" && a != "yes" {
+		fmt.Println(Gray + "Not deleted." + Reset)
+		return false, nil
+	}
+
+	q.QUOTES = append(q.QUOTES[:index], q.QUOTES[index+1:]...)
+	return true, q.Save()
+}
+
 func (q *Quotes) promptEntry(existing Quote, isNew bool) (Quote, error) {
 	result := existing
 
@@ -332,9 +488,13 @@ func (q *Quotes) promptEntry(existing Quote, isNew bool) (Quote, error) {
 
 	defDate := existing.DATE
 	if isNew && defDate == "" {
-		defDate = time.Now().Format("2006-01-02")
+		defDate = time.Now().Format("02.01.2006")
 	}
-	if result.DATE, err = promptDate("Date (YYYY-MM-DD):", defDate); err != nil {
+	if result.DATE, err = promptDate("Date (DD.MM.YYYY):", defDate); err != nil {
+		return Quote{}, err
+	}
+
+	if result.WRITTEN_ON_PAPER, err = promptBool("Written on paper (y/n):", existing.WRITTEN_ON_PAPER); err != nil {
 		return Quote{}, err
 	}
 
@@ -363,12 +523,35 @@ func promptDate(label, suggestion string) (string, error) {
 		if v == "" {
 			return "", nil
 		}
-		if _, perr := time.Parse("2006-01-02", v); perr != nil {
-			fmt.Println(Gray + "   Invalid date, use YYYY-MM-DD." + Reset)
+		if _, perr := time.Parse("02.01.2006", v); perr != nil {
+			fmt.Println(Gray + "   Invalid date, use DD.MM.YYYY." + Reset)
 			suggestion = v // keep what they typed so they can fix it
 			continue
 		}
 		return v, nil
+	}
+}
+
+func promptBool(label string, def bool) (bool, error) {
+	suggestion := "n"
+	if def {
+		suggestion = "y"
+	}
+	for {
+		v, err := prompt(label, suggestion)
+		if err != nil {
+			return false, err
+		}
+		switch strings.ToLower(strings.TrimSpace(v)) {
+		case "":
+			return def, nil
+		case "y", "yes":
+			return true, nil
+		case "n", "no":
+			return false, nil
+		}
+		fmt.Println(Gray + "   Please answer y or n." + Reset)
+		suggestion = v // keep what they typed so they can fix it
 	}
 }
 

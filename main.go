@@ -74,12 +74,6 @@ func main() {
 		log.Fatalf("load from file: %v", err)
 	}
 
-	go func() {
-		if err := PlayMP3(); err != nil {
-			log.Printf("MP3 Playback Error: %v", err)
-		}
-	}()
-
 	var err error
 	showReport := true // redraw the main screen after the command
 
